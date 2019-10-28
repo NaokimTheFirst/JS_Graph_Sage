@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <style>
-    body{
-      background-color
-      :rgb(15, 15, 73);
+    body {
+      background-color: rgb(15, 15, 73);
     }
 
-    rect{
-      fill:rgb(15, 15, 73);
+    rect {
+      fill: rgb(15, 15, 73);
     }
+
     .node {
       stroke: #fff;
       stroke-width: 1.5px;
     }
 
-    text{
+    text {
       fill: white;
     }
 
@@ -42,7 +42,53 @@
   // D3JS_SCRIPT_HEREEEEEEEEEEE
   <!-- This is where the d3.js script will stop : -->
   <script type="text/javascript">
+    var currentObject = null;
+
+    function RemoveElement() {
+      let elemClass = currentObject.getAttribute("class");
+      switch (elemClass) {
+        case "node":
+          RemoveNode(currentObject);
+          break;
+        case "link directed":
+          currentObject.parentNode.removeChild(currentObject);
+          break;
+      }
+      currentObject = null;
+    }
+
+    //Remove a node, his name and the links bound to it
+    function RemoveNode(currentNode) {
+      //Remove the node
+      nodeID = currentNode.getAttribute("id");
+      currentNode.parentNode.removeChild(currentNode);
+      //Remove the label next to the node
+      var text = document.getElementById(nodeID + "label");
+      text.parentNode.removeChild(text);
+
+      //Remove links bound to the node
+      var rule = new RegExp("^" + nodeID + "_");
+      var rule2 = new RegExp("_" + nodeID + "$");
+      var links = document.getElementsByClassName("link directed");
+      for (let index = links.length - 1; index >= 0; index--) {
+        if (links[index].id.match(rule) || links[index].id.match(rule2)) {
+          links[index].parentNode.removeChild(links[index]);
+        }
+      }
+    }
+
     window.onload = function () {
+      //Keyboard Event
+      d3.select("body").on("keydown", function () {
+        //Suppr
+        if (d3.event.keyCode == 46) {
+          if (currentObject != null) {
+            RemoveElement(currentObject);
+          }
+        };
+      })
+
+
       var pos;
 
       // Loads the graph data
@@ -69,7 +115,6 @@
       if (graph.pos.length != 0) {
         center_and_scale(graph);
       }
-
       // SVG window
       var svg = d3.select("body").append("svg")
         .attr("width", width)
@@ -103,10 +148,16 @@
           return "link directed";
         })
         .attr("id", function (current) {
-            return current.source+"_"+current.target;
+          return current.source + "_" + current.target;
         })
         .attr("marker-end", function (d) {
           return "url(#directed)";
+        })
+        .on("mouseover", function () {
+          currentObject = this;
+        })
+        .on("mouseout", function () {
+          currentObject = null;
         })
         .style("stroke", function (d) {
           return d.color;
@@ -139,8 +190,11 @@
         .style("fill", function (d) {
           return color(d.group);
         })
-        .on("click", function (d) {
-          remove_node_and_dependences(d);
+        .on("mouseover", function () {
+          currentObject = this;
+        })
+        .on("mouseout", function () {
+          currentObject = null;
         })
         .call(force.drag()
           .on('dragstart', function () {
@@ -357,27 +411,6 @@
         });
       }
 
-    }
-
-    //Remove a node, his name and the links bound to it
-    function remove_node_and_dependences(currentNode){
-      //Remove the node
-      var element = document.getElementById(currentNode.name);
-          element.parentNode.removeChild(element);
-          //Remove the label next to the node
-          var text = document.getElementById(currentNode.name+"label");
-          text.parentNode.removeChild(text);
-
-          //Remove links bound to the node
-          var rule = new RegExp("^"+currentNode.name+"_");
-          var rule2 = new RegExp("_"+currentNode.name+"$");
-          var links = document.getElementsByClassName("link directed");
-          for (let index = links.length-1; index >= 0 ; index--) {
-            if(links[index].id.match(rule) || links[index].id.match(rule2))
-            {
-              links[index].parentNode.removeChild(links[index]);
-            }
-          }
     }
   </script>
 

@@ -313,23 +313,24 @@ def gen_html_code(G,
 
 
 
-    from sage.env import SAGE_EXTCODE, SAGE_SHARE
-    js_code_file = open("./desktop/base_html.html", 'r')
+    # from sage.env import SAGE_EXTCODE, SAGE_SHARE
+    js_code_file = open("Mes Documents/Git/JS_Graph_Sage/base_html.html", 'r')
     js_code = js_code_file.read().replace("// GRAPH_DATA_HEREEEEEEEEEEE", string)
     js_code_file.close()
 
 
     # Add d3.js script depending on whether d3js package is installed.
-    d3js_filepath = os.path.join(SAGE_SHARE, 'd3js', 'd3.min.js')
-    if os.path.exists(d3js_filepath):
-        with open(d3js_filepath, 'r') as d3js_code_file:
-            d3js_script = '<script>' + d3js_code_file.read() + '</script>'
-    else:
-        d3js_script = '<script src="http://d3js.org/d3.v3.min.js"></script>'
+    #d3js_filepath = os.path.join(SAGE_SHARE, 'd3js', 'd3.min.js')
+    #if os.path.exists(d3js_filepath):
+    #    with open(d3js_filepath, 'r') as d3js_code_file:
+    #        d3js_script = '<script>' + d3js_code_file.read() + '</script>'
+    #else:
+        
+    d3js_script = '<script src="http://d3js.org/d3.v3.min.js"></script>'
     js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
     # Writes the temporary .html file
-    filename = './desktop/result.html'
+    filename = 'Mes Documents/Git/JS_Graph_Sage/result.html'
     f = open(filename, 'w')
     f.write(js_code)
     f.close()
