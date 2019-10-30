@@ -314,7 +314,7 @@ def gen_html_code(G,
 
 
     # from sage.env import SAGE_EXTCODE, SAGE_SHARE
-    js_code_file = open("Mes Documents/Git/JS_Graph_Sage/base_html.html", 'r')
+    js_code_file = open("Mes Documents/Git/JS_Graph_Sage/src/HTML/base_html.html", 'r')
     js_code = js_code_file.read().replace("// GRAPH_DATA_HEREEEEEEEEEEE", string)
     js_code_file.close()
 
@@ -330,7 +330,7 @@ def gen_html_code(G,
     js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
     # Writes the temporary .html file
-    filename = 'Mes Documents/Git/JS_Graph_Sage/result.html'
+    filename = 'Mes Documents/Git/JS_Graph_Sage/obj/result.html'
     f = open(filename, 'w')
     f.write(js_code)
     f.close()
