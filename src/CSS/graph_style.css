@@ -1,0 +1,35 @@
+/* graph_style.css */
+body {
+    background-color: rgb(15, 15, 73);
+}
+
+rect {
+    fill: rgb(15, 15, 73);
+}
+
+.node {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+text {
+    fill: white;
+}
+
+.link {
+    fill: none;
+    stroke: #000;
+    stroke-opacity: .6;
+    opacity: .6
+}
+
+.directed {
+    fill: none;
+    stroke: #000;
+    stroke-opacity: .6;
+    opacity: .6
+}
+
+marker {
+    fill: #bbb;
+}
