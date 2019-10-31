@@ -17,10 +17,13 @@ function RemoveElement() {
 function RemoveNode(currentNode) {
     //Remove the node
     nodeID = currentNode.getAttribute("id");
-    currentNode.parentNode.removeChild(currentNode);
-    //Remove the label next to the node
-    var text = document.getElementById(nodeID + "label");
-    text.parentNode.removeChild(text);
+    //Remove the element with this ID
+    graphJSON.nodes.splice(nodeID,1);
+
+    ManageNodes();
+    ManageVertexLabel();
+
+    force.start();
 
     //Remove links bound to the node
     var rule = new RegExp("^" + nodeID + "_");

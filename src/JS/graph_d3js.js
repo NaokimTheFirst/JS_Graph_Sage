@@ -8,16 +8,45 @@ var drag_in_progress = false;
 var is_freeze = false;
 
 //DOM Elements / D3JS Elements
-var nodes, links, loops, v_labels, e_labels, l_labels,line,svg;
+var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
 
+const cursorPosition = {
+    x: 0,
+    y: 0
+};
+
+window.onload = function () {
+    document.body.onmousemove = handleMouseMove;
+
+    LoadGraphData();
+    InitGraph();
+    KeyboardEventInit();
+
+    ManageAllGraphicsElements();
+
+    InitForce();
+
+    //Start the automatic force layout
+    force.start();
+}
+
+function handleMouseMove(event) {
+    cursorPosition.x = event.pageX;
+    cursorPosition.y = event.pageY;
+}
 // Loads the graph data
 function LoadGraphData() {
     var mydiv = document.getElementById("mygraph")
     var graph_as_string = mydiv.innerHTML
     graphJSON = eval('(' + graph_as_string + ')');
 
-    width = document.documentElement.clientWidth - 32;
-    height = document.documentElement.clientHeight - 32;
+    //Put index on nodes
+    for (let index = 0; index < graphJSON.nodes.length; index++) {
+        graphJSON.nodes[index].index = index;
+    }
+
+    width = document.documentElement.clientWidth;
+    height = document.documentElement.clientHeight;
     // List of colors
     color = d3.scale.category10();
 }
@@ -48,12 +77,16 @@ function KeyboardEventInit() {
                     RemoveElement(currentObject);
                 }
                 break;
-            //F for Freeze
+                //A for Add
+            case 65:
+                AddNode();
+                break;
+                //F for Freeze
             case 70:
                 FreezeGraph();
                 break;
-            //T for Test, to remove before build
-            case 84: 
+                //T for Test, to remove before build
+            case 84:
                 console.log("Test");
                 break;
             default:
@@ -96,7 +129,7 @@ function center_and_scale() {
     var miny = graphJSON.pos[0][1];
     var maxy = graphJSON.pos[0][1];
 
-    graphJSON.nodes.forEach(function (d,i) {
+    graphJSON.nodes.forEach(function (d, i) {
         maxx = Math.max(maxx, graphJSON.pos[i][0]);
         minx = Math.min(minx, graphJSON.pos[i][0]);
         maxy = Math.max(maxy, graphJSON.pos[i][1]);
@@ -118,8 +151,7 @@ function center_and_scale() {
 }
 
 //Define all forces movements
-function InitForce()
-{
+function InitForce() {
     force.on("tick", function () {
 
         // Position of vertices
@@ -197,8 +229,15 @@ function InitForce()
     });
 }
 
-function AppendAllGraphElement()
-{
+function RecordMousePos(target) {
+    let pos = d3.mouse(target);
+    mousePosition = {
+        x: pos[0],
+        y: pos[1]
+    };
+}
+
+function ManageAllGraphicsElements() {
     // SVG window
     svg = d3.select("body").append("svg")
         .attr("width", width)
@@ -207,6 +246,7 @@ function AppendAllGraphElement()
         .append('svg:g')
         .call(d3.behavior.zoom().on("zoom", redraw_on_zoom))
         .append('svg:g');
+
 
     // Zooming
     svg.append('svg:rect')
@@ -255,22 +295,8 @@ function AppendAllGraphElement()
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
 
-    AppendNodesElement(force.nodes());
-
-    // Vertex labels
-    if (graphJSON.vertex_labels) {
-        v_labels = svg.selectAll(".v_label")
-            .data(force.nodes())
-            .enter()
-            .append("svg:text")
-            .attr("vertical-align", "middle")
-            .attr("id", function (d) {
-                return d.name + "label";
-            })
-            .text(function (d) {
-                return d.name;
-            })
-    }
+    ManageNodes();
+    ManageVertexLabel();
 
     // Edge labels
     if (graphJSON.edge_labels) {
@@ -336,48 +362,81 @@ function FreezeGraph() {
     });
 }
 
-function AppendNodesElement(nodesData)
-{
-    // Nodes
-    nodes = svg.selectAll(".node")
-    .data(nodesData)
-    .enter().append("circle")
-    .attr("class", "node")
-    .attr("r", graphJSON.vertex_size)
-    .attr("id", function (d) {
-        return d.name;
-    })
-    .style("fill", function (d) {
-        return color(d.group);
-    })
-    .on("mouseover", function () {
-        currentObject = this;
-    })
-    .on("mouseout", function () {
-        currentObject = null;
-    })
-    .call(force.drag()
-        .on('dragstart', function () {
-            drag_in_progress = true;
-        })
-        .on('dragend', function () {
-            drag_in_progress = false;
-        }))
+function ManageVertexLabel() {
+    // Vertex labels
+    if (graphJSON.vertex_labels) {
+        v_labels = svg.selectAll(".v_label")
+            .data(graphJSON.nodes)
+            
+        v_labels.enter()
+            .append("svg:text")
+            .attr("class", "v_label")
+            .attr("vertical-align", "middle")
+            .attr("id", function (d) {
+                return d.index;
+            })
+            .text(function (d) {
+                return d.name;
+            });
 
-    nodes.append("title").text(function (d) {
-    return d.name;
-    });
+        v_labels.exit().remove();
+    }
 }
 
-window.onload = function () {
+//Assure that all the current data correspond to a node
+function ManageNodes(bool) {
+    // Defines nodes elements
+    nodes = svg.selectAll(".node")
+        .data(graphJSON.nodes)
 
-    LoadGraphData();
-    InitGraph();
-    KeyboardEventInit();
+    //Define what happend a data is added
+    nodes.enter().append("circle")
+        .attr("class", "node")
+        .attr("r", graphJSON.vertex_size)
+        .attr("name", function (d) {
+            return d.name;
+        })
+        .attr("id", function (d) {
+            return d.index;
+        })
+        .style("fill", function (d) {
+            return color(d.group);
+        })
+        .on("mouseover", function () {
+            currentObject = this;
+        })
+        .on("mouseout", function () {
+            currentObject = null;
+        })
+        .call(force.drag()
+            .on('dragstart', function () {
+                drag_in_progress = true;
+            })
+            .on('dragend', function () {
+                drag_in_progress = false;
+            }));
 
-    AppendAllGraphElement();
+    //Define what happend when a data is removed
+    nodes.exit().remove();
+}
 
-    InitForce();
-    // Starts the automatic force layout
+function AddNode() {
+    //Create new node
+    var newNode = {
+        group: "0",
+        name: "no_name",
+        index: graphJSON.nodes.length,
+        x: cursorPosition.x,
+        y: cursorPosition.y
+    };
+
+    //Add it to the data
+    graphJSON.nodes.push(newNode);
+
+    //Apply nodes rules to the data
+    ManageNodes();
+    ManageVertexLabel();
+
+    //Restart the force layout with the new elements
     force.start();
 }
