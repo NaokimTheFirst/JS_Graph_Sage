@@ -5,7 +5,7 @@ var color;
 var width;
 var height;
 var drag_in_progress = false;
-var is_freeze = false;
+var is_frozen = false;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
@@ -238,13 +238,15 @@ function RecordMousePos(target) {
 }
 
 function ManageAllGraphicsElements() {
+
+    d3.select("svg").remove();
     // SVG window
     svg = d3.select("body").append("svg")
         .attr("width", width)
         .attr("height", height)
         .attr("pointer-events", "all") // Zoom+move management
         .append('svg:g')
-        .call(d3.behavior.zoom().on("zoom", redraw_on_zoom))
+        .call(d3.behavior.zoom().on("zoom", redraw_on_zoom)).on("dblclick.zoom", null)
         .append('svg:g');
 
 
@@ -265,7 +267,15 @@ function ManageAllGraphicsElements() {
             return "link directed";
         })
         .attr("id", function (current) {
-            return current.source + "_" + current.target;
+            //TODO : solve problem here with generated links
+            //if the link is generated, current.source returns an object
+            //even though there's no difference in force.links()
+            if(typeof current.source === 'number') {
+                return current.source + "_" + current.target;
+            }
+            else {
+                return current.source.name + "_" + current.target.name;
+            }
         })
         .attr("marker-end", function (d) {
             return "url(#directed)";
@@ -280,6 +290,7 @@ function ManageAllGraphicsElements() {
             return d.color;
         })
         .style("stroke-width", graphJSON.edge_thickness + "px");
+    console.log(force.links());
 
     // Loops
     loops = svg.selectAll(".loop")
@@ -355,10 +366,10 @@ function ManageAllGraphicsElements() {
 
 //Enable or disable the forces
 function FreezeGraph() {
-    is_freeze = !is_freeze;
+    is_frozen = !is_frozen;
 
     graphJSON.nodes.forEach(function (d) {
-        d.fixed = is_freeze;
+        d.fixed = is_frozen;
     });
 }
 
@@ -409,14 +420,18 @@ function ManageNodes(bool) {
             currentObject = null;
         })
         .call(force.drag()
-            .on('dragstart', function () {
+            .on('dragstart', function (d) {
                 drag_in_progress = true;
+                d.fixed = true;
             })
             .on('dragend', function () {
                 drag_in_progress = false;
-            }));
+            }))
+        .on("dblclick", function (d) {
+                d.fixed = false;
+        });
 
-    //Define what happend when a data is removed
+    //Defines what happend when a data is removed
     nodes.exit().remove();
 }
 
@@ -439,4 +454,40 @@ function AddNode() {
 
     //Restart the force layout with the new elements
     force.start();
+}
+
+function AddEdge(src, dest) {
+
+    var nodeSrc = null;
+    var nodeDest = null;
+
+    var i = 0;
+    while(i<force.nodes().length || nodeSrc===null && nodeDest===null) {
+        if (force.nodes()[i].name == src){
+            nodeSrc = force.nodes()[i];
+
+        }
+        if (force.nodes()[i].name == dest){
+            nodeDest = force.nodes()[i];
+        }
+        i++;
+    }
+
+    if(nodeSrc===null) {
+        console.log("Node "+src+" not found");
+    }
+    else if(nodeDest===null) {
+        console.log("Node "+dest+" not found");
+    }
+    else {
+        force.links().push({"strength" : 0,
+                  "target" : nodeDest,
+                  "color" : "#aaa",
+                  "curve" : 0,
+                  "source" : nodeSrc,
+                  "name" : ""});
+
+        ManageAllGraphicsElements();
+        force.start();
+    }
 }
