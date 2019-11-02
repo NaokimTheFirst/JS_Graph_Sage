@@ -3,6 +3,16 @@ body {
     background-color: rgb(15, 15, 73);
 }
 
+#commandList{
+    position: absolute;
+    color : white;
+    z-index: 10;
+    border-right:3px solid black ;
+    border-bottom:3px solid black;
+    background: rgba(184, 184, 184, 0.473);
+    padding: 1%;
+    margin : 1%;
+}
 rect {
     fill: rgb(15, 15, 73);
 }

@@ -19,6 +19,8 @@ window.onload = function () {
     document.body.onmousemove = handleMouseMove;
 
     LoadGraphData();
+    AddIndexesOnGraphElement();
+
     InitGraph();
     KeyboardEventInit();
 
@@ -36,19 +38,27 @@ function handleMouseMove(event) {
 }
 // Loads the graph data
 function LoadGraphData() {
-    var mydiv = document.getElementById("mygraph")
+    var mydiv = document.getElementById("mygraphdata")
     var graph_as_string = mydiv.innerHTML
     graphJSON = eval('(' + graph_as_string + ')');
 
-    //Put index on nodes
-    for (let index = 0; index < graphJSON.nodes.length; index++) {
-        graphJSON.nodes[index].index = index;
-    }
 
     width = document.documentElement.clientWidth;
     height = document.documentElement.clientHeight;
     // List of colors
     color = d3.scale.category10();
+}
+
+function AddIndexesOnGraphElement() {
+    //Put index on nodes
+    for (let index = 0; index < graphJSON.nodes.length; index++) {
+        graphJSON.nodes[index].index = index;
+    }
+
+    //Put index on links
+    for (let index = 0; index < graphJSON.links.length; index++) {
+        graphJSON.links[index].index = index;
+    }
 }
 
 function InitGraph() {
@@ -238,10 +248,8 @@ function RecordMousePos(target) {
 }
 
 function ManageAllGraphicsElements() {
-
-    d3.select("svg").remove();
     // SVG window
-    svg = d3.select("body").append("svg")
+    svg = d3.select("#graphFrame").append("svg")
         .attr("width", width)
         .attr("height", height)
         .attr("pointer-events", "all") // Zoom+move management
@@ -249,48 +257,12 @@ function ManageAllGraphicsElements() {
         .call(d3.behavior.zoom().on("zoom", redraw_on_zoom)).on("dblclick.zoom", null)
         .append('svg:g');
 
-
     // Zooming
     svg.append('svg:rect')
         .attr('x', -10000)
         .attr('y', -10000)
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000);
-
-
-
-    // Edges
-    links = svg.selectAll(".link")
-        .data(force.links())
-        .enter().append("path")
-        .attr("class", function (d) {
-            return "link directed";
-        })
-        .attr("id", function (current) {
-            //TODO : solve problem here with generated links
-            //if the link is generated, current.source returns an object
-            //even though there's no difference in force.links()
-            if(typeof current.source === 'number') {
-                return current.source + "_" + current.target;
-            }
-            else {
-                return current.source.name + "_" + current.target.name;
-            }
-        })
-        .attr("marker-end", function (d) {
-            return "url(#directed)";
-        })
-        .on("mouseover", function () {
-            currentObject = this;
-        })
-        .on("mouseout", function () {
-            currentObject = null;
-        })
-        .style("stroke", function (d) {
-            return d.color;
-        })
-        .style("stroke-width", graphJSON.edge_thickness + "px");
-    console.log(force.links());
 
     // Loops
     loops = svg.selectAll(".loop")
@@ -308,6 +280,7 @@ function ManageAllGraphicsElements() {
 
     ManageNodes();
     ManageVertexLabel();
+    ManageEdges();
 
     // Edge labels
     if (graphJSON.edge_labels) {
@@ -373,12 +346,49 @@ function FreezeGraph() {
     });
 }
 
+
+function ManageEdges() {
+    // Edges
+    links = svg.selectAll(".link")
+        .data(force.links())
+
+    links.enter().append("path")
+        .attr("class", function (d) {
+            return "link directed";
+        })
+        .attr("id", function (current) {
+            return current.index;
+        })
+        .attr("source", function (current) {
+            return current.source.index;
+        })
+        .attr("target", function (current) {
+            return current.target.index;
+        })
+        .attr("marker-end", function (d) {
+            return "url(#directed)";
+        })
+        .on("mouseover", function () {
+            currentObject = this;
+        })
+        .on("mouseout", function () {
+            currentObject = null;
+        })
+        .style("stroke", function (d) {
+            return d.color;
+        })
+        .style("stroke-width", graphJSON.edge_thickness + "px");
+
+    links.exit().remove();
+}
+
+
 function ManageVertexLabel() {
     // Vertex labels
     if (graphJSON.vertex_labels) {
         v_labels = svg.selectAll(".v_label")
             .data(graphJSON.nodes)
-            
+
         v_labels.enter()
             .append("svg:text")
             .attr("class", "v_label")
@@ -395,7 +405,7 @@ function ManageVertexLabel() {
 }
 
 //Assure that all the current data correspond to a node
-function ManageNodes(bool) {
+function ManageNodes() {
     // Defines nodes elements
     nodes = svg.selectAll(".node")
         .data(graphJSON.nodes)
@@ -428,7 +438,7 @@ function ManageNodes(bool) {
                 drag_in_progress = false;
             }))
         .on("dblclick", function (d) {
-                d.fixed = false;
+            d.fixed = false;
         });
 
     //Defines what happend when a data is removed
@@ -457,37 +467,26 @@ function AddNode() {
 }
 
 function AddEdge(src, dest) {
-
     var nodeSrc = null;
     var nodeDest = null;
 
-    var i = 0;
-    while(i<force.nodes().length || nodeSrc===null && nodeDest===null) {
-        if (force.nodes()[i].name == src){
-            nodeSrc = force.nodes()[i];
+    nodeSrc = graphJSON.nodes.filter(function(current){return current.name == src})[0];
+    nodeDest = graphJSON.nodes.filter(function(current){return current.name == dest})[0];
 
-        }
-        if (force.nodes()[i].name == dest){
-            nodeDest = force.nodes()[i];
-        }
-        i++;
+    if (nodeSrc === undefined) {
+        return console.log("Node " + src + " not found");
+    } else if (nodeDest === undefined) {
+        return console.log("Node " + dest + " not found");
     }
 
-    if(nodeSrc===null) {
-        console.log("Node "+src+" not found");
-    }
-    else if(nodeDest===null) {
-        console.log("Node "+dest+" not found");
-    }
-    else {
-        force.links().push({"strength" : 0,
-                  "target" : nodeDest,
-                  "color" : "#aaa",
-                  "curve" : 0,
-                  "source" : nodeSrc,
-                  "name" : ""});
+    graphJSON.links.push({"strength" : 0,
+    "target" : nodeDest,
+    "color":"#aaa" ,
+    "curve" : 0,
+    "source" : nodeSrc,
+    "name" : "",
+    "index":graphJSON.links.length});
 
-        ManageAllGraphicsElements();
-        force.start();
-    }
+    ManageEdges();
+    force.start();
 }

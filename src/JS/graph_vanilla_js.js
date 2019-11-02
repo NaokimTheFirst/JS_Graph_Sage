@@ -7,31 +7,52 @@ function RemoveElement() {
             RemoveNode(currentObject);
             break;
         case "link directed":
-            currentObject.parentNode.removeChild(currentObject);
+            RemoveEdge(currentObject);
             break;
     }
     currentObject = null;
 }
 
+function RemoveEdge(currentLink){
+    //Remove the link
+    RemoveEdgeByIndex(currentLink.getAttribute("id"));
+}
+
+function RemoveEdgeByIndex(linkIndex){
+  //Remove the element with this ID
+  graphJSON.links.splice(linkIndex,1);
+
+  //Apply change on graph
+  ManageEdges();
+  force.start();
+
+  //Reset ID on remaining Edges
+  AddIndexesOnGraphElement();
+}
+
+//Find Edges bound to a Vertex
+function GetEdgesByVertexID(nodeID){
+    return graphJSON.links.filter(
+        function(current){return current.source.index == nodeID 
+            || current.target.index == nodeID});
+}
+
 //Remove a node, his name and the links bound to it
 function RemoveNode(currentNode) {
-    //Remove the node
     nodeID = currentNode.getAttribute("id");
+
+    GetEdgesByVertexID(nodeID).forEach(element => {
+        RemoveEdgeByIndex(element.index)
+    });
+
     //Remove the element with this ID
     graphJSON.nodes.splice(nodeID,1);
+    
 
     ManageNodes();
     ManageVertexLabel();
 
     force.start();
 
-    //Remove links bound to the node
-    var rule = new RegExp("^" + nodeID + "_");
-    var rule2 = new RegExp("_" + nodeID + "$");
-    var links = document.getElementsByClassName("link directed");
-    for (let index = links.length - 1; index >= 0; index--) {
-        if (links[index].id.match(rule) || links[index].id.match(rule2)) {
-            links[index].parentNode.removeChild(links[index]);
-        }
-    }
+    AddIndexesOnGraphElement();
 }
