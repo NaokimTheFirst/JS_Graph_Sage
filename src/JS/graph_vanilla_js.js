@@ -53,6 +53,4 @@ function RemoveNode(currentNode) {
     ManageVertexLabel();
 
     force.start();
-
-    AddIndexesOnGraphElement();
 }
