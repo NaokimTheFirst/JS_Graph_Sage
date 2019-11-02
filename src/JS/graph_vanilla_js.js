@@ -27,7 +27,7 @@ function RemoveEdgeByIndex(linkIndex){
   force.start();
 
   //Reset ID on remaining Edges
-  AddIndexesOnGraphElement();
+  UpdateIndexesOnLinks();
 }
 
 //Find Edges bound to a Vertex

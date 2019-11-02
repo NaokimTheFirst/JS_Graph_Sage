@@ -55,6 +55,10 @@ function AddIndexesOnGraphElement() {
         graphJSON.nodes[index].index = index;
     }
 
+    UpdateIndexesOnLinks();
+}
+
+function UpdateIndexesOnLinks(){
     //Put index on links
     for (let index = 0; index < graphJSON.links.length; index++) {
         graphJSON.links[index].index = index;
@@ -395,10 +399,11 @@ function ManageVertexLabel() {
             .attr("vertical-align", "middle")
             .attr("id", function (d) {
                 return d.index;
-            })
-            .text(function (d) {
-                return d.name;
             });
+
+        v_labels.text(function (d) {
+            return d.name;
+        });
 
         v_labels.exit().remove();
     }
@@ -414,9 +419,6 @@ function ManageNodes() {
     nodes.enter().append("circle")
         .attr("class", "node")
         .attr("r", graphJSON.vertex_size)
-        .attr("name", function (d) {
-            return d.name;
-        })
         .attr("id", function (d) {
             return d.index;
         })
@@ -440,6 +442,10 @@ function ManageNodes() {
         .on("dblclick", function (d) {
             d.fixed = false;
         });
+
+    nodes.attr("name", function (d) {
+        return d.name;
+    })
 
     //Defines what happend when a data is removed
     nodes.exit().remove();
