@@ -27,15 +27,6 @@ text {
 }
 
 .link {
-    fill: none;
-    stroke: #000;
-    stroke-opacity: .6;
-    opacity: .6
-}
-
-.directed {
-    fill: none;
-    stroke: #000;
     stroke-opacity: .6;
     opacity: .6
 }

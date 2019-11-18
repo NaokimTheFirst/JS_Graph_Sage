@@ -9,6 +9,8 @@ var is_frozen = false;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
+var currentSelection = [];
+var currentObject = null;
 
 const cursorPosition = {
     x: 0,
@@ -58,7 +60,7 @@ function AddIndexesOnGraphElement() {
     UpdateIndexesOnLinks();
 }
 
-function UpdateIndexesOnLinks(){
+function UpdateIndexesOnLinks() {
     //Put index on links
     for (let index = 0; index < graphJSON.links.length; index++) {
         graphJSON.links[index].index = index;
@@ -85,22 +87,30 @@ function KeyboardEventInit() {
     //Keyboard Event
     d3.select("body").on("keydown", function () {
         switch (d3.event.keyCode) {
-            //Suppr
             case 46:
+                //Suppr
                 if (currentObject != null) {
-                    RemoveElement(currentObject);
+                    RemoveElementFromGraph(currentObject);
                 }
                 break;
-                //A for Add
             case 65:
+                //A for Add
                 AddNode();
                 break;
-                //F for Freeze
+            case 69:
+                //E for Edges
+                AddEdgesOnSelection();
+                break;
             case 70:
+                //F for Freeze
                 FreezeGraph();
                 break;
-                //T for Test, to remove before build
+            case 82:
+                //R to reset selection
+                ResetSelection();
+                break;
             case 84:
+                //T for Test, to remove before build
                 console.log("Test");
                 break;
             default:
@@ -109,6 +119,61 @@ function KeyboardEventInit() {
                 break;
         }
     })
+}
+
+function UpdateSelection(newElement){
+    idx = currentSelection.indexOf(newElement);
+
+    if(idx == -1){
+        AddElementToSelection(newElement);
+    }
+    else 
+    {
+        RemoveElementFromSelection(idx)
+    }
+}
+
+function AddElementToSelection(newElement)
+{
+    switch (newElement.tagName) {
+        case "circle":
+            graphJSON.nodes[newElement.id].selectionGroup="0";
+            ManageNodes();
+            break;
+        case "path":
+            graphJSON.links[newElement.id].selectionGroup="0";
+            ManageEdges();
+            break;
+        default:
+            break;
+    }
+
+    currentSelection.push(newElement);
+}
+
+
+function RemoveElementFromSelection(elementPos){
+    element = currentSelection[elementPos];
+    switch (element.tagName) {
+        case "circle":
+            graphJSON.nodes[element.id].selectionGroup=null;
+            ManageNodes();
+            break;
+        case "path":
+            graphJSON.links[element.id].selectionGroup=null;
+            ManageEdges();
+            break;
+        default:
+            break;
+    }
+
+    currentSelection.splice(elementPos,1);
+}
+
+function ResetSelection(){
+    for (let index = currentSelection.length - 1; index >= 0; index--) {
+        RemoveElementFromSelection(index);
+    }
 }
 
 function redraw_on_zoom() {
@@ -243,14 +308,6 @@ function InitForce() {
     });
 }
 
-function RecordMousePos(target) {
-    let pos = d3.mouse(target);
-    mousePosition = {
-        x: pos[0],
-        y: pos[1]
-    };
-}
-
 function ManageAllGraphicsElements() {
     // SVG window
     svg = d3.select("#graphFrame").append("svg")
@@ -357,9 +414,7 @@ function ManageEdges() {
         .data(force.links())
 
     links.enter().append("path")
-        .attr("class", function (d) {
-            return "link directed";
-        })
+        .attr("class","link directed")
         .attr("id", function (current) {
             return current.index;
         })
@@ -369,19 +424,21 @@ function ManageEdges() {
         .attr("target", function (current) {
             return current.target.index;
         })
-        .attr("marker-end", function (d) {
-            return "url(#directed)";
-        })
+        .attr("marker-end","url(#directed)")
         .on("mouseover", function () {
             currentObject = this;
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .style("stroke", function (d) {
-            return d.color;
-        })
-        .style("stroke-width", graphJSON.edge_thickness + "px");
+        .style("stroke-width", graphJSON.edge_thickness + "px")
+        .on("dblclick", function () {
+            UpdateSelection(this);
+        });
+
+    links.style("stroke", function (d) {
+        return(d.selectionGroup != null)? "red" : d.color; 
+    });
 
     links.exit().remove();
 }
@@ -422,9 +479,6 @@ function ManageNodes() {
         .attr("id", function (d) {
             return d.index;
         })
-        .style("fill", function (d) {
-            return color(d.group);
-        })
         .on("mouseover", function () {
             currentObject = this;
         })
@@ -434,18 +488,20 @@ function ManageNodes() {
         .call(force.drag()
             .on('dragstart', function (d) {
                 drag_in_progress = true;
-                d.fixed = true;
             })
             .on('dragend', function () {
                 drag_in_progress = false;
             }))
-        .on("dblclick", function (d) {
-            d.fixed = false;
+        .on("dblclick", function () {
+            UpdateSelection(this);
         });
 
     nodes.attr("name", function (d) {
         return d.name;
     })
+    .style("fill", function (d) {
+        return(d.selectionGroup != null)? "red" : color(d.group); 
+    });
 
     //Defines what happend when a data is removed
     nodes.exit().remove();
@@ -472,12 +528,32 @@ function AddNode() {
     force.start();
 }
 
+
+//Add edges between all selected nodes
+function AddEdgesOnSelection(){
+    selectedNodes = currentSelection.filter(function(current){
+        return current.tagName == "circle";
+    });
+
+    let j;
+    for (let i = 0; i < selectedNodes.length; i++) {
+        j = i+1;
+        for (; j < selectedNodes.length; j++) {
+            AddEdge(selectedNodes[i].id, selectedNodes[j].id);
+        }
+    }
+}
+
 function AddEdge(src, dest) {
     var nodeSrc = null;
     var nodeDest = null;
 
-    nodeSrc = graphJSON.nodes.filter(function(current){return current.name == src})[0];
-    nodeDest = graphJSON.nodes.filter(function(current){return current.name == dest})[0];
+    nodeSrc = graphJSON.nodes.filter(function (current) {
+        return current.name == src
+    })[0];
+    nodeDest = graphJSON.nodes.filter(function (current) {
+        return current.name == dest
+    })[0];
 
     if (nodeSrc === undefined) {
         return console.log("Node " + src + " not found");
@@ -485,14 +561,72 @@ function AddEdge(src, dest) {
         return console.log("Node " + dest + " not found");
     }
 
-    graphJSON.links.push({"strength" : 0,
-    "target" : nodeDest,
-    "color":"#aaa" ,
-    "curve" : 0,
-    "source" : nodeSrc,
-    "name" : "",
-    "index":graphJSON.links.length});
+    graphJSON.links.push({
+        "strength": 0,
+        "target": nodeDest,
+        "color": "#aaa",
+        "curve": 0,
+        "source": nodeSrc,
+        "name": "",
+        "index": graphJSON.links.length
+    });
 
     ManageEdges();
+    force.start();
+}
+
+
+function RemoveElementFromGraph() {
+    let elemClass = currentObject.getAttribute("class");
+    switch (elemClass) {
+        case "node":
+            RemoveNode(currentObject);
+            break;
+        case "link directed":
+            RemoveEdge(currentObject);
+            break;
+    }
+    currentObject = null;
+}
+
+function RemoveEdge(currentLink){
+    //Remove the link
+    RemoveEdgeByIndex(currentLink.getAttribute("id"));
+}
+
+function RemoveEdgeByIndex(linkIndex){
+  //Remove the element with this ID
+  graphJSON.links.splice(linkIndex,1);
+
+  //Apply change on graph
+  ManageEdges();
+  force.start();
+
+  //Reset ID on remaining Edges
+  UpdateIndexesOnLinks();
+}
+
+//Find Edges bound to a Vertex
+function GetEdgesByVertexID(nodeID){
+    return graphJSON.links.filter(
+        function(current){return current.source.index == nodeID 
+            || current.target.index == nodeID});
+}
+
+//Remove a node, his name and the links bound to it
+function RemoveNode(currentNode) {
+    nodeID = currentNode.getAttribute("id");
+
+    GetEdgesByVertexID(nodeID).forEach(element => {
+        RemoveEdgeByIndex(element.index)
+    });
+
+    //Remove the element with his ID
+    graphJSON.nodes.splice(nodeID,1);
+    
+
+    ManageNodes();
+    ManageVertexLabel();
+
     force.start();
 }
