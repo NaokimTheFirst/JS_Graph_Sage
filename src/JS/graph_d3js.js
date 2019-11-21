@@ -49,6 +49,9 @@ function LoadGraphData() {
 }
 
 function InitGraph() {
+    graphJSON.loops.forEach(element => {
+        element.source = graphJSON.nodes[element.source];
+        element.target = graphJSON.nodes[element.source];
     });
 
     force = d3.layout.force()
