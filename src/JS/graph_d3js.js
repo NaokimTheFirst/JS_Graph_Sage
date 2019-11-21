@@ -9,7 +9,6 @@ var is_frozen = false;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
-var currentSelection = [];
 var currentObject = null;
 
 const cursorPosition = {
@@ -21,8 +20,6 @@ window.onload = function () {
     document.body.onmousemove = handleMouseMove;
 
     LoadGraphData();
-    AddIndexesOnGraphElement();
-
     InitGraph();
     KeyboardEventInit();
 
@@ -49,22 +46,6 @@ function LoadGraphData() {
     height = document.documentElement.clientHeight;
     // List of colors
     color = d3.scale.category10();
-}
-
-function AddIndexesOnGraphElement() {
-    //Put index on nodes
-    for (let index = 0; index < graphJSON.nodes.length; index++) {
-        graphJSON.nodes[index].index = index;
-    }
-
-    UpdateIndexesOnLinks();
-}
-
-function UpdateIndexesOnLinks() {
-    //Put index on links
-    for (let index = 0; index < graphJSON.links.length; index++) {
-        graphJSON.links[index].index = index;
-    }
 }
 
 function InitGraph() {
@@ -121,59 +102,14 @@ function KeyboardEventInit() {
     })
 }
 
-function UpdateSelection(newElement){
-    idx = currentSelection.indexOf(newElement);
-
-    if(idx == -1){
-        AddElementToSelection(newElement);
-    }
-    else 
-    {
-        RemoveElementFromSelection(idx)
-    }
-}
-
-function AddElementToSelection(newElement)
-{
-    switch (newElement.tagName) {
-        case "circle":
-            graphJSON.nodes[newElement.id].selectionGroup="0";
-            ManageNodes();
-            break;
-        case "path":
-            graphJSON.links[newElement.id].selectionGroup="0";
-            ManageEdges();
-            break;
-        default:
-            break;
-    }
-
-    currentSelection.push(newElement);
-}
-
-
-function RemoveElementFromSelection(elementPos){
-    element = currentSelection[elementPos];
-    switch (element.tagName) {
-        case "circle":
-            graphJSON.nodes[element.id].selectionGroup=null;
-            ManageNodes();
-            break;
-        case "path":
-            graphJSON.links[element.id].selectionGroup=null;
-            ManageEdges();
-            break;
-        default:
-            break;
-    }
-
-    currentSelection.splice(elementPos,1);
-}
-
 function ResetSelection(){
-    for (let index = currentSelection.length - 1; index >= 0; index--) {
-        RemoveElementFromSelection(index);
+    currentSelection = GetCurrentSelection();
+    
+    for (let index = 0; index < currentSelection.length; index++) {
+        currentSelection[index].selectionGroup = null;
     }
+
+    RefreshNodes();
 }
 
 function redraw_on_zoom() {
@@ -408,6 +344,16 @@ function FreezeGraph() {
 }
 
 
+class Element {
+    constructor(data, type) {
+        this.data = data;
+        this.type = type;
+    }
+}
+
+
+const EdgeType = "link directed";
+
 function ManageEdges() {
     // Edges
     links = svg.selectAll(".link")
@@ -415,26 +361,14 @@ function ManageEdges() {
 
     links.enter().append("path")
         .attr("class","link directed")
-        .attr("id", function (current) {
-            return current.index;
-        })
-        .attr("source", function (current) {
-            return current.source.index;
-        })
-        .attr("target", function (current) {
-            return current.target.index;
-        })
         .attr("marker-end","url(#directed)")
-        .on("mouseover", function () {
-            currentObject = this;
+        .on("mouseover", function (currentData) {
+            currentObject = new Element(currentData,EdgeType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .style("stroke-width", graphJSON.edge_thickness + "px")
-        .on("dblclick", function () {
-            UpdateSelection(this);
-        });
+        .style("stroke-width", graphJSON.edge_thickness + "px");
 
     links.style("stroke", function (d) {
         return(d.selectionGroup != null)? "red" : d.color; 
@@ -454,10 +388,6 @@ function ManageVertexLabel() {
             .append("svg:text")
             .attr("class", "v_label")
             .attr("vertical-align", "middle")
-            .attr("id", function (d) {
-                return d.index;
-            });
-
         v_labels.text(function (d) {
             return d.name;
         });
@@ -465,6 +395,8 @@ function ManageVertexLabel() {
         v_labels.exit().remove();
     }
 }
+
+const NodeType = "Node"
 
 //Assure that all the current data correspond to a node
 function ManageNodes() {
@@ -476,11 +408,8 @@ function ManageNodes() {
     nodes.enter().append("circle")
         .attr("class", "node")
         .attr("r", graphJSON.vertex_size)
-        .attr("id", function (d) {
-            return d.index;
-        })
-        .on("mouseover", function () {
-            currentObject = this;
+        .on("mouseover", function (currentData) {
+            currentObject = new Element(currentData,NodeType)
         })
         .on("mouseout", function () {
             currentObject = null;
@@ -492,27 +421,39 @@ function ManageNodes() {
             .on('dragend', function () {
                 drag_in_progress = false;
             }))
-        .on("dblclick", function () {
-            UpdateSelection(this);
+        .on("dblclick", function (d) {
+            d.selectionGroup = (d.selectionGroup == null)? -1: null;
+            RefreshNodes();
         });
+        
+        RefreshNodes();
+   
 
+    //Defines what happend when a data is removed
+    nodes.exit().remove();
+}
+
+function RefreshNodes(){
     nodes.attr("name", function (d) {
         return d.name;
     })
     .style("fill", function (d) {
         return(d.selectionGroup != null)? "red" : color(d.group); 
     });
-
-    //Defines what happend when a data is removed
-    nodes.exit().remove();
 }
+
+function GetCurrentSelection(){
+    return graphJSON.nodes.filter(function (currentNode) {
+        return currentNode.selectionGroup == -1;
+    })
+}
+
 
 function AddNode() {
     //Create new node
     var newNode = {
         group: "0",
         name: "no_name",
-        index: graphJSON.nodes.length,
         x: cursorPosition.x,
         y: cursorPosition.y
     };
@@ -531,44 +472,25 @@ function AddNode() {
 
 //Add edges between all selected nodes
 function AddEdgesOnSelection(){
-    selectedNodes = currentSelection.filter(function(current){
-        return current.tagName == "circle";
-    });
+    selectedNodes = GetCurrentSelection();
 
     let j;
     for (let i = 0; i < selectedNodes.length; i++) {
         j = i+1;
         for (; j < selectedNodes.length; j++) {
-            AddEdge(selectedNodes[i].id, selectedNodes[j].id);
+            AddEdge(selectedNodes[i], selectedNodes[j]);
         }
     }
 }
 
 function AddEdge(src, dest) {
-    var nodeSrc = null;
-    var nodeDest = null;
-
-    nodeSrc = graphJSON.nodes.filter(function (current) {
-        return current.name == src
-    })[0];
-    nodeDest = graphJSON.nodes.filter(function (current) {
-        return current.name == dest
-    })[0];
-
-    if (nodeSrc === undefined) {
-        return console.log("Node " + src + " not found");
-    } else if (nodeDest === undefined) {
-        return console.log("Node " + dest + " not found");
-    }
-
     graphJSON.links.push({
         "strength": 0,
-        "target": nodeDest,
+        "target": dest,
         "color": "#aaa",
         "curve": 0,
-        "source": nodeSrc,
+        "source": src,
         "name": "",
-        "index": graphJSON.links.length
     });
 
     ManageEdges();
@@ -577,53 +499,37 @@ function AddEdge(src, dest) {
 
 
 function RemoveElementFromGraph() {
-    let elemClass = currentObject.getAttribute("class");
-    switch (elemClass) {
-        case "node":
-            RemoveNode(currentObject);
+    switch (currentObject.type) {
+        case NodeType:
+            RemoveNode(currentObject.data);
             break;
-        case "link directed":
-            RemoveEdge(currentObject);
+        case EdgeType:
+            RemoveEdge(currentObject.data);
             break;
     }
     currentObject = null;
 }
 
-function RemoveEdge(currentLink){
-    //Remove the link
-    RemoveEdgeByIndex(currentLink.getAttribute("id"));
-}
-
-function RemoveEdgeByIndex(linkIndex){
-  //Remove the element with this ID
-  graphJSON.links.splice(linkIndex,1);
-
-  //Apply change on graph
-  ManageEdges();
-  force.start();
-
-  //Reset ID on remaining Edges
-  UpdateIndexesOnLinks();
+function RemoveEdge(edgeData){
+    graphJSON.links.splice(graphJSON.links.indexOf(edgeData),1);
+    ManageEdges();
+    force.start();
 }
 
 //Find Edges bound to a Vertex
-function GetEdgesByVertexID(nodeID){
+function GetEdgesByVertex(currentNode){
     return graphJSON.links.filter(
-        function(current){return current.source.index == nodeID 
-            || current.target.index == nodeID});
+        function(current){return current.source == currentNode 
+            || current.target == currentNode});
 }
 
 //Remove a node, his name and the links bound to it
-function RemoveNode(currentNode) {
-    nodeID = currentNode.getAttribute("id");
+function RemoveNode(nodeData) {
+    graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData),1);
 
-    GetEdgesByVertexID(nodeID).forEach(element => {
-        RemoveEdgeByIndex(element.index)
+    GetEdgesByVertex(nodeData).forEach(element => {
+        RemoveEdge(element)
     });
-
-    //Remove the element with his ID
-    graphJSON.nodes.splice(nodeID,1);
-    
 
     ManageNodes();
     ManageVertexLabel();
