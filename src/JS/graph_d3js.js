@@ -49,6 +49,8 @@ function LoadGraphData() {
 }
 
 function InitGraph() {
+    });
+
     force = d3.layout.force()
         .charge(graphJSON.charge)
         .linkDistance(graphJSON.link_distance)
@@ -86,6 +88,10 @@ function KeyboardEventInit() {
                 //F for Freeze
                 FreezeGraph();
                 break;
+            case 76:
+                //L for Loops
+                AddLoopOnSelection();
+                break;
             case 82:
                 //R to reset selection
                 ResetSelection();
@@ -102,9 +108,9 @@ function KeyboardEventInit() {
     })
 }
 
-function ResetSelection(){
+function ResetSelection() {
     currentSelection = GetCurrentSelection();
-    
+
     for (let index = 0; index < currentSelection.length; index++) {
         currentSelection[index].selectionGroup = null;
     }
@@ -207,10 +213,10 @@ function InitForce() {
         if (graphJSON.loops.length != 0) {
             loops
                 .attr("cx", function (d) {
-                    return force.nodes()[d.source].x;
+                    return d.source.x;
                 })
                 .attr("cy", function (d) {
-                    return force.nodes()[d.source].y - d.curve;
+                    return d.source.y - d.curve;
                 })
         }
 
@@ -261,20 +267,8 @@ function ManageAllGraphicsElements() {
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000);
 
-    // Loops
-    loops = svg.selectAll(".loop")
-        .data(graphJSON.loops)
-        .enter().append("circle")
-        .attr("class", "link")
-        .attr("r", function (d) {
-            return d.curve;
-        })
-        .style("stroke", function (d) {
-            return d.color;
-        })
-        .style("stroke-width", graphJSON.edge_thickness + "px");
 
-
+    ManageLoops();
     ManageNodes();
     ManageVertexLabel();
     ManageEdges();
@@ -352,18 +346,44 @@ class Element {
 }
 
 
+const LoopType = "loop";
+
+function ManageLoops() {
+    // Loops
+    loops = svg.selectAll(".loop")
+        .data(graphJSON.loops);
+
+    loops.enter().append("circle")
+        .attr("class", "loop")
+        .attr("r", function (d) {
+            return d.curve;
+        })
+        .on("mouseover", function (currentData) {
+            currentObject = new Element(currentData, LoopType)
+        })
+        .on("mouseout", function () {
+            currentObject = null;
+        })
+        .style("stroke", function (d) {
+            return d.color;
+        })
+        .style("stroke-width", graphJSON.edge_thickness + "px");
+
+    loops.exit().remove();
+};
+
 const EdgeType = "link directed";
 
 function ManageEdges() {
     // Edges
     links = svg.selectAll(".link")
-        .data(force.links())
+        .data(force.links());
 
     links.enter().append("path")
-        .attr("class","link directed")
-        .attr("marker-end","url(#directed)")
+        .attr("class", "link directed")
+        .attr("marker-end", "url(#directed)")
         .on("mouseover", function (currentData) {
-            currentObject = new Element(currentData,EdgeType)
+            currentObject = new Element(currentData, EdgeType)
         })
         .on("mouseout", function () {
             currentObject = null;
@@ -371,7 +391,7 @@ function ManageEdges() {
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
     links.style("stroke", function (d) {
-        return(d.selectionGroup != null)? "red" : d.color; 
+        return (d.selectionGroup != null) ? "red" : d.color;
     });
 
     links.exit().remove();
@@ -409,7 +429,7 @@ function ManageNodes() {
         .attr("class", "node")
         .attr("r", graphJSON.vertex_size)
         .on("mouseover", function (currentData) {
-            currentObject = new Element(currentData,NodeType)
+            currentObject = new Element(currentData, NodeType)
         })
         .on("mouseout", function () {
             currentObject = null;
@@ -422,27 +442,27 @@ function ManageNodes() {
                 drag_in_progress = false;
             }))
         .on("dblclick", function (d) {
-            d.selectionGroup = (d.selectionGroup == null)? -1: null;
+            d.selectionGroup = (d.selectionGroup == null) ? -1 : null;
             RefreshNodes();
         });
-        
-        RefreshNodes();
-   
+
+    RefreshNodes();
+
 
     //Defines what happend when a data is removed
     nodes.exit().remove();
 }
 
-function RefreshNodes(){
+function RefreshNodes() {
     nodes.attr("name", function (d) {
-        return d.name;
-    })
-    .style("fill", function (d) {
-        return(d.selectionGroup != null)? "red" : color(d.group); 
-    });
+            return d.name;
+        })
+        .style("fill", function (d) {
+            return (d.selectionGroup != null) ? "red" : color(d.group);
+        });
 }
 
-function GetCurrentSelection(){
+function GetCurrentSelection() {
     return graphJSON.nodes.filter(function (currentNode) {
         return currentNode.selectionGroup == -1;
     })
@@ -471,17 +491,27 @@ function AddNode() {
 
 
 //Add edges between all selected nodes
-function AddEdgesOnSelection(){
+function AddLoopOnSelection() {
+    selectedNodes = GetCurrentSelection();
+    
+    for (let i = 0; i < selectedNodes.length; i++) {
+        AddLoop(selectedNodes[i]);
+    }
+}
+
+//Add edges between all selected nodes
+function AddEdgesOnSelection() {
     selectedNodes = GetCurrentSelection();
 
     let j;
     for (let i = 0; i < selectedNodes.length; i++) {
-        j = i+1;
+        j = i + 1;
         for (; j < selectedNodes.length; j++) {
             AddEdge(selectedNodes[i], selectedNodes[j]);
         }
     }
 }
+
 
 function AddEdge(src, dest) {
     graphJSON.links.push({
@@ -498,6 +528,21 @@ function AddEdge(src, dest) {
 }
 
 
+
+function AddLoop(src) {
+    graphJSON.loops.push({
+        "strength": 0,
+        "target": src,
+        "color": "#aaa",
+        "curve": 20,
+        "source": src,
+        "name": "",
+    });
+
+    ManageLoops();
+    force.start();
+}
+
 function RemoveElementFromGraph() {
     switch (currentObject.type) {
         case NodeType:
@@ -506,30 +551,57 @@ function RemoveElementFromGraph() {
         case EdgeType:
             RemoveEdge(currentObject.data);
             break;
+        case LoopType:
+            RemoveLoop(currentObject.data);
+            break;
     }
     currentObject = null;
 }
 
-function RemoveEdge(edgeData){
-    graphJSON.links.splice(graphJSON.links.indexOf(edgeData),1);
+function RemoveEdge(edgeData) {
+    graphJSON.links.splice(graphJSON.links.indexOf(edgeData), 1);
     ManageEdges();
     force.start();
 }
 
+
+function RemoveLoop(loopData) {
+    graphJSON.loops.splice(graphJSON.loops.indexOf(loopData), 1);
+    ManageLoops();
+    force.start();
+}
+
+
 //Find Edges bound to a Vertex
-function GetEdgesByVertex(currentNode){
+function GetEdgesByVertex(currentNode) {
     return graphJSON.links.filter(
-        function(current){return current.source == currentNode 
-            || current.target == currentNode});
+        function (current) {
+            return current.source == currentNode ||
+                current.target == currentNode
+        });
+}
+
+//Find Loops bound to a Vertex
+function GetLoopsByVertex(currentNode) {
+    return graphJSON.loops.filter(
+        function (current) {
+            return current.source == currentNode;
+        });
 }
 
 //Remove a node, his name and the links bound to it
 function RemoveNode(nodeData) {
-    graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData),1);
+    graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData), 1);
+
 
     GetEdgesByVertex(nodeData).forEach(element => {
         RemoveEdge(element)
     });
+    
+    GetLoopsByVertex(nodeData).forEach(element => {
+        RemoveLoop(element)
+    });
+    
 
     ManageNodes();
     ManageVertexLabel();

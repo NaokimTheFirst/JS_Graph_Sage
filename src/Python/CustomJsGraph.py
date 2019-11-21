@@ -92,10 +92,10 @@ def gen_html_code(G,
                   edge_partition=[],
                   force_spring_layout=False,
                   charge=-120,
-                  link_distance=30,
+                  link_distance=100,
                   link_strength=2,
                   gravity=.04,
-                  vertex_size=7,
+                  vertex_size=12,
                   edge_thickness=4):
     r"""
     Creates a .html file showing the graph using `d3.js <http://d3js.org/>`_.

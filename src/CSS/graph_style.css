@@ -27,8 +27,13 @@ text {
 }
 
 .link {
-    stroke-opacity: .6;
-    opacity: .6
+    opacity: .6;
+    fill:rgba(255, 255, 255, 0);
+}
+
+.loop{
+    opacity: .6;
+    fill:rgba(255, 255, 255, 0);
 }
 
 marker {
