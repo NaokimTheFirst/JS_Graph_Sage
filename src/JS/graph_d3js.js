@@ -9,6 +9,7 @@ var is_frozen = false;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
+var IDCounter = 0;
 var currentObject = null;
 
 const cursorPosition = {
@@ -29,6 +30,9 @@ window.onload = function () {
 
     //Start the automatic force layout
     force.start();
+
+    //Freeze the graph after 2 sec
+    WaitGraphLoadToFreeze(1000);
 }
 
 function handleMouseMove(event) {
@@ -49,6 +53,13 @@ function LoadGraphData() {
 }
 
 function InitGraph() {
+    //Find the highest  ID in the graph
+    graphJSON.nodes.forEach(element => {
+        if(element.name > IDCounter){
+            IDCounter = element.name;
+        }
+    });
+
     graphJSON.loops.forEach(element => {
         element.source = graphJSON.nodes[element.source];
         element.target = graphJSON.nodes[element.source];
@@ -82,6 +93,7 @@ function KeyboardEventInit() {
             case 65:
                 //A for Add
                 AddNode();
+                StoreInMemento();
                 break;
             case 69:
                 //E for Edges
@@ -102,6 +114,7 @@ function KeyboardEventInit() {
             case 84:
                 //T for Test, to remove before build
                 console.log("Test");
+                DownloadJSON();
                 break;
             default:
                 //Affiche le code de la touche pressée
@@ -121,10 +134,14 @@ function ResetSelection() {
     RefreshNodes();
 }
 
+var currentScale = 1;
+
 function redraw_on_zoom() {
     if (!drag_in_progress) {
+        currentScale = d3.event.scale ;
+
         svg.attr("transform",
-            "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
+            "translate(" + d3.event.translate + ") scale(" + currentScale + ")");
     }
 }
 
@@ -473,12 +490,17 @@ function GetCurrentSelection() {
 
 
 function AddNode() {
+    var newX = cursorPosition.x ;
+    var newY = cursorPosition.y ;
+
+    IDCounter ++
     //Create new node
     var newNode = {
         group: "0",
-        name: "no_name",
-        x: cursorPosition.x,
-        y: cursorPosition.y
+        name: IDCounter,
+        x: newX,
+        y: newY,
+        fixed:is_frozen
     };
 
     //Add it to the data
@@ -491,6 +513,7 @@ function AddNode() {
     //Restart the force layout with the new elements
     force.start();
 }
+
 
 
 //Add edges between all selected nodes
@@ -611,3 +634,69 @@ function RemoveNode(nodeData) {
 
     force.start();
 }
+
+function WaitGraphLoadToFreeze(waitingTime) {
+    setTimeout(function () {
+        FreezeGraph();
+    }, waitingTime);
+}
+
+
+//////////////////
+
+
+////////////////
+
+
+const savedGraphJSON = [];
+
+class Memento{
+    constructor(grapgJSONsave){
+        var cloneGraph = JSON.parse(JSON.stringify(grapgJSONsave));
+        this.savedGraph = cloneGraph;
+    }
+}
+
+function StoreInMemento() {
+    savedGraphJSON.push(new Memento(graphJSON));
+}
+
+function RestoreFromMemento(memento) {
+    graphJSON = memento.savedGraph;
+    ManageNodes();
+    ManageEdges();
+    ManageVertexLabel();
+    
+    force.start();
+}
+
+function PrettyfyJSON(){
+    var prettyJSON = JSON.parse(JSON.stringify(graphJSON));
+    prettyJSON.links.forEach(element => {
+        element.source = element.source.index;
+        element.target = element.target.index;
+    });
+
+    //Return the Y to correspond with Sage Plan
+    prettyJSON.nodes.forEach(element => {
+        element.y = -element.y;
+    });
+
+    return prettyJSON;
+}
+
+//Save the JSON to a txt
+function DownloadJSON() {
+    var prettyJSON = PrettyfyJSON();
+
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(prettyJSON)));
+    element.setAttribute('download', 'Graph_JSON');
+  
+    element.style.display = 'none';
+    document.body.appendChild(element);
+  
+    element.click();
+  
+    document.body.removeChild(element);
+  }

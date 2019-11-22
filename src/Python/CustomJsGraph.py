@@ -336,3 +336,45 @@ def gen_html_code(G,
     f.close()
 
     return filename
+
+import re
+
+
+def GetBackJSON():
+  filename = 'Mes Documents/Git/JS_Graph_Sage/obj/Graph_JSON.txt'
+
+  f = open(filename, 'r')
+  if f.mode == 'r':
+    lines = f.readlines()
+
+  return lines[0]
+
+class DataGraph(object):
+  def __init__(self, data):
+    self.__dict__ = json.loads(data)
+
+import json
+from sage.graphs import graph
+
+def ConstructGraphFromJSON():
+  string = GetBackJSON()
+  JSONObject = DataGraph(string)
+
+  posdict={}
+
+  G = graphs.EmptyGraph()
+
+  #Add nodes
+  for n in JSONObject.nodes:
+    G.add_vertex(int(n.get("name")))
+
+  for i in range(len(JSONObject.nodes)):
+    node = JSONObject.nodes[i]
+    posdict[i] = (node.get("x"),node.get("y"))
+
+  G.set_pos(posdict)
+
+  for l in JSONObject.links:
+    G.add_edge(l.get("source"),l.get("target"))
+ 
+  return G
