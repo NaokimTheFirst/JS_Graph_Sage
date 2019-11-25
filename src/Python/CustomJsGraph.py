@@ -349,6 +349,7 @@ def GetBackJSON():
 
   return lines[0]
 
+
 class DataGraph(object):
   def __init__(self, data):
     self.__dict__ = json.loads(data)
@@ -366,15 +367,17 @@ def ConstructGraphFromJSON():
 
   #Add nodes
   for n in JSONObject.nodes:
-    G.add_vertex(int(n.get("name")))
+    G.add_vertex(n.get("name"))
 
   for i in range(len(JSONObject.nodes)):
     node = JSONObject.nodes[i]
-    posdict[i] = (node.get("x"),node.get("y"))
+    posdict[node.get("name")] = (node.get("x"),node.get("y"))
 
+  print(posdict)
   G.set_pos(posdict)
 
   for l in JSONObject.links:
     G.add_edge(l.get("source"),l.get("target"))
- 
+
+  
   return G

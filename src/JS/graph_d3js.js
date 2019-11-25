@@ -497,7 +497,7 @@ function AddNode() {
     //Create new node
     var newNode = {
         group: "0",
-        name: IDCounter,
+        name: IDCounter.toString(),
         x: newX,
         y: newY,
         fixed:is_frozen
@@ -673,8 +673,8 @@ function RestoreFromMemento(memento) {
 function PrettyfyJSON(){
     var prettyJSON = JSON.parse(JSON.stringify(graphJSON));
     prettyJSON.links.forEach(element => {
-        element.source = element.source.index;
-        element.target = element.target.index;
+        element.source = element.source.name;
+        element.target = element.target.name;
     });
 
     //Return the Y to correspond with Sage Plan
