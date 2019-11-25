@@ -113,7 +113,7 @@ function KeyboardEventInit() {
                 //R to reset selection
                 ResetSelection();
                 break;
-            case 82:
+            case 83:
                 //S to save
                 DownloadJSON();
                 break;
