@@ -33,6 +33,10 @@ var SelectNodeCommand = function(value){
     return new Command(SelectNode, SelectNode, value);
 };
 
+var MoveNodeCommand = function(value){
+    return new Command(SetNewPosition, SetOldPosition, value);
+};
+
 var Manager = function () {
     var commandsStack = [];
     var revertedCommandStack = [];

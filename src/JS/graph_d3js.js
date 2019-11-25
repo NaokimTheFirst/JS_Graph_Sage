@@ -18,6 +18,23 @@ const cursorPosition = {
     y: 0
 };
 
+class PositionRegisterer {
+    constructor(oldPos, newPos, node)  {
+        this.oldPos = oldPos;
+        this.newPos = newPos;
+        this.node = node;
+    }
+}
+
+
+class Element {
+    constructor(data, type) {
+        this.data = data;
+        this.type = type;
+    }
+}
+
+
 window.onload = function () {
     document.body.onmousemove = handleMouseMove;
 
@@ -372,13 +389,6 @@ function FreezeGraph() {
 }
 
 
-class Element {
-    constructor(data, type) {
-        this.data = data;
-        this.type = type;
-    }
-}
-
 
 const LoopType = "loop";
 
@@ -471,9 +481,14 @@ function ManageNodes() {
         .call(force.drag()
             .on('dragstart', function (d) {
                 drag_in_progress = true;
+                d.originPos= [d.x,d.y];
             })
-            .on('dragend', function () {
+            .on('dragend', function (d) {
                 drag_in_progress = false;
+                d.finalPos=[d.x,d.y];
+
+                var positions = new PositionRegisterer(d.originPos,d.finalPos,d);
+                MyManager.execute(new MoveNodeCommand(positions));
             }))
         .on("dblclick", function (d) {
             MyManager.execute(new SelectNodeCommand(d));
@@ -486,6 +501,29 @@ function ManageNodes() {
     nodes.exit().remove();
 }
 
+
+
+
+function SetNewPosition(registeredPos) {
+    var currrentNode = graphJSON.nodes.filter(function name(current) {
+        return current.name == registeredPos.node.name;
+    })[0];
+    force.stop();
+    currrentNode.px = registeredPos.newPos[0];
+    currrentNode.py = registeredPos.newPos[1];
+    force.start();
+}
+
+function SetOldPosition(registeredPos) {
+    var currrentNode = graphJSON.nodes.filter(function name(current) {
+        return current.name == registeredPos.node.name;
+    })[0];
+    
+    force.stop();
+    currrentNode.px = registeredPos.oldPos[0];
+    currrentNode.py = registeredPos.oldPos[1];
+    force.start();
+}
 
 function RefreshNodes() {
     nodes.attr("name", function (d) {
@@ -677,7 +715,7 @@ function RemoveNode(nodeData) {
     });
     
     GetLoopsByVertex(nodeData).forEach(element => {
-        RemoveLoop(element)
+        MyManager.execute(new SupprLoopCommand(element));
     });
     
 
@@ -692,38 +730,6 @@ function WaitGraphLoadToFreeze(waitingTime) {
         FreezeGraph();
     }, waitingTime);
 }
-
-
-//////////////////
-///USELESS
-////////////////
-
-
-const savedGraphJSON = [];
-
-class Memento{
-    constructor(grapgJSONsave){
-        var cloneGraph = JSON.parse(JSON.stringify(grapgJSONsave));
-        this.savedGraph = cloneGraph;
-    }
-}
-
-function StoreInMemento() {
-    savedGraphJSON.push(new Memento(graphJSON));
-}
-
-function RestoreFromMemento(memento) {
-    graphJSON = memento.savedGraph;
-    ManageNodes();
-    ManageEdges();
-    ManageVertexLabel();
-    
-    force.start();
-}
-
-//////////////////
-///USELESS
-////////////////
 
 function PrettyfyJSON(){
     var prettyJSON = JSON.parse(JSON.stringify(graphJSON));
