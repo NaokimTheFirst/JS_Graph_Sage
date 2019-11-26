@@ -11,10 +11,20 @@ body {
     border-bottom:3px solid black;
     background: rgba(184, 184, 184, 0.473);
     padding: 1%;
-    margin : 1%;
+    margin : none;
 }
 rect {
     fill: rgb(15, 15, 73);
+}
+
+#commandList th:nth-child(1) {
+    text-align: left;
+}
+#commandList th:nth-child(2) {
+    text-align: right;
+}
+#commandList td:nth-child(2) {
+    text-align: right;
 }
 
 .node {

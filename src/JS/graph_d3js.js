@@ -46,6 +46,15 @@ class GraphSelection {
     }
 }
 
+//Hide or show key helper
+function ShowKeys(button){
+    let commandList = document.getElementById("commandTable");
+    let show = (commandList.style.display == "none");
+    
+    commandList.style.display = (show)? "":"none";
+    button.value =(show)?"Hide Key Helper": "Show Key Helper";
+}
+
 window.onload = function () {
     document.body.onmousemove = handleMouseMove;
 
@@ -136,6 +145,15 @@ function KeyboardEventInit() {
             case 76:
                 //L for Loops
                 AddLoopOnNode();
+                break;
+            case 81:
+                //Q to select
+                if(currentObject != null){
+                    MyManager.execute(new SelectElementCommand(currentObject));
+                }
+                else {
+                    console.warn("Nothing to select");
+                }
                 break;
             case 82:
                 //R to reset selection
@@ -430,10 +448,7 @@ function ManageLoops() {
         .style("stroke", function (d) {
             return d.color;
         })
-        .style("stroke-width", graphJSON.edge_thickness + "px")
-        .on("dblclick", function (currentData) {
-            MyManager.execute(new SelectElementCommand(new Element(currentData,LoopType)));
-        });
+        .style("stroke-width", graphJSON.edge_thickness + "px");
 
     RefreshLoops();
 
@@ -461,10 +476,7 @@ function ManageEdges() {
         .on("mouseout", function () {
             currentObject = null;
         })
-        .style("stroke-width", graphJSON.edge_thickness + "px")
-        .on("dblclick", function (d) {
-            MyManager.execute(new SelectElementCommand(new Element(d,EdgeType)));
-        });
+        .style("stroke-width", graphJSON.edge_thickness + "px");
 
     RefreshEdge();
 
@@ -523,10 +535,7 @@ function ManageNodes() {
 
                 var positions = new PositionRegisterer(d.originPos,d.finalPos,d);
                 MyManager.execute(new MoveNodeCommand(positions));
-            }))
-        .on("dblclick", function (currentData) {
-            MyManager.execute(new SelectElementCommand(new Element(currentData, NodeType)));
-        });
+            }));
 
     RefreshNodes();
 
@@ -567,9 +576,10 @@ function RefreshNodes() {
     });
 }
 
-function SelectElement(elementData){
-    elementData.data.selectionGroup = (elementData.data.selectionGroup == null) ? -1 : null;
-    switch (elementData.type) {
+
+function SelectElement(element){
+    element.data.selectionGroup = (element.data.selectionGroup == null) ? -1 : null;
+    switch (element.type) {
         case NodeType:
             RefreshNodes();
             break;
@@ -667,7 +677,7 @@ function AddLoopOnNode() {
 function AddLoopOnSelection() {
     selectedNodes = GetCurrentSelection().nodes;
 
-    if(selectedNode.length > 0){
+    if(selectedNodes.length > 0){
         for (let i = 0; i < selectedNodes.length; i++) {
             var newLoop = CreateLoop(selectedNodes[i].data);
             MyManager.execute(new AddLoopCommand(newLoop));
@@ -682,7 +692,7 @@ function AddLoopOnSelection() {
 function AddEdgesOnSelection() {
     selectedNodes = GetCurrentSelection().nodes;
 
-    if(selectedNode.length > 0){
+    if(selectedNodes.length > 0){
         let j;
         for (let i = 0; i < selectedNodes.length; i++) {
             j = i + 1;
@@ -693,7 +703,7 @@ function AddEdgesOnSelection() {
         }
     }
     else {
-        console.warn("No nodes to add edges at on the selection");
+        console.warn("No nodes to add loop at on the selection");
     }
 }
 
