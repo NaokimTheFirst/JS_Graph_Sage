@@ -314,7 +314,7 @@ def gen_html_code(G,
 
 
     # from sage.env import SAGE_EXTCODE, SAGE_SHARE
-    js_code_file = open("Mes Documents/Git/JS_Graph_Sage/src/HTML/base_html.html", 'r')
+    js_code_file = open(path_To_Project_Repo+"/JS_Graph_Sage/src/HTML/base_html.html", 'r')
     js_code = js_code_file.read().replace("// GRAPH_DATA_HEREEEEEEEEEEE", string)
     js_code_file.close()
 
@@ -330,7 +330,7 @@ def gen_html_code(G,
     js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
     # Writes the temporary .html file
-    filename = 'Mes Documents/Git/JS_Graph_Sage/obj/result.html'
+    filename = path_To_Project_Repo+'/JS_Graph_Sage/obj/result.html'
     f = open(filename, 'w')
     f.write(js_code)
     f.close()
@@ -341,7 +341,7 @@ import re
 
 
 def GetBackJSON():
-  filename = 'Mes Documents/Git/JS_Graph_Sage/obj/Graph_JSON.txt'
+  filename = path_To_JSON_Repo+'/Graph_JSON.txt'
 
   f = open(filename, 'r')
   if f.mode == 'r':
@@ -357,7 +357,9 @@ class DataGraph(object):
 import json
 from sage.graphs import graph
 
+
 def ConstructGraphFromJSON():
+  print pathToRepo
   string = GetBackJSON()
   JSONObject = DataGraph(string)
 
@@ -369,13 +371,13 @@ def ConstructGraphFromJSON():
   for n in JSONObject.nodes:
     G.add_vertex(n.get("name"))
 
-  for i in range(len(JSONObject.nodes)):
-    node = JSONObject.nodes[i]
-    posdict[node.get("name")] = (node.get("x"),node.get("y"))
+  #Fill the dictionary of node coordinates
+  for n in JSONObject.nodes:
+    posdict[n.get("name")] = (n.get("x"),n.get("y"))
 
-  print(posdict)
   G.set_pos(posdict)
 
+  #Add edges
   for l in JSONObject.links:
     G.add_edge(l.get("source"),l.get("target"))
 
