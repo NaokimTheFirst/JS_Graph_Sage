@@ -29,8 +29,8 @@ var SupprLoopCommand = function (value) {
     return new Command(RemoveLoop, AddLoop, value);
 };
 
-var SelectNodeCommand = function(value){
-    return new Command(SelectNode, SelectNode, value);
+var SelectElementCommand = function(value){
+    return new Command(SelectElement, SelectElement, value);
 };
 
 var MoveNodeCommand = function(value){
