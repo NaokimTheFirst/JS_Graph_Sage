@@ -359,7 +359,6 @@ from sage.graphs import graph
 
 
 def ConstructGraphFromJSON():
-  print pathToRepo
   string = GetBackJSON()
   JSONObject = DataGraph(string)
 
@@ -379,6 +378,12 @@ def ConstructGraphFromJSON():
 
   #Add edges
   for l in JSONObject.links:
+    G.add_edge(l.get("source"),l.get("target"))
+
+  #Add loops
+  if len(JSONObject.loops)>0:
+    G.allow_loops(true)
+  for l in JSONObject.loops:
     G.add_edge(l.get("source"),l.get("target"))
 
   

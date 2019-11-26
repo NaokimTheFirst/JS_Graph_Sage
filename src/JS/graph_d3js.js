@@ -737,6 +737,10 @@ function PrettyfyJSON(){
         element.source = element.source.name;
         element.target = element.target.name;
     });
+    prettyJSON.loops.forEach(element => {
+        element.source = element.source.name;
+        element.target = element.target.name;
+    });
 
     //Return the Y to correspond with Sage Plan
     prettyJSON.nodes.forEach(element => {
