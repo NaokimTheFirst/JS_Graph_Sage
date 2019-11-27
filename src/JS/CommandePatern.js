@@ -4,29 +4,20 @@ var Command = function (execute, undo, value) {
     this.value = value;
 }
 
+var SupprElementCommand = function (value) {
+    return new Command(RemoveElementFromGraph, AddElementToGraph, value);
+};
+
 var AddNodeCommand = function (value) {
     return new Command(AddNode, RemoveNode, value);
-};
-
-var SupprNodeCommand = function (value) {
-    return new Command(RemoveNode, AddNode, value);
-};
-
-var SupprEdgeCommand = function (value) {
-    return new Command(RemoveEdge, AddEdge, value);
 };
 
 var AddEdgeCommand = function (value) {
     return new Command(AddEdge, RemoveEdge, value);
 };
 
-
 var AddLoopCommand = function (value) {
     return new Command(AddLoop, RemoveLoop, value);
-};
-
-var SupprLoopCommand = function (value) {
-    return new Command(RemoveLoop, AddLoop, value);
 };
 
 var SelectElementCommand = function(value){

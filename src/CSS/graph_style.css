@@ -3,6 +3,10 @@ body {
     background-color: rgb(15, 15, 73);
 }
 
+rect {
+    fill: rgb(15, 15, 73);
+}
+
 #commandList{
     position: absolute;
     color : white;
@@ -13,9 +17,6 @@ body {
     padding: 1%;
     margin : none;
 }
-rect {
-    fill: rgb(15, 15, 73);
-}
 
 #commandList th:nth-child(1) {
     text-align: left;
@@ -25,6 +26,10 @@ rect {
 }
 #commandList td:nth-child(2) {
     text-align: right;
+}
+
+#commandTable{
+    display:none;
 }
 
 .node {
