@@ -69,12 +69,19 @@ function handleMouseMove(event) {
     cursorPosition.x = event.pageX;
     cursorPosition.y = event.pageY;
 }
-// Loads the graph data
-function LoadGraphData() {
+
+//
+function GetGraphFromHTML() {
     var mydiv = document.getElementById("mygraphdata")
     var graph_as_string = mydiv.innerHTML
-    graphJSON = eval('(' + graph_as_string + ')');
+    let graph = eval('(' + graph_as_string + ')');
 
+    return graph;
+}
+
+// Loads the graph data
+function LoadGraphData() {
+    graphJSON = GetGraphFromHTML();
 
     width = document.documentElement.clientWidth;
     height = document.documentElement.clientHeight;

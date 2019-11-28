@@ -4,7 +4,7 @@ function prettyDate2() {
     return date.toLocaleTimeString(navigator.language, {
       hour: '2-digit',
       minute:'2-digit'
-    });
+    })+" ";
 }
 
 function CustomWarn(string){
@@ -75,7 +75,7 @@ function KeyboardEventInit() {
                 break;
             case 84:
                 //T for Test, to remove before build
-                console.log("Test");
+                LaunchAllTest();
                 break;
             case 89:
                 //Y to redo
