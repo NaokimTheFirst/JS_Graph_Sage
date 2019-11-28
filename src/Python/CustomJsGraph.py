@@ -337,7 +337,14 @@ def gen_html_code(G,
 
     return filename
 
+
+
+
 import re
+import webbrowser
+
+def show_CustomJS(G):
+  webbrowser.open('file://'+os.path.realpath(gen_html_code(G)))
 
 
 def GetBackJSON():
