@@ -120,12 +120,14 @@ function InitGraph() {
 function ResetSelection() {
     currentSelection = GetCurrentSelection();
 
+    let isFirst = true;
     if (currentSelection != null) {
         //For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
-                MyManager.execute(new SelectElementCommand(new Element(element.data, element.type)));
+                MyManager.execute(new SelectElementCommand(new Element(element.data, element.type),isFirst));
+                isFirst = false;
             });
         });
 
@@ -557,9 +559,18 @@ function AddNode(newNode) {
     force.start();
 }
 
-function CreateNode() {
+function CreateNode(pos = null) {
     var newX = cursorPosition.x;
     var newY = cursorPosition.y;
+    if(pos != null){
+        newX = pos[0];
+        newY = pos[1];
+    }
+    else 
+    {
+        newX = cursorPosition.x;
+        newY = cursorPosition.y;
+    }
 
     IDCounter++
     var newNode = {
@@ -585,33 +596,41 @@ function AddLoopOnNode() {
 
 //Add loop on all selected nodes
 function AddLoopOnSelection() {
-    selectedNodes = GetCurrentSelection().nodes;
-
-    if (selectedNodes.length > 0) {
-        for (let i = 0; i < selectedNodes.length; i++) {
-            var newLoop = CreateLoop(selectedNodes[i].data);
-            MyManager.execute(new AddLoopCommand(newLoop));
+    if(GetCurrentSelection())
+    {
+        selection = GetCurrentSelection().nodes;
+    
+        if (selectedNodes.length > 0) {
+            for (let i = 0; i < selectedNodes.length; i++) {
+                var newLoop = CreateLoop(selectedNodes[i].data);
+                MyManager.execute(new AddLoopCommand(newLoop));
+            }
+        } else {
+            CustomWarn("No nodes to add loop at on the selection");
         }
-    } else {
-        CustomWarn("No nodes to add loop at on the selection");
     }
 }
 
 //Add edges between all selected nodes
 function AddEdgesOnSelection() {
-    selectedNodes = GetCurrentSelection().nodes;
-
-    if (selectedNodes.length > 0) {
-        let j;
-        for (let i = 0; i < selectedNodes.length; i++) {
-            j = i + 1;
-            for (; j < selectedNodes.length; j++) {
-                var newLink = CreateEdge(selectedNodes[i].data, selectedNodes[j].data);
-                MyManager.execute(new AddEdgeCommand(newLink));
+    if(GetCurrentSelection())
+    {
+        selectedNodes = GetCurrentSelection().nodes;
+    
+        let isFirst = true;
+        if (selectedNodes.length > 0) {
+            let j;
+            for (let i = 0; i < selectedNodes.length; i++) {
+                j = i + 1;
+                for (; j < selectedNodes.length; j++) {
+                    var newLink = CreateEdge(selectedNodes[i].data, selectedNodes[j].data);
+                    MyManager.execute(new AddEdgeCommand(newLink,isFirst));
+                    isFirst = false;
+                }
             }
+        } else {
+            CustomWarn("No nodes to add loop at on the selection");
         }
-    } else {
-        CustomWarn("No nodes to add loop at on the selection");
     }
 }
 
@@ -653,43 +672,41 @@ function CreateLoop(src) {
     return loop;
 }
 
-function AddElementToGraph(element) {
+function RemoveElementFromGraph(element, _isFirst = true) {
     switch (element.type) {
         case NodeType:
-            AddNode(element.data);
-            break;
-        case EdgeType:
-            AddEdge(element.data);
-            break;
-        case LoopType:
-            AddLoop(element.data);
-            break;
-    }
-}
+            let isFirst = _isFirst;
+            GetEdgesByVertex(element.data).forEach(edge => {
+                MyManager.execute(new SupprEdgeCommand(edge,isFirst));
+                isFirst = false;
+            });
+            
+            GetLoopsByVertex(element.data).forEach(loop => {
+                MyManager.execute(new SupprLoopCommand(loop,false));
+            });
 
-function RemoveElementFromGraph(element) {
-    switch (element.type) {
-        case NodeType:
-            RemoveNode(element.data);
+            MyManager.execute(new SupprNodeCommand(element.data,false));
             break;
         case EdgeType:
-            RemoveEdge(element.data);
+            MyManager.execute(new SupprEdgeCommand(element.data,_isFirst));
             break;
         case LoopType:
-            RemoveLoop(element.data);
+            MyManager.execute(new SupprLoopCommand(element.data,_isFirst));
             break;
     }
 }
 
 function RemoveSelection() {
     let currentSelection = GetCurrentSelection();
-
+    let isFirst = true;
+    
     if (currentSelection != null) {
         //For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
-                MyManager.execute(new SupprElementCommand(element));
+                RemoveElementFromGraph(element,isFirst)
+                isFirst = false;
             });
         });
 
@@ -739,21 +756,37 @@ function GetLoopsByVertex(currentNode) {
 //Remove a node, his name and the links bound to it
 function RemoveNode(nodeData) {
     graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData), 1);
-
-
-    GetEdgesByVertex(nodeData).forEach(element => {
-        MyManager.execute(new SupprElementCommand(new Element(element, EdgeType)));
-    });
-
-    GetLoopsByVertex(nodeData).forEach(element => {
-        MyManager.execute(new SupprElementCommand(new Element(element, LoopType)));
-    });
-
-
-    ManageNodes();
+    ManageNodes(); 
     ManageVertexLabel();
-
     force.start();
+}
+
+function SubdivideEdge(edge, isFirst = true)
+{
+    let pos = third_point_of_curved_edge(edge.source,edge.target,0);
+    let newNode = CreateNode(pos);
+
+    MyManager.execute(new AddNodeCommand(newNode, isFirst));
+    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode,edge.source),false));
+    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode,edge.target),false));
+    MyManager.execute(new SupprEdgeCommand(edge,false));
+}
+
+function SubdivideEdgeOnSelection(){
+    if(GetCurrentSelection())
+    {
+        edges = GetCurrentSelection().edges;
+        if(edges.length > 0){
+            let isFirst = true;
+            edges.forEach(edge => {
+                SubdivideEdge(edge.data,isFirst);
+                isFirst = false;
+            });
+        }
+        else {
+            CustomWarn("No edges to subdivide");
+        }
+    }
 }
 
 function WaitGraphLoadToFreeze(waitingTime) {

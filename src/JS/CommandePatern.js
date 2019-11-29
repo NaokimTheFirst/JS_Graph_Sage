@@ -1,35 +1,44 @@
-var Command = function (execute, undo, value) {
+var Command = function (execute, undo, value, firstAction) {
     this.execute = execute;
     this.undo = undo;
     this.value = value;
+    this.firstAction = firstAction;
 }
 
-var SupprElementCommand = function (value) {
-    return new Command(RemoveElementFromGraph, AddElementToGraph, value);
+var SupprNodeCommand = function (value, firstAction = true)  {
+    return new Command(RemoveNode, AddNode, value, firstAction);
 };
 
-var AddNodeCommand = function (value) {
-    return new Command(AddNode, RemoveNode, value);
+var SupprEdgeCommand = function (value, firstAction = true)  {
+    return new Command(RemoveEdge, AddEdge, value, firstAction);
 };
 
-var AddEdgeCommand = function (value) {
-    return new Command(AddEdge, RemoveEdge, value);
+var SupprLoopCommand = function (value, firstAction = true)  {
+    return new Command(RemoveLoop, AddLoop, value, firstAction);
 };
 
-var AddLoopCommand = function (value) {
-    return new Command(AddLoop, RemoveLoop, value);
+var AddNodeCommand = function (value, firstAction = true)  {
+    return new Command(AddNode, RemoveNode, value, firstAction);
 };
 
-var SelectElementCommand = function(value){
-    return new Command(SelectElement, SelectElement, value);
+var AddEdgeCommand = function (value, firstAction = true)  {
+    return new Command(AddEdge, RemoveEdge, value, firstAction);
 };
 
-var MoveNodeCommand = function(value){
-    return new Command(SetNewPosition, SetOldPosition, value);
+var AddLoopCommand = function (value, firstAction = true)  {
+    return new Command(AddLoop, RemoveLoop, value, firstAction);
 };
 
+var SelectElementCommand = function(value, firstAction = true)  {
+    return new Command(SelectElement, SelectElement, value, firstAction);
+};
+
+var MoveNodeCommand = function(value, firstAction = true)  {
+    return new Command(SetNewPosition, SetOldPosition, value, firstAction);
+};
+
+var commandsStack = [];
 var Manager = function () {
-    var commandsStack = [];
     var revertedCommandStack = [];
 
     function action(command) {
@@ -46,10 +55,19 @@ var Manager = function () {
 
         undo: function () {
             if (commandsStack.length > 0) {
+                while(commandsStack.length > 0 && commandsStack[commandsStack.length - 1].firstAction == false){
+                    var command = commandsStack.pop();
+                    current = command.undo(command.value);
+                    log.add("Undo " + action(command) + ": " + command.value);
+                    revertedCommandStack.push(command);
+                }
+
+                //Redo the first action of the user
                 var command = commandsStack.pop();
                 current = command.undo(command.value);
                 log.add("Undo " + action(command) + ": " + command.value);
                 revertedCommandStack.push(command);
+
             } else {
                 console.warn("Nothing to revert");
             }
@@ -62,8 +80,12 @@ var Manager = function () {
 
         redo: function () {
             if (revertedCommandStack.length > 0) {
-                var command = revertedCommandStack.pop();
-                this.do(command);
+                do
+                {
+                    var command = revertedCommandStack.pop();
+                    this.do(command);
+                } 
+                while(revertedCommandStack.length > 0 && revertedCommandStack[revertedCommandStack.length - 1].firstAction == false)
             } else {
                 console.warn("Nothing to redo");
             }

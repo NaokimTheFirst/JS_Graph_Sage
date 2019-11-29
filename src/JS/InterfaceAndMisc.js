@@ -33,7 +33,7 @@ function KeyboardEventInit() {
                 else 
                 {
                     if (currentObject != null) {
-                        MyManager.execute(new SupprElementCommand(currentObject));
+                        RemoveElementFromGraph(currentObject);
                         currentObject = null;
                     } else {
                         CustomWarn("Nothing to delete");
@@ -44,6 +44,15 @@ function KeyboardEventInit() {
                 //A for Add
                 var newNode = CreateNode();
                 MyManager.execute(new AddNodeCommand(newNode));
+                break;
+            case 68:
+                //D for SubDivide
+                if (currentObject != null && currentObject.type == EdgeType) {
+                    SubdivideEdge(currentObject.data);
+                    currentObject = null;
+                } else {
+                    CustomWarn("Nothing to subidivide");
+                }
                 break;
             case 69:
                 //E for Edges
@@ -77,6 +86,12 @@ function KeyboardEventInit() {
                 //T for Test, to remove before build
                 LaunchAllTest();
                 break;
+            case 86:
+                //V for Divide nodes on selection
+                SubdivideEdgeOnSelection();
+                break;
+            case 87:
+                //W for log
             case 89:
                 //Y to redo
                 MyManager.redo();
