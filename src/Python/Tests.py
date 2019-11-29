@@ -1,7 +1,7 @@
 def _Test_ConstuctGraphFromJson():
-	g=ConstructGraphFromJSON()
+	g=ConstructGraphFromJSON(nameJSON='Graph_JSON_test')
 
-	string = GetBackJSON()
+	string = GetBackJSON(nameJSON='Graph_JSON_test')
   	JSONObject = DataGraph(string)
 
   	passedtests=0
@@ -138,3 +138,5 @@ def __Compare_Graphs_Edges(g1, g2, test=1) :
 		print(output)
 	elif test==0 :
 		return outval
+
+

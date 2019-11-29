@@ -314,7 +314,11 @@ def gen_html_code(G,
 
 
     # from sage.env import SAGE_EXTCODE, SAGE_SHARE
-    js_code_file = open(path_To_Project_Repo+"/JS_Graph_Sage/src/HTML/base_html.html", 'r')
+    try :
+      js_code_file = open(path_To_Project_Repo+"/JS_Graph_Sage/src/HTML/base_html.html", 'r')
+    except :
+      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
+      sys.exit(1)
     js_code = js_code_file.read().replace("// GRAPH_DATA_HEREEEEEEEEEEE", string)
     js_code_file.close()
 
@@ -330,7 +334,11 @@ def gen_html_code(G,
     js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
     # Writes the temporary .html file
-    filename = path_To_Project_Repo+'/JS_Graph_Sage/obj/result.html'
+    try :
+      filename = path_To_Project_Repo+'/JS_Graph_Sage/obj/result.html'
+    except :
+      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
+      sys.exit(1)
     f = open(filename, 'w')
     f.write(js_code)
     f.close()
@@ -347,10 +355,19 @@ def show_CustomJS(G):
   webbrowser.open('file://'+os.path.realpath(gen_html_code(G)))
 
 
-def GetBackJSON():
-  filename = path_To_JSON_Repo+'/Graph_JSON.txt'
+def GetBackJSON(pathRepo=path_To_JSON_Repo,
+                nameJSON=JSON_name):
 
-  f = open(filename, 'r')
+  filename = pathRepo+nameJSON
+  
+  try :
+    f = open(filename, 'r')
+  except :
+    print ('File '+pathRepo+nameJSON+' does not exist')
+    print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
+    print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
+    sys.exit(1)
+
   if f.mode == 'r':
     lines = f.readlines()
 
@@ -365,8 +382,9 @@ import json
 from sage.graphs import graph
 
 
-def ConstructGraphFromJSON():
-  string = GetBackJSON()
+def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
+                           nameJSON=JSON_name):
+  string = GetBackJSON(nameJSON=nameJSON)
   JSONObject = DataGraph(string)
 
   posdict={}
@@ -395,3 +413,4 @@ def ConstructGraphFromJSON():
 
   
   return G
+
