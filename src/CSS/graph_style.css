@@ -7,15 +7,22 @@ rect {
     fill: rgb(15, 15, 73);
 }
 
-#commandList{
+#Overlay{
     position: absolute;
-    color : white;
+    background: none;
     z-index: 10;
-    border-right:3px solid black ;
-    border-bottom:3px solid black;
-    background: rgba(184, 184, 184, 0.473);
-    padding: 1%;
     margin : none;
+}
+
+#commandList, #groupPanel{
+    color : white;
+    background: rgba(184, 184, 184, 0.473);
+    padding: 5%;
+    width : fit-content;
+}
+
+#groupPanel{
+    margin-top: 5%;
 }
 
 #commandList th:nth-child(1) {
@@ -50,6 +57,7 @@ text {
     opacity: .6;
     fill:rgba(255, 255, 255, 0);
 }
+
 
 marker {
     fill: #bbb;

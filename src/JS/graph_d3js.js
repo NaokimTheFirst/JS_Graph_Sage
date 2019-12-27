@@ -10,8 +10,11 @@ var is_frozen = false;
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
 var IDCounter = 0;
+var groupList = [];
+var currentGroup = 0;
 var currentObject = null;
 const MyManager = new Manager();
+
 
 const cursorPosition = {
     x: 0,
@@ -85,8 +88,23 @@ function LoadGraphData() {
 
     width = document.documentElement.clientWidth;
     height = document.documentElement.clientHeight;
+
     // List of colors
     color = d3.scale.category10();
+    
+    //Init group
+    FillGroupFromGraph(graphJSON);
+    PopulateGroupList();
+
+    
+}
+
+function FillGroupFromGraph(graph){
+    graph.nodes.forEach(element => {
+        if (!groupList.includes(element.group)) {
+            groupList.push(element.group);
+        }
+    });
 }
 
 function InitGraph() {
@@ -384,7 +402,7 @@ function ManageLoops() {
 
 function RefreshLoops() {
     loops.style("stroke", function (d) {
-        return (d.selectionGroup != null) ? "red" : d.color;
+        return (d.isSelected == true) ? "red" : d.color;
     });
 }
 
@@ -411,7 +429,7 @@ function ManageEdges() {
 
 function RefreshEdge() {
     links.style("stroke", function (d) {
-        return (d.selectionGroup != null) ? "red" : d.color;
+        return (d.isSelected == true) ? "red" : d.color;
     });
 }
 
@@ -493,13 +511,24 @@ function RefreshNodes() {
     nodes.attr("name", function (d) {
             return d.name;
         })
-        .style("fill", function (d) {
-            return (d.selectionGroup != null) ? "red" : color(d.group);
+        .attr("fill", function (d){
+            return color(d.group);
         });
+
+    OutlineNodes();
+}
+
+function OutlineNodes(){
+    nodes.style("stroke", function (d) {
+        return (d.isSelected == true) ? "red" : "white";
+    })
+    .style("stroke-width", function (d) {
+        return (d.isSelected == true) ? "3" : "2";
+    })
 }
 
 function SelectElement(element) {
-    element.data.selectionGroup = (element.data.selectionGroup == null) ? -1 : null;
+    element.data.isSelected = (element.data.isSelected == true) ? false : true;
     switch (element.type) {
         case NodeType:
             RefreshNodes();
@@ -517,7 +546,7 @@ function GetCurrentSelection() {
     var currentSelection = new GraphSelection([], [], []);
 
     let nodes = graphJSON.nodes.filter(function (currentNode) {
-        return currentNode.selectionGroup == -1;
+        return currentNode.isSelected == true;
     });
     nodes.forEach(element => {
         currentSelection.nodes.push(new Element(element, NodeType))
@@ -525,14 +554,14 @@ function GetCurrentSelection() {
 
 
     let edges = graphJSON.links.filter(function (currentLink) {
-        return currentLink.selectionGroup == -1;
+        return currentLink.isSelected == true;
     });
     edges.forEach(element => {
         currentSelection.edges.push(new Element(element, EdgeType))
     });
 
     let loops = graphJSON.loops.filter(function (currentLoop) {
-        return currentLoop.selectionGroup == -1;
+        return currentLoop.isSelected == true;
     });
     loops.forEach(element => {
         currentSelection.loops.push(new Element(element, LoopType))
@@ -828,4 +857,14 @@ function DownloadJSON() {
     element.click();
 
     document.body.removeChild(element);
+}
+
+function AddNewGroup(name){
+    groupList.push(name);
+    AddGroupElement(name);
+}
+
+function ChangeNodeGroup(nodeData){
+    nodeData.group = currentGroup;
+    RefreshNodes();
 }

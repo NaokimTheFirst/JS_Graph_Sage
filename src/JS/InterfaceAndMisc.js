@@ -1,3 +1,32 @@
+//Structure that allow to search DOM element only once
+var overlayElements = {
+    groupListElement : null,
+    get groupList() {
+        if(!this.groupListElement)
+        {
+            this.groupListElement = document.getElementById("groupList");
+        }
+        return this.groupListElement;
+    },
+
+    commandListElement : null,
+    get commandList(){
+        if(!this.commandListElement)
+        {
+            this.commandListElement = document.getElementById("commandTable");
+        }
+        return this.commandListElement;
+    },
+
+    promptResultElement : null,
+    get promptResult(){
+        if(!this.promptResultElement){
+            this.promptResultElement = document.getElementById("PromptResult");
+        }
+        return this.promptResultElement;
+    }
+}
+
 //Return string with time on format "HH:MM""
 function prettyDate2() {
     var date = new Date();
@@ -13,11 +42,67 @@ function CustomWarn(string){
 
 //Hide or show key helper
 function ShowKeys(button){
-    let commandList = document.getElementById("commandTable");
-    let show = (commandList.style.display == "" || commandList.style.display == "none");
+    let show = (overlayElements.commandList.style.display == "" 
+    || overlayElements.commandList.style.display == "none");
     
-    commandList.style.display = (show)? "inherit":"none";
+    overlayElements.commandList.style.display = (show)? "inherit":"none";
     button.value =(show)?"Hide Key Helper": "Show Key Helper";
+}
+
+function PopulateGroupList(){
+    for(var i = 0; i < groupList.length; i++) {
+        CreateGroupElement(groupList[i]);
+    }
+
+    overlayElements.groupList.selectedIndex = 0;
+}
+
+function ChangeSelectedGroup(){
+    if(overlayElements.groupList.selectedIndex == overlayElements.groupList.childElementCount - 1)
+    {
+        if(!CheckNewGroupName()){
+            overlayElements.groupList.selectedIndex = currentGroup;
+        }
+    }
+    else
+    {
+        SetCurrentGroup();
+    }
+}
+
+function SetCurrentGroup(){
+    currentGroup = overlayElements.groupList.selectedIndex;
+    overlayElements.groupList.style.backgroundColor = color(currentGroup); 
+}
+
+function CreateGroupElement(name){
+    var newElem = document.createElement("option");
+    newElem.textContent = name;
+    newElem.value = name;
+    
+    let list = overlayElements.groupList;
+    let lastIndex = list.childElementCount - 1;
+    newElem.style.backgroundColor = color(lastIndex);
+    list.insertBefore(newElem,list.childNodes[lastIndex]);
+
+    overlayElements.groupList.selectedIndex = lastIndex;
+    SetCurrentGroup();
+}
+
+function CheckNewGroupName(){
+    var newName = prompt("Please enter the group name:", "New Group");
+    if (newName == null || newName == "") {
+        window.alert("Invalid name, no new group created.");
+        return false;
+    } else if (groupList.includes(newName)) {
+        window.alert("This group already exist.");
+        return false;
+    }
+    else {
+      groupList.push(newName);
+      CreateGroupElement(newName);
+      return true;
+    }
 }
 
 function KeyboardEventInit() {
@@ -45,9 +130,19 @@ function KeyboardEventInit() {
                 var newNode = CreateNode();
                 MyManager.execute(new AddNodeCommand(newNode));
                 break;
+            case 67 :
+                //C for color
+                if(CheckCurrentObjectType(NodeType))
+                {
+                    ChangeNodeGroup(currentObject.data);
+                }
+                else {
+                    CustomWarn("Nothing to color");
+                }
+                break;
             case 68:
                 //D for SubDivide
-                if (currentObject != null && currentObject.type == EdgeType) {
+                if (CheckCurrentObjectType(EdgeType)) {
                     SubdivideEdge(currentObject.data);
                     currentObject = null;
                 } else {
@@ -92,6 +187,7 @@ function KeyboardEventInit() {
                 break;
             case 87:
                 //W for log
+                break;
             case 89:
                 //Y to redo
                 MyManager.redo();
@@ -105,5 +201,10 @@ function KeyboardEventInit() {
                 console.log("Keycode : " + key.keyCode);
                 break;
         }
+    }
+
+    function CheckCurrentObjectType(type)
+    {
+        return currentObject && currentObject.type == type;
     }
 }

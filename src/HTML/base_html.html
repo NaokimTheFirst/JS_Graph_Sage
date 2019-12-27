@@ -21,70 +21,82 @@
     // GRAPH_DATA_HEREEEEEEEEEEE
   </div>
   <div id="graphFrame">
-    <div id="commandList">
-      <table id="commandTable">
-        <tr>
-          <th>Action</th>
-          <th>Key</th>
-        </tr>
-        <tr>
-          <td>Freeze/UnFreeze Positions</td>
-          <td>F</td>
-        </tr>
-        <tr>
-          <td>Select/Unselect Element</td>
-          <td>Q</td>
-        </tr>
-        <tr>
-          <td>Add Node</td>
-          <td>A</td>
-        </tr>
-        <tr>
-          <td>Delete Element</td>
-          <td>Del</td>
-        </tr>
-        <tr>
-          <td>Delete Selection</td>
-          <td>Alt + Del</td>
-        </tr>
-        <tr>
-          <td>Move Node</td>
-          <td>Drag</td>
-        </tr>
-        <tr>
-          <td>Add Edges On Selection</td>
-          <td>E</td>
-        </tr>
-        <tr>
-          <td>Reset Selection</td>
-          <td>R</td>
-        </tr>
-        <tr>
-          <td>Add Loop</td>
-          <td>L</td>
-        </tr>
-        <tr>
-          <td>Subdivide Edge</td>
-          <td>D</td>
-        </tr>
-        <tr>
-          <td>Subdivide Edge On Selection</td>
-          <td>V</td>
-        </tr>
-        <tr>
-          <td>Undo</td>
-          <td>Z</td>
-        </tr>
-        <tr>
-          <td>Redo</td>
-          <td>Y</td>
-        </tr>
-        <tr>
-          <td>Save graph</td>
-          <td>S</td>
-        </tr>
-      </table>
-      <input type="button" onclick="ShowKeys(this)" value="Show Key Helper">
+    <div id="Overlay">
+      <div id="commandList">
+        <table id="commandTable">
+          <tr>
+            <th>Action</th>
+            <th>Key</th>
+          </tr>
+          <tr>
+            <td>Freeze/UnFreeze Positions</td>
+            <td>F</td>
+          </tr>
+          <tr>
+            <td>Select/Unselect Element</td>
+            <td>Q</td>
+          </tr>
+          <tr>
+            <td>Add to Group</td>
+            <td>C</td>
+          </tr>
+          <tr>
+            <td>Add Node</td>
+            <td>A</td>
+          </tr>
+          <tr>
+            <td>Delete Element</td>
+            <td>Del</td>
+          </tr>
+          <tr>
+            <td>Delete Selection</td>
+            <td>Alt + Del</td>
+          </tr>
+          <tr>
+            <td>Move Node</td>
+            <td>Drag</td>
+          </tr>
+          <tr>
+            <td>Add Edges On Selection</td>
+            <td>E</td>
+          </tr>
+          <tr>
+            <td>Reset Selection</td>
+            <td>R</td>
+          </tr>
+          <tr>
+            <td>Add Loop</td>
+            <td>L</td>
+          </tr>
+          <tr>
+            <td>Subdivide Edge</td>
+            <td>D</td>
+          </tr>
+          <tr>
+            <td>Subdivide Edge On Selection</td>
+            <td>V</td>
+          </tr>
+          <tr>
+            <td>Undo</td>
+            <td>Z</td>
+          </tr>
+          <tr>
+            <td>Redo</td>
+            <td>Y</td>
+          </tr>
+          <tr>
+            <td>Save graph</td>
+            <td>S</td>
+          </tr>
+        </table>
+        <input type="button" onclick="ShowKeys(this)" value="Show Key Helper">
+      </div>
+      <div id="groupPanel">
+        <p>Current Group : </p> 
+        <select id="groupList" onchange="ChangeSelectedGroup()">
+          <option value="Add New Group" style="background-color: white;">Add New Group</option>
+        </select>
+      </div>
     </div>
   </div>
 </body>

@@ -283,7 +283,7 @@ function TestInitialGraphIsntModifyBySelection() {
     MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
     let newGraph = GetGraphFromHTML();
 
-    let expr = oldGraph.nodes[0].selectionGroup == newGraph.nodes[0].selectionGroup;
+    let expr = oldGraph.nodes[0].isSelected == newGraph.nodes[0].isSelected;
     testOutput(expr, "Le graph initial n'est pas modifié après une sélection");
 
     return expr;
@@ -445,7 +445,7 @@ function TestUndoSelect() {
     MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
     MyManager.undo()
 
-    let expr = graphJSON.nodes[0].selectionGroup == null;
+    let expr = graphJSON.nodes[0].isSelected == false;
     testOutput(expr, "La sélection est bien annulée");
 
     return expr;
@@ -641,7 +641,7 @@ function TestFinalGraphCorrespondAfterSelection() {
     MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
     let newGraph = PrettyfyJSON();
 
-    let expr = oldGraph.nodes[0].selectionGroup != newGraph.nodes[0].selectionGroup;
+    let expr = oldGraph.nodes[0].isSelected != newGraph.nodes[0].isSelected;
     testOutput(expr, "Le graph final correspond après une sélection");
 
     return expr;
