@@ -60,7 +60,7 @@ function PopulateGroupList(){
 function ChangeSelectedGroup(){
     if(overlayElements.groupList.selectedIndex == overlayElements.groupList.childElementCount - 1)
     {
-        if(!CheckNewGroupName()){
+        if(!TryAddNewGroup()){
             overlayElements.groupList.selectedIndex = currentGroupIndex;
         }
     }
@@ -89,7 +89,7 @@ function CreateGroupElement(name){
     SetCurrentGroup();
 }
 
-function CheckNewGroupName(){
+function TryAddNewGroup(){
     var newName = prompt("Please enter the group name:", "New Group");
     if (newName == null || newName == "") {
         window.alert("Invalid name, no new group created.");
@@ -132,17 +132,7 @@ function KeyboardEventInit() {
                 break;
             case 67 :
                 //C for color
-                if(CheckCurrentObjectType(NodeType))
-                {
-                    MyManager.execute(new ChangeGroupCommand(
-                        new ValueRegisterer(
-                        currentObject.data.group, 
-                        groupList[currentGroupIndex], 
-                        currentObject.data.name)));
-                }
-                else {
-                    CustomWarn("Nothing to color");
-                }
+                TryColorNode();
                 break;
             case 68:
                 //D for SubDivide
@@ -208,6 +198,20 @@ function KeyboardEventInit() {
     }
 
  
+}
+
+function TryColorNode() {
+    if (CheckCurrentObjectType(NodeType)) {
+        if (currentObject.data.group != groupList[currentGroupIndex]) {
+            MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(currentObject.data.group, groupList[currentGroupIndex], currentObject.data.name)));
+        }
+        else {
+            CustomWarn("The node is already in this group");
+        }
+    }
+    else {
+        CustomWarn("Nothing to color");
+    }
 }
 
 function CheckCurrentObjectType(type)

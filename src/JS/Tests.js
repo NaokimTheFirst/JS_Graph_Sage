@@ -11,12 +11,13 @@ const TestList = [new TestGroup("Test AddNode()", [TestAddCorrectNumberOfNode, T
     new TestGroup("Test RemoveLoop()", [TestRemoveCorrectNumberOfLoop, TestRemoveWantedLoop, TestRemoveLoopDontModifyOthersElements]),
     new TestGroup("Test AddEdge()", [TestAddCorrectNumberOfLink, TestAddWantedLink, TestAddLinkDontModifyOthersElements]),
     new TestGroup("Test RemoveEdge()", [TestRemoveCorrectNumberOfLink, TestRemoveWantedLink, TestRemoveLinkDontModifyOthersElements]),
-    new TestGroup("Test Undo()", [TestUndoAddNode, TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoSelect, TestUndoMove,TestUndoSubdivide]),
+    new TestGroup("Test Undo()", [TestUndoChangeGroup,TestUndoAddNode, TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoSelect, TestUndoMove,TestUndoSubdivide]),
     new TestGroup("Test MoveNode()", [TestMoveOnWantedPosition]),
     new TestGroup("Test SelectElement()", [TestSelectNode, TestSelectLink, TestSelectLoop, TestUnselectNode]),
     new TestGroup("Test Subdivide Edge()", [TestSubdivideEdgeElementCount,TestSubdivideEdgeCorrespondingElement,TestSubdivideEdgeOnSelectionCorrespondingElement]),
     new TestGroup("Test GetGraphFromHTML()", [TestInitialGraphIsntModifyByAddNode, TestInitialGraphIsntModifyByAddLink, TestInitialGraphIsntModifyByAddLoop, TestInitialGraphIsntModifyByRemoveNode, TestInitialGraphIsntModifyByRemoveEdge, TestInitialGraphIsntModifyByRemoveLoop, TestInitialGraphIsntModifyByMovements, TestInitialGraphIsntModifyBySelection]),
     new TestGroup("Test PretyfyJSON()", [TestFinalGraphCorrespondAfterAddNode, TestFinalGraphCorrespondAfterAddLink, TestFinalGraphCorrespondAfterAddLoop, TestFinalGraphCorrespondAfterRemoveNode, TestFinalGraphCorrespondAfterRemoveEdge, TestFinalGraphCorrespondAfterRemoveLoop, TestFinalGraphCorrespondAfterMove, TestFinalGraphCorrespondAfterSelection, TestFinalGraphInverseYCoordinates, TestFinalGraphSimplifyTargetSourceOfEdges, TestFinalGraphSimplifyTargetSourceOfLoops]),
+    new TestGroup("Test ChangeGroup()",[TestChangeToCorrectGroup])
 ];
 
 function testOutput(expr, message) {
@@ -37,6 +38,43 @@ function LaunchAllTest() {
     });
 
     console.log("%c" + prettyDate2() + "Test passed : " + passTest + "/" + (passTest + failedTest), 'font-weight: bold');
+}
+
+
+function TestUndoChangeGroup() {
+    //Setup
+    let newGroupName = "test";
+    groupList.push(newGroupName);
+    CreateGroupElement(newGroupName);
+    SetCurrentGroup();
+    let oldGroup = graphJSON.nodes[0].group;
+
+    MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(
+        graphJSON.nodes[0].group, 
+        newGroupName, 
+        graphJSON.nodes[0].name)));
+    MyManager.undo();
+
+    let expr =  graphJSON.nodes[0].group == oldGroup;
+
+    testOutput(expr, "Group changement has been revert correctly");
+
+    return expr;
+}
+
+function TestChangeToCorrectGroup(){
+    let currentGroup = groupList[currentGroupIndex];
+
+    MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(
+        graphJSON.nodes[0].group, 
+        currentGroup, 
+        graphJSON.nodes[0].name)));
+
+    let expr =  graphJSON.nodes[0].group == currentGroup;
+
+    testOutput(expr,"Node change to the correct group");
+
+    return expr;
 }
 
 function TestAddCorrectNumberOfNode() {
@@ -267,7 +305,10 @@ function TestInitialGraphIsntModifyByRemoveLoop() {
 function TestInitialGraphIsntModifyByMovements() {
     //Setup
     let oldGraph = GetGraphFromHTML();
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        graphJSON.nodes[0].name)
     MyManager.execute(new MoveNodeCommand(pos));
     let newGraph = GetGraphFromHTML();
 
@@ -366,6 +407,8 @@ function TestRemoveLoopDontModifyOthersElements() {
     return expr;
 }
 
+
+
 function TestUndoAddNode() {
     //Setup
     let newElement = CreateNode();
@@ -453,11 +496,14 @@ function TestUndoSelect() {
 
 function TestUndoMove() {
     //Setup
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        graphJSON.nodes[0].name)
     MyManager.execute(new MoveNodeCommand(pos));
     MyManager.undo()
 
-    let expr = graphJSON.nodes[0].px == pos.oldPos[0];
+    let expr = graphJSON.nodes[0].px == pos.oldValue[0];
     testOutput(expr, "Le déplacement est bien annulé");
 
     return expr;
@@ -480,10 +526,13 @@ function TestUndoSubdivide() {
 
 function TestMoveOnWantedPosition() {
     //Setup
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        graphJSON.nodes[0].name)
     MyManager.execute(new MoveNodeCommand(pos));
 
-    let expr = graphJSON.nodes[0].px == pos.newPos[0] && graphJSON.nodes[0].py == pos.newPos[1];
+    let expr = graphJSON.nodes[0].px == pos.newValue[0] && graphJSON.nodes[0].py == pos.newValue[1];
     testOutput(expr, "Le déplacement est bien effectué");
 
     return expr;
@@ -625,11 +674,14 @@ function TestFinalGraphCorrespondAfterRemoveLoop() {
 function TestFinalGraphCorrespondAfterMove() {
     //Setup
     let oldGraph = PrettyfyJSON();
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        graphJSON.nodes[0].name)
     MyManager.execute(new MoveNodeCommand(pos));
     let newGraph = PrettyfyJSON();
 
-    let expr = oldGraph.nodes[0].px != newGraph.nodes[0].px && oldGraph.nodes[0].py != newGraph.nodes[0].py && newGraph.nodes[0].px == pos.newPos[0];
+    let expr = oldGraph.nodes[0].px != newGraph.nodes[0].px && oldGraph.nodes[0].py != newGraph.nodes[0].py && newGraph.nodes[0].px == pos.newValue[0];
     testOutput(expr, "Le graph final correspond après un déplacement");
 
     return expr;

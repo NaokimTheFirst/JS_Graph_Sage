@@ -138,8 +138,8 @@ function InitGraph() {
 function ResetSelection() {
     currentSelection = GetCurrentSelection();
 
-    let isFirst = true;
     if (currentSelection != null) {
+        let isFirst = true;
         //For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
@@ -863,11 +863,6 @@ function DownloadJSON() {
     element.click();
 
     document.body.removeChild(element);
-}
-
-function AddNewGroup(name){
-    groupList.push(name);
-    AddGroupElement(name);
 }
 
 //Change the group of a node
