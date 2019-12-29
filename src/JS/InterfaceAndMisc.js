@@ -151,6 +151,10 @@ function KeyboardEventInit() {
                 //F for Freeze
                 FreezeGraph();
                 break;
+            case 73 :
+                //I for invert
+                TryInvertEdge();
+                break;
             case 76:
                 //L for Loops
                 AddLoopOnNode();
@@ -200,10 +204,19 @@ function KeyboardEventInit() {
  
 }
 
+function TryInvertEdge() {
+    if (CheckCurrentObjectType(EdgeType)) {
+        MyManager.execute(new InvertDirectionCommand(new ValueRegisterer([currentObject.data.source, currentObject.data.target], [currentObject.data.target, currentObject.data.source], currentObject)));
+    }
+    else {
+        CustomWarn("Nothing to invert");
+    }
+}
+
 function TryColorNode() {
     if (CheckCurrentObjectType(NodeType)) {
         if (currentObject.data.group != groupList[currentGroupIndex]) {
-            MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(currentObject.data.group, groupList[currentGroupIndex], currentObject.data.name)));
+            MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(currentObject.data.group, groupList[currentGroupIndex], currentObject)));
         }
         else {
             CustomWarn("The node is already in this group");

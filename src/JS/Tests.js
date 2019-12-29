@@ -52,7 +52,7 @@ function TestUndoChangeGroup() {
     MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(
         graphJSON.nodes[0].group, 
         newGroupName, 
-        graphJSON.nodes[0].name)));
+        new Element(graphJSON.nodes[0],NodeType))));
     MyManager.undo();
 
     let expr =  graphJSON.nodes[0].group == oldGroup;
@@ -65,10 +65,15 @@ function TestUndoChangeGroup() {
 function TestChangeToCorrectGroup(){
     let currentGroup = groupList[currentGroupIndex];
 
-    MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(
-        graphJSON.nodes[0].group, 
-        currentGroup, 
-        graphJSON.nodes[0].name)));
+    MyManager.execute(
+        new ChangeGroupCommand(
+            new ValueRegisterer(
+                graphJSON.nodes[0].group, 
+                currentGroup, 
+                new Element(graphJSON.nodes[0],NodeType)
+            )
+        )
+    );
 
     let expr =  graphJSON.nodes[0].group == currentGroup;
 
@@ -308,7 +313,7 @@ function TestInitialGraphIsntModifyByMovements() {
     let pos = new ValueRegisterer(
         [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
         [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
-        graphJSON.nodes[0].name)
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
     let newGraph = GetGraphFromHTML();
 
@@ -499,7 +504,7 @@ function TestUndoMove() {
     let pos = new ValueRegisterer(
         [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
         [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
-        graphJSON.nodes[0].name)
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
     MyManager.undo()
 
@@ -529,7 +534,7 @@ function TestMoveOnWantedPosition() {
     let pos = new ValueRegisterer(
         [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
         [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
-        graphJSON.nodes[0].name)
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
 
     let expr = graphJSON.nodes[0].px == pos.newValue[0] && graphJSON.nodes[0].py == pos.newValue[1];
@@ -677,7 +682,7 @@ function TestFinalGraphCorrespondAfterMove() {
     let pos = new ValueRegisterer(
         [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
         [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
-        graphJSON.nodes[0].name)
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
     let newGraph = PrettyfyJSON();
 

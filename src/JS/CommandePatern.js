@@ -37,6 +37,9 @@ var ChangeGroupCommand = function(value, firstAction = true)  {
     return new Command(SetNodeGroup, SetNodeGroup, value, firstAction);
 };
 
+var InvertDirectionCommand = function(value, firstAction = true)  {
+    return new Command(SetLinkDirection, SetLinkDirection, value, firstAction);
+};
 var MoveNodeCommand = function(value, firstAction = true)  {
     return new Command(SetNewPosition, SetOldPosition, value, firstAction);
 };

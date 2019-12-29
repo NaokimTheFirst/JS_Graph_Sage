@@ -26,10 +26,10 @@ const NodeType = "Node";
 const EdgeType = "link directed";
 
 class ValueRegisterer {
-    constructor(oldValue, newValue, elementName) {
+    constructor(oldValue, newValue, element) {
         this.oldValue = oldValue;
         this.newValue = newValue;
-        this.elementName = elementName;
+        this.element = element;
     }
 }
 
@@ -344,7 +344,6 @@ function ManageAllGraphicsElements() {
             .attr("refY", 0)
             .attr("markerWidth", 4)
             .attr("markerHeight", 4)
-            .attr("preserveAspectRatio", false)
             .attr("orient", "auto")
             .append("svg:path")
             // triangles with endpoints (0,-2), (4,0), (0,2)
@@ -476,7 +475,7 @@ function ManageNodes() {
                 drag_in_progress = false;
                 d.finalPos = [d.x, d.y];
 
-                var positions = new ValueRegisterer(d.originPos, d.finalPos, d.name);
+                var positions = new ValueRegisterer(d.originPos, d.finalPos, new Element(d,NodeType));
                 MyManager.execute(new MoveNodeCommand(positions));
             }));
 
@@ -488,26 +487,20 @@ function ManageNodes() {
 
 function SetNewPosition(registeredPos) 
 {
-    SetNodePosition(registeredPos.newValue, registeredPos.elementName);
+    SetNodePosition(registeredPos.newValue, registeredPos.element);
 }
 
-function SetNodePosition(Pos, nodeName) {
-    let currrentNode = FindNodeInGraph(nodeName);
+function SetNodePosition(Pos, nodeData) {
+    let currrentNode = FindElementInGraph(nodeData);
     force.stop();
     currrentNode.px = Pos[0];
     currrentNode.py = Pos[1];
     force.start();
 }
 
-function FindNodeInGraph(nodeName) {
-    return graphJSON.nodes.filter(function name(current) {
-        return current.name == nodeName;
-    })[0];
-}
-
 function SetOldPosition(registeredPos) 
 {
-    SetNodePosition(registeredPos.oldValue, registeredPos.elementName);;
+    SetNodePosition(registeredPos.oldValue, registeredPos.element);;
 }
 
 function RefreshNodes() {
@@ -867,8 +860,35 @@ function DownloadJSON() {
 
 //Change the group of a node
 function SetNodeGroup(valueRegisterer){
-    let node = FindNodeInGraph(valueRegisterer.elementName);
+    let node = FindElementInGraph(valueRegisterer.element);
     node.group = (node.group == valueRegisterer.newValue)? valueRegisterer.oldValue : valueRegisterer.newValue;
     RefreshNodes();
 }
 
+
+//Change the direction of a directedLink
+function SetLinkDirection(valueRegisterer){
+    let link = FindElementInGraph(valueRegisterer.element);
+    let targetedValue = (link.source == valueRegisterer.newValue[0])? valueRegisterer.oldValue : valueRegisterer.newValue;
+
+    link.source = targetedValue[0];
+    link.target = targetedValue[1];
+
+    force.start();
+}
+
+function FindElementInGraph(element) {
+    let list ;
+    switch (element.type) {
+        case NodeType:
+            list = graphJSON.nodes;
+            break;
+        case EdgeType:
+            list = graphJSON.links;
+            break;
+        case LoopType:
+            list = graphJSON.loop;
+            break;
+    }
+    return list[list.indexOf(element.data)];
+}
