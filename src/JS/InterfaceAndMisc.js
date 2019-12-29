@@ -61,7 +61,7 @@ function ChangeSelectedGroup(){
     if(overlayElements.groupList.selectedIndex == overlayElements.groupList.childElementCount - 1)
     {
         if(!CheckNewGroupName()){
-            overlayElements.groupList.selectedIndex = currentGroup;
+            overlayElements.groupList.selectedIndex = currentGroupIndex;
         }
     }
     else
@@ -71,8 +71,8 @@ function ChangeSelectedGroup(){
 }
 
 function SetCurrentGroup(){
-    currentGroup = overlayElements.groupList.selectedIndex;
-    overlayElements.groupList.style.backgroundColor = color(currentGroup); 
+    currentGroupIndex = overlayElements.groupList.selectedIndex;
+    overlayElements.groupList.style.backgroundColor = color(currentGroupIndex); 
 }
 
 function CreateGroupElement(name){
@@ -134,7 +134,11 @@ function KeyboardEventInit() {
                 //C for color
                 if(CheckCurrentObjectType(NodeType))
                 {
-                    ChangeNodeGroup(currentObject.data);
+                    MyManager.execute(new ChangeGroupCommand(
+                        new ValueRegisterer(
+                        currentObject.data.group, 
+                        groupList[currentGroupIndex], 
+                        currentObject.data.name)));
                 }
                 else {
                     CustomWarn("Nothing to color");
@@ -203,8 +207,10 @@ function KeyboardEventInit() {
         }
     }
 
-    function CheckCurrentObjectType(type)
-    {
-        return currentObject && currentObject.type == type;
-    }
+ 
+}
+
+function CheckCurrentObjectType(type)
+{
+    return currentObject && currentObject.type == type;
 }

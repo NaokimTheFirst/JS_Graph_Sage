@@ -33,6 +33,10 @@ var SelectElementCommand = function(value, firstAction = true)  {
     return new Command(SelectElement, SelectElement, value, firstAction);
 };
 
+var ChangeGroupCommand = function(value, firstAction = true)  {
+    return new Command(SetNodeGroup, SetNodeGroup, value, firstAction);
+};
+
 var MoveNodeCommand = function(value, firstAction = true)  {
     return new Command(SetNewPosition, SetOldPosition, value, firstAction);
 };

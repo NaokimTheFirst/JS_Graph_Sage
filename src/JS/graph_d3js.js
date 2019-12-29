@@ -11,7 +11,7 @@ var is_frozen = false;
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
 var IDCounter = 0;
 var groupList = [];
-var currentGroup = 0;
+var currentGroupIndex = 0;
 var currentObject = null;
 const MyManager = new Manager();
 
@@ -25,11 +25,11 @@ const LoopType = "loop";
 const NodeType = "Node";
 const EdgeType = "link directed";
 
-class PositionRegisterer {
-    constructor(oldPos, newPos, node) {
-        this.oldPos = oldPos;
-        this.newPos = newPos;
-        this.node = node;
+class ValueRegisterer {
+    constructor(oldValue, newValue, elementName) {
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+        this.elementName = elementName;
     }
 }
 
@@ -476,7 +476,7 @@ function ManageNodes() {
                 drag_in_progress = false;
                 d.finalPos = [d.x, d.y];
 
-                var positions = new PositionRegisterer(d.originPos, d.finalPos, d);
+                var positions = new ValueRegisterer(d.originPos, d.finalPos, d.name);
                 MyManager.execute(new MoveNodeCommand(positions));
             }));
 
@@ -486,25 +486,28 @@ function ManageNodes() {
     nodes.exit().remove();
 }
 
-function SetNewPosition(registeredPos) {
-    var currrentNode = graphJSON.nodes.filter(function name(current) {
-        return current.name == registeredPos.node.name;
-    })[0];
+function SetNewPosition(registeredPos) 
+{
+    SetNodePosition(registeredPos.newValue, registeredPos.elementName);
+}
+
+function SetNodePosition(Pos, nodeName) {
+    let currrentNode = FindNodeInGraph(nodeName);
     force.stop();
-    currrentNode.px = registeredPos.newPos[0];
-    currrentNode.py = registeredPos.newPos[1];
+    currrentNode.px = Pos[0];
+    currrentNode.py = Pos[1];
     force.start();
 }
 
-function SetOldPosition(registeredPos) {
-    var currrentNode = graphJSON.nodes.filter(function name(current) {
-        return current.name == registeredPos.node.name;
+function FindNodeInGraph(nodeName) {
+    return graphJSON.nodes.filter(function name(current) {
+        return current.name == nodeName;
     })[0];
+}
 
-    force.stop();
-    currrentNode.px = registeredPos.oldPos[0];
-    currrentNode.py = registeredPos.oldPos[1];
-    force.start();
+function SetOldPosition(registeredPos) 
+{
+    SetNodePosition(registeredPos.oldValue, registeredPos.elementName);;
 }
 
 function RefreshNodes() {
@@ -512,13 +515,13 @@ function RefreshNodes() {
             return d.name;
         })
         .attr("fill", function (d){
-            return color(d.group);
+            return color(groupList.indexOf(d.group));
         });
 
-    OutlineNodes();
+    RefreshNodeOutline();
 }
 
-function OutlineNodes(){
+function RefreshNodeOutline(){
     nodes.style("stroke", function (d) {
         return (d.isSelected == true) ? "red" : "white";
     })
@@ -615,10 +618,13 @@ function CreateNode(pos = null) {
 
 //Add loop on the node hovered
 function AddLoopOnNode() {
-    if (currentObject != null && currentObject.type == NodeType) {
+    if(CheckCurrentObjectType(NodeType))
+    {
         var newLoop = CreateLoop(currentObject.data);
         MyManager.execute(new AddLoopCommand(newLoop));
-    } else {
+    }
+    else 
+    {
         CustomWarn("The element hovered is not a node");
     }
 }
@@ -864,7 +870,10 @@ function AddNewGroup(name){
     AddGroupElement(name);
 }
 
-function ChangeNodeGroup(nodeData){
-    nodeData.group = currentGroup;
+//Change the group of a node
+function SetNodeGroup(valueRegisterer){
+    let node = FindNodeInGraph(valueRegisterer.elementName);
+    node.group = (node.group == valueRegisterer.newValue)? valueRegisterer.oldValue : valueRegisterer.newValue;
     RefreshNodes();
 }
+
