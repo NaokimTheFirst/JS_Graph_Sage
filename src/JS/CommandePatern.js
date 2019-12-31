@@ -37,6 +37,10 @@ var ChangeGroupCommand = function(value, firstAction = true)  {
     return new Command(SetNodeGroup, SetNodeGroup, value, firstAction);
 };
 
+var ChangeWeightCommand = function(value, firstAction = true)  {
+    return new Command(SetWeight, SetWeight, value, firstAction);
+};
+
 var InvertDirectionCommand = function(value, firstAction = true)  {
     return new Command(SetLinkDirection, SetLinkDirection, value, firstAction);
 };

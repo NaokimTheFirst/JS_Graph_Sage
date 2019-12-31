@@ -184,7 +184,8 @@ function KeyboardEventInit() {
                 SubdivideEdgeOnSelection();
                 break;
             case 87:
-                //W for log
+                //W for Weight
+                TrySetWeight();
                 break;
             case 89:
                 //Y to redo
@@ -227,7 +228,39 @@ function TryColorNode() {
     }
 }
 
-function CheckCurrentObjectType(type)
+function TrySetWeight() {
+    if (CheckCurrentObjectType([EdgeType,LoopType])) {
+        let newWeight = prompt("Enter the new weight",1);
+
+        if (!isNaN(newWeight))
+        {
+            if (currentObject.data.weight != newWeight) 
+            {
+                MyManager.execute(new ChangeWeightCommand(
+                    new ValueRegisterer(currentObject.data.weight, 
+                        newWeight, 
+                        currentObject)
+                    )
+                );
+            }
+        }
+        else 
+        {
+            CustomWarn("The weight must be a number");
+        }
+    }
+    else 
+    {
+        CustomWarn("Only edge and loop can be weighted");
+    }
+}
+
+function CheckCurrentObjectType(types)
 {
-    return currentObject && currentObject.type == type;
+    let result = (currentObject != null);
+    if(result)
+    {
+        result = types.includes(currentObject.type);
+    }
+    return result;
 }

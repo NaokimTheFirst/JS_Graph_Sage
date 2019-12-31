@@ -53,6 +53,7 @@ window.onload = function () {
     document.body.onmousemove = handleMouseMove;
 
     LoadGraphData();
+    graphJSON.edge_labels = true;
     InitGraph();
     KeyboardEventInit();
 
@@ -277,11 +278,11 @@ function InitForce() {
                     return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[1];
                 })
             l_labels
-                .attr("x", function (d, i) {
-                    return force.nodes()[d.source].x;
+                .attr("x", function (d) {
+                    return d.source.x;
                 })
-                .attr("y", function (d, i) {
-                    return force.nodes()[d.source].y - 2 * d.curve - 1;
+                .attr("y", function (d) {
+                    return d.source.y - 2 * d.curve - 1;
                 })
         }
     });
@@ -307,29 +308,8 @@ function ManageAllGraphicsElements() {
 
     ManageLoops();
     ManageNodes();
-    ManageVertexLabel();
+    ManageNodeLabels();
     ManageEdges();
-
-    // Edge labels
-    if (graphJSON.edge_labels) {
-        e_labels = svg.selectAll(".e_label")
-            .data(force.links())
-            .enter()
-            .append("svg:text")
-            .attr("text-anchor", "middle")
-            .text(function (d) {
-                return d.name;
-            })
-
-        l_labels = svg.selectAll(".l_label")
-            .data(graphJSON.loops)
-            .enter()
-            .append("svg:text")
-            .attr("text-anchor", "middle")
-            .text(function (d, i) {
-                return graphJSON.loops[i].name;
-            })
-    }
 
     // Arrows, for directed graphs
     if (graphJSON.directed) {
@@ -395,6 +375,7 @@ function ManageLoops() {
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
     RefreshLoops();
+    ManageLoopLabels();
 
     loops.exit().remove();
 };
@@ -404,6 +385,32 @@ function RefreshLoops() {
         return (d.isSelected == true) ? "red" : d.color;
     });
 }
+
+function ManageLoopLabels() {
+    if (graphJSON.edge_labels) {
+        l_labels = svg.selectAll(".l_label")
+            .data(graphJSON.loops);
+
+        l_labels.enter()
+            .append("svg:text")
+            .attr("class", "l_label")
+            .attr("text-anchor", "middle");
+
+        l_labels.exit().remove();
+
+        RefreshLoopLabels();
+    }
+}
+
+function RefreshLoopLabels() {
+    l_labels.text(function (d) {
+        if(d.weight){
+            return "w : "+d.weight;
+        }
+    });
+}
+
+
 
 function ManageEdges() {
     // Edges
@@ -424,6 +431,8 @@ function ManageEdges() {
     RefreshEdge();
 
     links.exit().remove();
+
+    ManageEdgeLabels();
 }
 
 function RefreshEdge() {
@@ -432,7 +441,33 @@ function RefreshEdge() {
     });
 }
 
-function ManageVertexLabel() {
+function ManageEdgeLabels() {
+    if (graphJSON.edge_labels) {
+        e_labels = svg.selectAll(".e_label")
+        .data(force.links());
+        
+        e_labels.enter()
+        .append("svg:text")
+        .attr("class", "e_label")
+        .attr("text-anchor", "middle");
+        
+        e_labels.exit().remove();
+
+        RefreshEdgeLabels();
+    }
+}
+
+
+function RefreshEdgeLabels()
+{
+    e_labels.text(function (d) {
+        if(d.weight){
+            return "w : "+d.weight;
+        }
+    });
+}
+
+function ManageNodeLabels() {
     // Vertex labels
     if (graphJSON.vertex_labels) {
         v_labels = svg.selectAll(".v_label")
@@ -442,6 +477,7 @@ function ManageVertexLabel() {
             .append("svg:text")
             .attr("class", "v_label")
             .attr("vertical-align", "middle")
+
         v_labels.text(function (d) {
             return d.name;
         });
@@ -578,7 +614,7 @@ function AddNode(newNode) {
 
     //Apply nodes rules to the data
     ManageNodes();
-    ManageVertexLabel();
+    ManageNodeLabels();
 
     //Restart the force layout with the new elements
     force.start();
@@ -785,7 +821,7 @@ function GetLoopsByVertex(currentNode) {
 function RemoveNode(nodeData) {
     graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData), 1);
     ManageNodes(); 
-    ManageVertexLabel();
+    ManageNodeLabels();
     force.start();
 }
 
@@ -877,6 +913,16 @@ function SetLinkDirection(valueRegisterer){
     force.start();
 }
 
+function SetWeight(valueRegisterer)
+{
+    let element = FindElementInGraph(valueRegisterer.element);
+    let targetedValue = (element.weight == valueRegisterer.newValue)? valueRegisterer.oldValue : valueRegisterer.newValue;
+
+    element.weight = targetedValue;
+
+    (valueRegisterer.element.type == EdgeType)? RefreshEdgeLabels(): RefreshLoopLabels();
+}
+
 function FindElementInGraph(element) {
     let list ;
     switch (element.type) {
@@ -887,7 +933,7 @@ function FindElementInGraph(element) {
             list = graphJSON.links;
             break;
         case LoopType:
-            list = graphJSON.loop;
+            list = graphJSON.loops;
             break;
     }
     return list[list.indexOf(element.data)];
