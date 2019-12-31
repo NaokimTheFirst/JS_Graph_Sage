@@ -33,6 +33,14 @@ var overlayElements = {
         }
         return this.weightRelatedElements;
     },
+
+    directedRelatedElements : null,
+    get directedRelated(){
+        if(!this.directedRelatedElements){
+            this.directedRelatedElements = document.getElementsByClassName("DirectedRelated");
+        }
+        return this.directedRelatedElements;
+    },
 }
 
 //Return string with time on format "HH:MM""
@@ -48,6 +56,16 @@ function CustomWarn(string){
     console.warn(prettyDate2()+" "+string);
 }
 
+function InitInterface(){
+    InitKeyHelper()
+    KeyboardEventInit();
+}
+
+function InitKeyHelper(){
+    for (let index = 0; index < overlayElements.directedRelated.length; index++) {
+        overlayElements.directedRelated[index].style.display = (isDirected)? "":"none";
+    }
+}
 //Hide or show key helper
 function ShowKeys(button){
     let show = (overlayElements.commandList.style.display == "" 
@@ -219,12 +237,10 @@ function KeyboardEventInit() {
                 break;
         }
     }
-
- 
 }
 
 function TryInvertEdge() {
-    if (CheckCurrentObjectType(EdgeType)) {
+    if (isDirected && CheckCurrentObjectType(EdgeType)) {
         MyManager.execute(new InvertDirectionCommand(new ValueRegisterer([currentObject.data.source, currentObject.data.target], [currentObject.data.target, currentObject.data.source], currentObject)));
     }
     else {
@@ -247,7 +263,7 @@ function TryColorNode() {
 }
 
 function TrySetWeight() {
-    if (CheckCurrentObjectType([EdgeType,LoopType])) {
+    if (displayWeight && CheckCurrentObjectType([EdgeType,LoopType])) {
         let newWeight = prompt("Enter the new weight",1);
 
         if (!isNaN(newWeight))

@@ -7,6 +7,7 @@ var height;
 var drag_in_progress = false;
 var is_frozen = false;
 var displayWeight = true;
+var isDirected = false;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
@@ -55,7 +56,7 @@ window.onload = function () {
 
     LoadGraphData();
     InitGraph();
-    KeyboardEventInit();
+    InitInterface();
 
     ManageAllGraphicsElements();
 
@@ -109,6 +110,8 @@ function FillGroupFromGraph(graph){
 }
 
 function InitGraph() {
+    isDirected = graphJSON.directed;
+
     //Find the highest  ID in the graph
     graphJSON.nodes.forEach(element => {
         if (element.name > IDCounter) {
@@ -308,7 +311,7 @@ function ManageAllGraphicsElements() {
     ManageEdges();
 
     // Arrows, for directed graphs
-    if (graphJSON.directed) {
+    if (isDirected) {
         svg.append("svg:defs").selectAll("marker")
             .data(["directed"])
             .enter().append("svg:marker")
