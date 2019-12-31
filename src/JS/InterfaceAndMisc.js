@@ -24,7 +24,15 @@ var overlayElements = {
             this.promptResultElement = document.getElementById("PromptResult");
         }
         return this.promptResultElement;
-    }
+    },
+
+    weightRelatedElements : null,
+    get weightRelated(){
+        if(!this.weightRelatedElements){
+            this.weightRelatedElements = document.getElementsByClassName("WeightRelated");
+        }
+        return this.weightRelatedElements;
+    },
 }
 
 //Return string with time on format "HH:MM""
@@ -47,6 +55,16 @@ function ShowKeys(button){
     
     overlayElements.commandList.style.display = (show)? "inherit":"none";
     button.value =(show)?"Hide Key Helper": "Show Key Helper";
+}
+
+function DisplayWeight(checkbox){
+    displayWeight = checkbox.checked;
+    RefreshLoopLabels();
+    RefreshEdgeLabels();
+
+    for (let index = 0; index < overlayElements.weightRelated.length; index++) {
+        overlayElements.weightRelated[index].style.display = (displayWeight)? "":"none";
+    }
 }
 
 function PopulateGroupList(){
@@ -258,8 +276,7 @@ function TrySetWeight() {
 function CheckCurrentObjectType(types)
 {
     let result = (currentObject != null);
-    if(result)
-    {
+    if(result){
         result = types.includes(currentObject.type);
     }
     return result;

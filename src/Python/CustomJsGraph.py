@@ -85,8 +85,6 @@ import os
 
 
 def gen_html_code(G,
-                  vertex_labels=True,
-                  edge_labels=False,
                   vertex_partition=[],
                   vertex_colors=None,
                   edge_partition=[],
@@ -106,12 +104,6 @@ def gen_html_code(G,
     INPUT:
 
     - ``G`` -- the graph
-
-    - ``vertex_labels`` -- boolean (default: ``False``); whether to display
-      vertex labels
-
-    - ``edge_labels`` -- boolean (default: ``False``); whether to display edge
-      labels
 
     - ``vertex_partition`` -- list (default: ``[]``); a list of lists
       representing a partition of the vertex set. Vertices are then colored in
@@ -176,7 +168,7 @@ def gen_html_code(G,
         sage: g.add_edge("10", "10", "c")
         sage: g.add_edge("10", "10", "d")
         sage: g.add_edge("01", "11", "1")
-        sage: g.show(method="js", vertex_labels=True,edge_labels=True,
+        sage: g.show(method="js"
         ....:        link_distance=200, gravity=.05, charge=-500,
         ....:        edge_partition=[[("11", "12", "2"), ("21", "21", "a")]],
         ....:        edge_thickness=4) # optional -- internet
@@ -276,7 +268,7 @@ def gen_html_code(G,
                       "strength": 0,
                       "color": color,
                       "curve": curve,
-                      "name": str(l) if edge_labels else ""})
+                      "name": str(l)})
 
     loops = [e for e in edges if e["source"] == e["target"]]
     edges = [e for e in edges if e["source"] != e["target"]]
@@ -304,8 +296,6 @@ def gen_html_code(G,
                                    "link_distance": int(link_distance),
                                    "link_strength": int(link_strength),
                                    "gravity": float(gravity),
-                                   "vertex_labels": bool(vertex_labels),
-                                   "edge_labels": bool(edge_labels),
                                    "vertex_size": int(vertex_size),
                                    "edge_thickness": int(edge_thickness)})
 

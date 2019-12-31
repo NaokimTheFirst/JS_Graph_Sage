@@ -8,22 +8,26 @@ rect {
 }
 
 #Overlay{
+    width: 100%;
     position: absolute;
     background: none;
     z-index: 10;
     margin : none;
+    pointer-events:none;
+}
+
+#commandList{
+    float: right;
 }
 
 #commandList, #groupPanel{
+    pointer-events:auto;
     color : white;
     background: rgba(184, 184, 184, 0.473);
-    padding: 5%;
-    width : fit-content;
+    padding: 1%;
+    width : max-content;
 }
 
-#groupPanel{
-    margin-top: 5%;
-}
 
 #commandList th:nth-child(1) {
     text-align: left;
@@ -31,12 +35,37 @@ rect {
 #commandList th:nth-child(2) {
     text-align: right;
 }
+
 #commandList td:nth-child(2) {
     text-align: right;
 }
 
+#groupPanel td:nth-child(2) {
+    text-align: right;
+}
+
+#groupPanel td {
+    width:fit-content;
+    height: min-content;
+}
+
 #commandTable{
     display:none;
+}
+
+input[type=checkbox]
+{
+  /* Increase Checkboxes size*/
+  -ms-transform: scale(1.5); /* IE */
+  -moz-transform: scale(1.5); /* FF */
+  -webkit-transform: scale(1.5); /* Safari and Chrome */
+  -o-transform: scale(1.5); /* Opera */
+  transform: scale(1.5);
+}
+
+select{
+    text-align-last:right;
+    direction: rtl;
 }
 
 .node {

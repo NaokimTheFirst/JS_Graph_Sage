@@ -6,6 +6,7 @@ var width;
 var height;
 var drag_in_progress = false;
 var is_frozen = false;
+var displayWeight = true;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
@@ -53,7 +54,6 @@ window.onload = function () {
     document.body.onmousemove = handleMouseMove;
 
     LoadGraphData();
-    graphJSON.edge_labels = true;
     InitGraph();
     KeyboardEventInit();
 
@@ -259,32 +259,28 @@ function InitForce() {
         }
 
         // Position of vertex labels
-        if (graphJSON.vertex_labels) {
-            v_labels
-                .attr("x", function (d) {
-                    return d.x + graphJSON.vertex_size;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-        }
+        v_labels
+            .attr("x", function (d) {
+                return d.x + graphJSON.vertex_size;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
         // Position of the edge labels
-        if (graphJSON.edge_labels) {
-            e_labels
-                .attr("x", function (d) {
-                    return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[0];
-                })
-                .attr("y", function (d) {
-                    return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[1];
-                })
-            l_labels
-                .attr("x", function (d) {
-                    return d.source.x;
-                })
-                .attr("y", function (d) {
-                    return d.source.y - 2 * d.curve - 1;
-                })
-        }
+        e_labels
+            .attr("x", function (d) {
+                return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[0];
+            })
+            .attr("y", function (d) {
+                return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[1];
+            })
+        l_labels
+            .attr("x", function (d) {
+                return d.source.x;
+            })
+            .attr("y", function (d) {
+                return d.source.y - 2 * d.curve - 1;
+            })
     });
 }
 
@@ -387,24 +383,22 @@ function RefreshLoops() {
 }
 
 function ManageLoopLabels() {
-    if (graphJSON.edge_labels) {
-        l_labels = svg.selectAll(".l_label")
-            .data(graphJSON.loops);
+    l_labels = svg.selectAll(".l_label")
+        .data(graphJSON.loops);
 
-        l_labels.enter()
-            .append("svg:text")
-            .attr("class", "l_label")
-            .attr("text-anchor", "middle");
+    l_labels.enter()
+        .append("svg:text")
+        .attr("class", "l_label")
+        .attr("text-anchor", "middle");
 
-        l_labels.exit().remove();
+    l_labels.exit().remove();
 
-        RefreshLoopLabels();
-    }
+    RefreshLoopLabels();
 }
 
 function RefreshLoopLabels() {
     l_labels.text(function (d) {
-        if(d.weight){
+        if(d.weight && displayWeight){
             return "w : "+d.weight;
         }
     });
@@ -442,26 +436,24 @@ function RefreshEdge() {
 }
 
 function ManageEdgeLabels() {
-    if (graphJSON.edge_labels) {
-        e_labels = svg.selectAll(".e_label")
-        .data(force.links());
-        
-        e_labels.enter()
-        .append("svg:text")
-        .attr("class", "e_label")
-        .attr("text-anchor", "middle");
-        
-        e_labels.exit().remove();
+    e_labels = svg.selectAll(".e_label")
+    .data(force.links());
+    
+    e_labels.enter()
+    .append("svg:text")
+    .attr("class", "e_label")
+    .attr("text-anchor", "middle");
+    
+    e_labels.exit().remove();
 
-        RefreshEdgeLabels();
-    }
+    RefreshEdgeLabels();
 }
 
 
 function RefreshEdgeLabels()
 {
     e_labels.text(function (d) {
-        if(d.weight){
+        if(d.weight && displayWeight){
             return "w : "+d.weight;
         }
     });
@@ -469,21 +461,19 @@ function RefreshEdgeLabels()
 
 function ManageNodeLabels() {
     // Vertex labels
-    if (graphJSON.vertex_labels) {
-        v_labels = svg.selectAll(".v_label")
-            .data(graphJSON.nodes)
+    v_labels = svg.selectAll(".v_label")
+        .data(graphJSON.nodes)
 
-        v_labels.enter()
-            .append("svg:text")
-            .attr("class", "v_label")
-            .attr("vertical-align", "middle")
+    v_labels.enter()
+        .append("svg:text")
+        .attr("class", "v_label")
+        .attr("vertical-align", "middle")
 
-        v_labels.text(function (d) {
-            return d.name;
-        });
+    v_labels.text(function (d) {
+        return d.name;
+    });
 
-        v_labels.exit().remove();
-    }
+    v_labels.exit().remove();
 }
 
 //Assure that all the current data correspond to a node
