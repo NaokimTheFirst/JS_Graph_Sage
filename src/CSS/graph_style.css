@@ -1,6 +1,7 @@
 /* graph_style.css */
 body {
     background-color: rgb(15, 15, 73);
+    margin : 0%;
 }
 
 rect {
@@ -16,18 +17,17 @@ rect {
     pointer-events:none;
 }
 
-#commandList{
-    float: right;
-}
-
-#commandList, #groupPanel{
+#commandList, #PropertiesPanel{
     pointer-events:auto;
     color : white;
     background: rgba(184, 184, 184, 0.473);
-    padding: 1%;
-    width : max-content;
+    padding: 0.5%;
+    margin: 0.5%;
 }
 
+#commandList{
+    float: right;
+}
 
 #commandList th:nth-child(1) {
     text-align: left;
@@ -40,13 +40,13 @@ rect {
     text-align: right;
 }
 
-#groupPanel td:nth-child(2) {
+#PropertiesPanel td:nth-child(2) {
     text-align: right;
 }
 
-#groupPanel td {
-    width:fit-content;
-    height: min-content;
+p {
+    margin: 1%;
+    width:max-content;
 }
 
 #commandTable{

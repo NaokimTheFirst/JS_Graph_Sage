@@ -11,13 +11,21 @@ const TestList = [new TestGroup("Test AddNode()", [TestAddCorrectNumberOfNode, T
     new TestGroup("Test RemoveLoop()", [TestRemoveCorrectNumberOfLoop, TestRemoveWantedLoop, TestRemoveLoopDontModifyOthersElements]),
     new TestGroup("Test AddEdge()", [TestAddCorrectNumberOfLink, TestAddWantedLink, TestAddLinkDontModifyOthersElements]),
     new TestGroup("Test RemoveEdge()", [TestRemoveCorrectNumberOfLink, TestRemoveWantedLink, TestRemoveLinkDontModifyOthersElements]),
-    new TestGroup("Test Undo()", [TestUndoChangeGroup,TestUndoAddNode, TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoSelect, TestUndoMove,TestUndoSubdivide]),
+    new TestGroup("Test Undo()", [TestUndoInvertEdgeDirection, TestUndoSetWeight, TestUndoSetName, TestUndoChangeGroup, TestUndoAddNode, 
+        TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoSelect, TestUndoMove,TestUndoSubdivide]),
     new TestGroup("Test MoveNode()", [TestMoveOnWantedPosition]),
     new TestGroup("Test SelectElement()", [TestSelectNode, TestSelectLink, TestSelectLoop, TestUnselectNode]),
     new TestGroup("Test Subdivide Edge()", [TestSubdivideEdgeElementCount,TestSubdivideEdgeCorrespondingElement,TestSubdivideEdgeOnSelectionCorrespondingElement]),
-    new TestGroup("Test GetGraphFromHTML()", [TestInitialGraphIsntModifyByAddNode, TestInitialGraphIsntModifyByAddLink, TestInitialGraphIsntModifyByAddLoop, TestInitialGraphIsntModifyByRemoveNode, TestInitialGraphIsntModifyByRemoveEdge, TestInitialGraphIsntModifyByRemoveLoop, TestInitialGraphIsntModifyByMovements, TestInitialGraphIsntModifyBySelection]),
-    new TestGroup("Test PretyfyJSON()", [TestFinalGraphCorrespondAfterAddNode, TestFinalGraphCorrespondAfterAddLink, TestFinalGraphCorrespondAfterAddLoop, TestFinalGraphCorrespondAfterRemoveNode, TestFinalGraphCorrespondAfterRemoveEdge, TestFinalGraphCorrespondAfterRemoveLoop, TestFinalGraphCorrespondAfterMove, TestFinalGraphCorrespondAfterSelection, TestFinalGraphInverseYCoordinates, TestFinalGraphSimplifyTargetSourceOfEdges, TestFinalGraphSimplifyTargetSourceOfLoops]),
-    new TestGroup("Test ChangeGroup()",[TestChangeToCorrectGroup])
+    new TestGroup("Test GetGraphFromHTML()", [TestInitialGraphIsntModifyByAddNode, TestInitialGraphIsntModifyByAddLink, TestInitialGraphIsntModifyByAddLoop, 
+        TestInitialGraphIsntModifyByRemoveNode, TestInitialGraphIsntModifyByRemoveEdge, TestInitialGraphIsntModifyByRemoveLoop, TestInitialGraphIsntModifyByMovements, 
+        TestInitialGraphIsntModifyBySelection]),
+    new TestGroup("Test PretyfyJSON()", [TestFinalGraphCorrespondAfterAddNode, TestFinalGraphCorrespondAfterAddLink, TestFinalGraphCorrespondAfterAddLoop, 
+        TestFinalGraphCorrespondAfterRemoveNode, TestFinalGraphCorrespondAfterRemoveEdge, TestFinalGraphCorrespondAfterRemoveLoop, TestFinalGraphCorrespondAfterMove, 
+        TestFinalGraphCorrespondAfterSelection, TestFinalGraphInverseYCoordinates, TestFinalGraphSimplifyTargetSourceOfEdges, TestFinalGraphSimplifyTargetSourceOfLoops]),
+    new TestGroup("Test ChangeGroup()",[TestChangeToCorrectGroup]),
+    new TestGroup("Test SetName()",[TestNodeNameIsChange,TestEdgeNameIsChange,TestLoopNameIsChange,TestChangeToExistingName]),
+    new TestGroup("Test SetWeight()",[TestEdgeWeightIsChange, TestLoopWeightIsChange]),
+    new TestGroup("Test InvertDirection()",[TestDirectionIsInverted]),
 ];
 
 function testOutput(expr, message) {
@@ -40,10 +48,160 @@ function LaunchAllTest() {
     console.log("%c" + prettyDate2() + "Test passed : " + passTest + "/" + (passTest + failedTest), 'font-weight: bold');
 }
 
+function TestUndoInvertEdgeDirection()
+{
+    //Setup
+    let newValue = [graphJSON.links[0].target,graphJSON.links[0].source];
+    let oldValue = [graphJSON.links[0].source,graphJSON.links[0].target];
+    let vr = new ValueRegisterer(oldValue, newValue, new Element(graphJSON.links[0],EdgeType));
+
+    MyManager.execute(new InvertDirectionCommand(vr));
+
+    MyManager.undo();
+
+    let expr =  graphJSON.links[0].source == oldValue[0] && graphJSON.links[0].target == oldValue[1];
+
+    testOutput(expr, "The edge direction has been revert correctly");
+
+    return expr;
+}
+
+function TestUndoSetWeight()
+{
+    //Setup
+    let oldValue = graphJSON.links[0].weight;
+    let newValue = "2121112123121312";
+    let vr = new ValueRegisterer(graphJSON.links[0].weight, newValue, new Element(graphJSON.links[0],EdgeType));
+    MyManager.execute(new ChangeWeightCommand(vr));
+
+    MyManager.undo();
+
+    expr = graphJSON.links[0].weight == oldValue;
+
+    testOutput(expr, "The edge weight has been revert correctly");
+
+    return expr;
+}
+
+function TestDirectionIsInverted(){
+    //Setup
+    let newValue = [graphJSON.links[0].target,graphJSON.links[0].source];
+    let vr = new ValueRegisterer([graphJSON.links[0].source,graphJSON.links[0].target], newValue, new Element(graphJSON.links[0],EdgeType));
+
+    MyManager.execute(new InvertDirectionCommand(vr));
+
+    let expr =  graphJSON.links[0].source == newValue[0] && graphJSON.links[0].target == newValue[1];
+    testOutput(expr, "The edge direction has been correctly inverted");
+
+    return expr;
+}
+
+function TestLoopWeightIsChange(){
+    //Setup
+    let newValue = "150";
+    let vr = new ValueRegisterer(graphJSON.links[0].weight, newValue, new Element(graphJSON.loops[0],LoopType));
+
+    MyManager.execute(new ChangeWeightCommand(vr));
+
+    let expr =  graphJSON.loops[0].weight == newValue;
+
+    testOutput(expr, "The loop weight has been correctly change");
+
+    return expr;
+}
+
+function TestEdgeWeightIsChange(){
+    //Setup
+    let newValue = "150";
+    let vr = new ValueRegisterer(graphJSON.links[0].weight, newValue, new Element(graphJSON.links[0],EdgeType));
+
+    MyManager.execute(new ChangeWeightCommand(vr));
+
+    let expr =  graphJSON.links[0].weight == newValue;
+
+    testOutput(expr, "The edge weight has been correctly change");
+
+    return expr;
+}
+
+function TestUndoSetName()
+{
+    //Setup
+    let oldName = graphJSON.nodes[0].name;
+    let newName = "test1";
+    let vr = new ValueRegisterer(graphJSON.nodes[0].name, newName, new Element(graphJSON.nodes[0],NodeType));
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    MyManager.undo();
+
+    expr = graphJSON.nodes[0].name == oldName;
+
+    testOutput(expr, "The node name has been revert correctly");
+
+    return expr;
+}
+
+
+function TestChangeToExistingName()
+{
+   //Setup
+   let newName = "test2";
+   let vr = new ValueRegisterer(graphJSON.links[0].name, newName, new Element(graphJSON.links[0],EdgeType));
+   MyManager.execute(new ChangeNameCommand(vr));
+
+   let expr = !CheckNewName(newName, EdgeType);
+
+   testOutput(expr, "The name hasn't change");
+
+   return expr;
+}
+
+function TestNodeNameIsChange(){
+    //Setup
+    let newName = "test3";
+    let vr = new ValueRegisterer(graphJSON.nodes[0].name, newName, new Element(graphJSON.nodes[0],NodeType));
+
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    let expr =  graphJSON.nodes[0].name == newName;
+
+    testOutput(expr, "The node name has been correctly change");
+
+    return expr;
+}
+
+function TestEdgeNameIsChange(){
+    //Setup
+    let newName = "test4";
+    let vr = new ValueRegisterer(graphJSON.links[0].name, newName, new Element(graphJSON.links[0],EdgeType));
+
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    let expr =  graphJSON.links[0].name == newName;
+
+    testOutput(expr, "The edge name has been correctly change");
+
+    return expr;
+}
+
+function TestLoopNameIsChange(){
+    //Setup
+    let newName = "test5";
+    let vr = new ValueRegisterer(graphJSON.loops[0].name, newName, new Element(graphJSON.loops[0],LoopType));
+
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    let expr =  graphJSON.loops[0].name == newName;
+
+    testOutput(expr, "The loop name has been correctly change");
+
+    return expr;
+}
+
 
 function TestUndoChangeGroup() {
     //Setup
-    let newGroupName = "test";
+    let newGroupName = "test6";
     groupList.push(newGroupName);
     CreateGroupElement(newGroupName);
     SetCurrentGroup();

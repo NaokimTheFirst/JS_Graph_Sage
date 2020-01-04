@@ -52,8 +52,9 @@ function prettyDate2() {
     })+" ";
 }
 
-function CustomWarn(string){
+function CustomWarn(string, display = true){
     console.warn(prettyDate2()+" "+string);
+    if (display) window.alert(string);
 }
 
 function InitInterface(){
@@ -191,9 +192,13 @@ function KeyboardEventInit() {
                 //I for invert
                 TryInvertEdge();
                 break;
-            case 76:
+            case 76 :
                 //L for Loops
                 AddLoopOnNode();
+                break;
+            case 78 : 
+                //N for Rename
+                TryRenameElement();
                 break;
             case 81:
                 //Q to select
@@ -239,9 +244,56 @@ function KeyboardEventInit() {
     }
 }
 
+function TryRenameElement(){
+    if(currentObject)
+    {
+        newName = AskForNewName();
+        result = CheckNewName(newName, currentObject.type);
+
+        if(result)
+        {
+            let vr = new ValueRegisterer(currentObject.data.name, newName, currentObject);
+            MyManager.execute(new ChangeNameCommand(vr));
+        }
+        else 
+        {
+            CustomWarn("This name is already taken");
+        }
+    }
+    else
+    {
+        CustomWarn("Nothing to rename");
+    }
+}
+
+function AskForNewName(){
+    result = prompt("How do you want to rename it ?", "New Name");
+    return result;
+}
+
+function CheckNewName(name, type){
+    list = null;
+    switch (type) {
+        case NodeType:
+            list = graphJSON.nodes;
+            break;
+        case EdgeType:
+            list = graphJSON.links;
+            break;
+        case LoopType:
+            list = graphJSON.loops;
+            break;
+    }
+
+    return !list.some(function f(elem) {
+        return elem.name == name;
+    });
+}
+
 function TryInvertEdge() {
     if (isDirected && CheckCurrentObjectType(EdgeType)) {
-        MyManager.execute(new InvertDirectionCommand(new ValueRegisterer([currentObject.data.source, currentObject.data.target], [currentObject.data.target, currentObject.data.source], currentObject)));
+        let vr = new ValueRegisterer([currentObject.data.source, currentObject.data.target], [currentObject.data.target, currentObject.data.source], currentObject);
+        MyManager.execute(new InvertDirectionCommand(vr));
     }
     else {
         CustomWarn("Nothing to invert");
@@ -263,29 +315,31 @@ function TryColorNode() {
 }
 
 function TrySetWeight() {
-    if (displayWeight && CheckCurrentObjectType([EdgeType,LoopType])) {
-        let newWeight = prompt("Enter the new weight",1);
-
-        if (!isNaN(newWeight))
-        {
-            if (currentObject.data.weight != newWeight) 
+    if(displayWeight){
+        if (CheckCurrentObjectType([EdgeType,LoopType])) {
+            let newWeight = prompt("Enter the new weight",1);
+    
+            if (!isNaN(newWeight))
             {
-                MyManager.execute(new ChangeWeightCommand(
-                    new ValueRegisterer(currentObject.data.weight, 
-                        newWeight, 
-                        currentObject)
-                    )
-                );
+                if (currentObject.data.weight != newWeight) 
+                {
+                    MyManager.execute(new ChangeWeightCommand(
+                        new ValueRegisterer(currentObject.data.weight, 
+                            newWeight, 
+                            currentObject)
+                        )
+                    );
+                }
+            }
+            else 
+            {
+                CustomWarn("The weight must be a number");
             }
         }
         else 
         {
-            CustomWarn("The weight must be a number");
+            CustomWarn("Only edge and loop can be weighted");
         }
-    }
-    else 
-    {
-        CustomWarn("Only edge and loop can be weighted");
     }
 }
 

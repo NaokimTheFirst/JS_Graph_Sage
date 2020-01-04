@@ -66,7 +66,7 @@ window.onload = function () {
     force.start();
 
     //Freeze the graph after 2 sec
-    WaitGraphLoadToFreeze(1000);
+    WaitGraphLoadToFreeze(1500);
 
 }
 
@@ -93,15 +93,15 @@ function LoadGraphData() {
 
     // List of colors
     color = d3.scale.category10();
-    
+
     //Init group
     FillGroupFromGraph(graphJSON);
     PopulateGroupList();
 
-    
+
 }
 
-function FillGroupFromGraph(graph){
+function FillGroupFromGraph(graph) {
     graph.nodes.forEach(element => {
         if (!groupList.includes(element.group)) {
             groupList.push(element.group);
@@ -148,7 +148,7 @@ function ResetSelection() {
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
-                MyManager.execute(new SelectElementCommand(new Element(element.data, element.type),isFirst));
+                MyManager.execute(new SelectElementCommand(new Element(element.data, element.type), isFirst));
                 isFirst = false;
             });
         });
@@ -401,9 +401,14 @@ function ManageLoopLabels() {
 
 function RefreshLoopLabels() {
     l_labels.text(function (d) {
-        if(d.weight && displayWeight){
-            return "w : "+d.weight;
+        let text = "";
+        if (d.name != "None" && d.name != "") {
+            text += "n : " + d.name+" ";
         }
+        if (d.weight && displayWeight) {
+            text += "w : " + d.weight;
+        }
+        return text;
     });
 }
 
@@ -440,25 +445,35 @@ function RefreshEdge() {
 
 function ManageEdgeLabels() {
     e_labels = svg.selectAll(".e_label")
-    .data(force.links());
-    
+        .data(force.links());
+
     e_labels.enter()
-    .append("svg:text")
-    .attr("class", "e_label")
-    .attr("text-anchor", "middle");
-    
+        .append("svg:text")
+        .attr("class", "e_label")
+        .attr("text-anchor", "middle");
+
     e_labels.exit().remove();
 
     RefreshEdgeLabels();
 }
 
 
-function RefreshEdgeLabels()
-{
+function RefreshEdgeLabels() {
     e_labels.text(function (d) {
-        if(d.weight && displayWeight){
-            return "w : "+d.weight;
+        let text = "";
+        let hasName = d.name != "None" && d.name != "";
+
+        if (hasName) {
+            text += "n : " + d.name;
         }
+
+        if (d.weight && displayWeight) {
+            if(hasName){
+                text += ", "
+            }
+            text += "w : " + d.weight;
+        }
+        return text;
     });
 }
 
@@ -472,11 +487,19 @@ function ManageNodeLabels() {
         .attr("class", "v_label")
         .attr("vertical-align", "middle")
 
-    v_labels.text(function (d) {
-        return d.name;
-    });
-
     v_labels.exit().remove();
+
+    RefreshNodeLabels();
+}
+
+function RefreshNodeLabels() {
+    v_labels.text(function (d) {
+        let text = "";
+        if (d.name != "") {
+            text += d.name;
+        }
+        return text;
+    });
 }
 
 //Assure that all the current data correspond to a node
@@ -504,7 +527,7 @@ function ManageNodes() {
                 drag_in_progress = false;
                 d.finalPos = [d.x, d.y];
 
-                var positions = new ValueRegisterer(d.originPos, d.finalPos, new Element(d,NodeType));
+                var positions = new ValueRegisterer(d.originPos, d.finalPos, new Element(d, NodeType));
                 MyManager.execute(new MoveNodeCommand(positions));
             }));
 
@@ -514,8 +537,7 @@ function ManageNodes() {
     nodes.exit().remove();
 }
 
-function SetNewPosition(registeredPos) 
-{
+function SetNewPosition(registeredPos) {
     SetNodePosition(registeredPos.newValue, registeredPos.element);
 }
 
@@ -527,8 +549,7 @@ function SetNodePosition(Pos, nodeData) {
     force.start();
 }
 
-function SetOldPosition(registeredPos) 
-{
+function SetOldPosition(registeredPos) {
     SetNodePosition(registeredPos.oldValue, registeredPos.element);;
 }
 
@@ -536,20 +557,20 @@ function RefreshNodes() {
     nodes.attr("name", function (d) {
             return d.name;
         })
-        .attr("fill", function (d){
+        .attr("fill", function (d) {
             return color(groupList.indexOf(d.group));
         });
 
     RefreshNodeOutline();
 }
 
-function RefreshNodeOutline(){
+function RefreshNodeOutline() {
     nodes.style("stroke", function (d) {
-        return (d.isSelected == true) ? "red" : "white";
-    })
-    .style("stroke-width", function (d) {
-        return (d.isSelected == true) ? "3" : "2";
-    })
+            return (d.isSelected == true) ? "red" : "white";
+        })
+        .style("stroke-width", function (d) {
+            return (d.isSelected == true) ? "3" : "2";
+        })
 }
 
 function SelectElement(element) {
@@ -616,12 +637,10 @@ function AddNode(newNode) {
 function CreateNode(pos = null) {
     var newX = cursorPosition.x;
     var newY = cursorPosition.y;
-    if(pos != null){
+    if (pos != null) {
         newX = pos[0];
         newY = pos[1];
-    }
-    else 
-    {
+    } else {
         newX = cursorPosition.x;
         newY = cursorPosition.y;
     }
@@ -640,23 +659,19 @@ function CreateNode(pos = null) {
 
 //Add loop on the node hovered
 function AddLoopOnNode() {
-    if(CheckCurrentObjectType(NodeType))
-    {
+    if (CheckCurrentObjectType(NodeType)) {
         var newLoop = CreateLoop(currentObject.data);
         MyManager.execute(new AddLoopCommand(newLoop));
-    }
-    else 
-    {
+    } else {
         CustomWarn("The element hovered is not a node");
     }
 }
 
 //Add loop on all selected nodes
 function AddLoopOnSelection() {
-    if(GetCurrentSelection())
-    {
+    if (GetCurrentSelection()) {
         selection = GetCurrentSelection().nodes;
-    
+
         if (selectedNodes.length > 0) {
             for (let i = 0; i < selectedNodes.length; i++) {
                 var newLoop = CreateLoop(selectedNodes[i].data);
@@ -670,10 +685,9 @@ function AddLoopOnSelection() {
 
 //Add edges between all selected nodes
 function AddEdgesOnSelection() {
-    if(GetCurrentSelection())
-    {
+    if (GetCurrentSelection()) {
         selectedNodes = GetCurrentSelection().nodes;
-    
+
         let isFirst = true;
         if (selectedNodes.length > 0) {
             let j;
@@ -681,7 +695,7 @@ function AddEdgesOnSelection() {
                 j = i + 1;
                 for (; j < selectedNodes.length; j++) {
                     var newLink = CreateEdge(selectedNodes[i].data, selectedNodes[j].data);
-                    MyManager.execute(new AddEdgeCommand(newLink,isFirst));
+                    MyManager.execute(new AddEdgeCommand(newLink, isFirst));
                     isFirst = false;
                 }
             }
@@ -734,21 +748,21 @@ function RemoveElementFromGraph(element, _isFirst = true) {
         case NodeType:
             let isFirst = _isFirst;
             GetEdgesByVertex(element.data).forEach(edge => {
-                MyManager.execute(new SupprEdgeCommand(edge,isFirst));
+                MyManager.execute(new SupprEdgeCommand(edge, isFirst));
                 isFirst = false;
             });
-            
+
             GetLoopsByVertex(element.data).forEach(loop => {
-                MyManager.execute(new SupprLoopCommand(loop,false));
+                MyManager.execute(new SupprLoopCommand(loop, false));
             });
 
-            MyManager.execute(new SupprNodeCommand(element.data,false));
+            MyManager.execute(new SupprNodeCommand(element.data, false));
             break;
         case EdgeType:
-            MyManager.execute(new SupprEdgeCommand(element.data,_isFirst));
+            MyManager.execute(new SupprEdgeCommand(element.data, _isFirst));
             break;
         case LoopType:
-            MyManager.execute(new SupprLoopCommand(element.data,_isFirst));
+            MyManager.execute(new SupprLoopCommand(element.data, _isFirst));
             break;
     }
 }
@@ -756,13 +770,13 @@ function RemoveElementFromGraph(element, _isFirst = true) {
 function RemoveSelection() {
     let currentSelection = GetCurrentSelection();
     let isFirst = true;
-    
+
     if (currentSelection != null) {
         //For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
-                RemoveElementFromGraph(element,isFirst)
+                RemoveElementFromGraph(element, isFirst)
                 isFirst = false;
             });
         });
@@ -813,34 +827,31 @@ function GetLoopsByVertex(currentNode) {
 //Remove a node, his name and the links bound to it
 function RemoveNode(nodeData) {
     graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData), 1);
-    ManageNodes(); 
+    ManageNodes();
     ManageNodeLabels();
     force.start();
 }
 
-function SubdivideEdge(edge, isFirst = true)
-{
-    let pos = third_point_of_curved_edge(edge.source,edge.target,0);
+function SubdivideEdge(edge, isFirst = true) {
+    let pos = third_point_of_curved_edge(edge.source, edge.target, 0);
     let newNode = CreateNode(pos);
 
     MyManager.execute(new AddNodeCommand(newNode, isFirst));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode,edge.source),false));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode,edge.target),false));
-    MyManager.execute(new SupprEdgeCommand(edge,false));
+    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.source), false));
+    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.target), false));
+    MyManager.execute(new SupprEdgeCommand(edge, false));
 }
 
-function SubdivideEdgeOnSelection(){
-    if(GetCurrentSelection())
-    {
+function SubdivideEdgeOnSelection() {
+    if (GetCurrentSelection()) {
         edges = GetCurrentSelection().edges;
-        if(edges.length > 0){
+        if (edges.length > 0) {
             let isFirst = true;
             edges.forEach(edge => {
-                SubdivideEdge(edge.data,isFirst);
+                SubdivideEdge(edge.data, isFirst);
                 isFirst = false;
             });
-        }
-        else {
+        } else {
             CustomWarn("No edges to subdivide");
         }
     }
@@ -888,17 +899,34 @@ function DownloadJSON() {
 }
 
 //Change the group of a node
-function SetNodeGroup(valueRegisterer){
+function SetNodeGroup(valueRegisterer) {
     let node = FindElementInGraph(valueRegisterer.element);
-    node.group = (node.group == valueRegisterer.newValue)? valueRegisterer.oldValue : valueRegisterer.newValue;
+    node.group = (node.group == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
     RefreshNodes();
 }
 
+//Change the name of an element
+function SetElementName(valueRegisterer) {
+    let element = FindElementInGraph(valueRegisterer.element);
+    element.name = (element.name == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
+
+    switch (valueRegisterer.element.type) {
+        case EdgeType:
+            RefreshEdgeLabels();
+            break;
+        case LoopType:
+            RefreshLoopLabels();
+            break;
+        case NodeType:
+            RefreshNodeLabels();
+            break;
+    }
+}
 
 //Change the direction of a directedLink
-function SetLinkDirection(valueRegisterer){
+function SetLinkDirection(valueRegisterer) {
     let link = FindElementInGraph(valueRegisterer.element);
-    let targetedValue = (link.source == valueRegisterer.newValue[0])? valueRegisterer.oldValue : valueRegisterer.newValue;
+    let targetedValue = (link.source == valueRegisterer.newValue[0]) ? valueRegisterer.oldValue : valueRegisterer.newValue;
 
     link.source = targetedValue[0];
     link.target = targetedValue[1];
@@ -906,18 +934,17 @@ function SetLinkDirection(valueRegisterer){
     force.start();
 }
 
-function SetWeight(valueRegisterer)
-{
+function SetWeight(valueRegisterer) {
     let element = FindElementInGraph(valueRegisterer.element);
-    let targetedValue = (element.weight == valueRegisterer.newValue)? valueRegisterer.oldValue : valueRegisterer.newValue;
+    let targetedValue = (element.weight == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
 
     element.weight = targetedValue;
 
-    (valueRegisterer.element.type == EdgeType)? RefreshEdgeLabels(): RefreshLoopLabels();
+    (valueRegisterer.element.type == EdgeType) ? RefreshEdgeLabels(): RefreshLoopLabels();
 }
 
 function FindElementInGraph(element) {
-    let list ;
+    let list;
     switch (element.type) {
         case NodeType:
             list = graphJSON.nodes;

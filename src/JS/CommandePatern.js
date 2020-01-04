@@ -41,6 +41,10 @@ var ChangeWeightCommand = function(value, firstAction = true)  {
     return new Command(SetWeight, SetWeight, value, firstAction);
 };
 
+var ChangeNameCommand = function(value, firstAction = true)  {
+    return new Command(SetElementName, SetElementName, value, firstAction);
+};
+
 var InvertDirectionCommand = function(value, firstAction = true)  {
     return new Command(SetLinkDirection, SetLinkDirection, value, firstAction);
 };
