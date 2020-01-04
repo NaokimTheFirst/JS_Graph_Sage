@@ -1,5 +1,5 @@
 #Your path to the repository JS_Graph_Sage
-path_To_Project_Repo = 'Mes Documents/GitHub'
+path_To_Project_Repo = 'Mes Documents/Git'
 def _update_JS_Repo(path) :
 	global path_To_Project_Repo
 	path_To_Project_Repo = str(path)
