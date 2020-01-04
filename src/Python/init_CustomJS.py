@@ -1,5 +1,5 @@
 #Your path to the repository JS_Graph_Sage
-path_To_Project_Repo = 'Mes Documents/GitHub'
+path_To_Project_Repo = 'Mes Documents/Git'
 def _update_JS_Repo(path) :
 	global path_To_Project_Repo
 	path_To_Project_Repo = str(path)
@@ -14,7 +14,14 @@ def _update_JSON_name(name) :
 	global JSON_name
 	JSON_name = name
 
-#Do not edit this
-attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/CustomJsGraph.py')
-attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Update.py')
-attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Tests.py')
+
+
+_update_JS_Repo(raw_input('Please enter the path to the repository containing the project : '))
+_update_JSON_Repo(path_To_Project_Repo+'/JS_Graph_Sage/obj/')
+
+try:
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/CustomJsGraph.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Update.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Tests.py')
+except:
+	print('Files not found')
