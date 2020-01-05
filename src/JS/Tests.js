@@ -12,7 +12,7 @@ const TestList = [new TestGroup("Test AddNode()", [TestAddCorrectNumberOfNode, T
     new TestGroup("Test AddEdge()", [TestAddCorrectNumberOfLink, TestAddWantedLink, TestAddLinkDontModifyOthersElements]),
     new TestGroup("Test RemoveEdge()", [TestRemoveCorrectNumberOfLink, TestRemoveWantedLink, TestRemoveLinkDontModifyOthersElements]),
     new TestGroup("Test Undo()", [TestUndoInvertEdgeDirection, TestUndoSetWeight, TestUndoSetName, TestUndoChangeGroup, TestUndoAddNode, 
-        TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoSelect, TestUndoMove,TestUndoSubdivide]),
+        TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoMove,TestUndoSubdivide]),
     new TestGroup("Test MoveNode()", [TestMoveOnWantedPosition]),
     new TestGroup("Test SelectElement()", [TestSelectNode, TestSelectLink, TestSelectLoop, TestUnselectNode]),
     new TestGroup("Test Subdivide Edge()", [TestSubdivideEdgeElementCount,TestSubdivideEdgeCorrespondingElement,TestSubdivideEdgeOnSelectionCorrespondingElement]),
@@ -484,7 +484,7 @@ function TestInitialGraphIsntModifyByMovements() {
 function TestInitialGraphIsntModifyBySelection() {
     //Setup
     let oldGraph = GetGraphFromHTML();
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
+    SelectElement(new Element(graphJSON.nodes[0]), NodeType);
     let newGraph = GetGraphFromHTML();
 
     let expr = oldGraph.nodes[0].isSelected == newGraph.nodes[0].isSelected;
@@ -646,17 +646,6 @@ function TestUndoRemoveLoop() {
     return expr;
 }
 
-function TestUndoSelect() {
-    //Setup
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
-    MyManager.undo()
-
-    let expr = graphJSON.nodes[0].isSelected == false;
-    testOutput(expr, "La sélection est bien annulée");
-
-    return expr;
-}
-
 function TestUndoMove() {
     //Setup
     let pos = new ValueRegisterer(
@@ -677,7 +666,7 @@ function TestUndoSubdivide() {
     //Setup
     let edge = CreateEdge(graphJSON.nodes[0],graphJSON.nodes[1]);
     MyManager.execute(new AddEdgeCommand(edge));
-    MyManager.execute(new SelectElementCommand(new Element(edge, EdgeType)));
+    SelectElement(new Element(edge, EdgeType));
     SubdivideEdge(edge);
     MyManager.undo()
 
@@ -704,7 +693,7 @@ function TestMoveOnWantedPosition() {
 
 function TestSelectNode() {
     //Setup
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
+    SelectElement(new Element(graphJSON.nodes[0]), NodeType);
 
     let expr = GetCurrentSelection().nodes[0].data == graphJSON.nodes[0];
     testOutput(expr, "La sélection du noeud est bien effectué");
@@ -715,7 +704,7 @@ function TestSelectNode() {
 
 function TestSelectLink() {
     //Setup
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.links[0]), EdgeType));
+    SelectElement(new Element(graphJSON.links[0]), EdgeType);
 
     let expr = GetCurrentSelection().edges[0].data == graphJSON.links[0];
     testOutput(expr, "La sélection du lien est bien effectué");
@@ -728,7 +717,7 @@ function TestSelectLoop() {
     //Setup
     let newLoop = CreateLoop(graphJSON.nodes[0]);
     MyManager.execute(new AddLoopCommand(newLoop));
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.loops[0]), LoopType));
+    SelectElement(new Element(graphJSON.loops[0]), LoopType);
 
     let expr = GetCurrentSelection().loops[0].data == graphJSON.loops[0];
     testOutput(expr, "La sélection de la boucle est bien effectué");
@@ -740,8 +729,8 @@ function TestUnselectNode() {
     //Setup
     let element = new Element(graphJSON.nodes[2], NodeType);
     let nodesCount = GetCurrentSelection().nodes.length;
-    MyManager.execute(new SelectElementCommand(element));
-    MyManager.execute(new SelectElementCommand(element));
+    SelectElement(element);
+    SelectElement(element);
 
     let expr = GetCurrentSelection().nodes.length == nodesCount;
     testOutput(expr, "La déselection de l'élement est bien effectué");
@@ -853,7 +842,7 @@ function TestFinalGraphCorrespondAfterMove() {
 function TestFinalGraphCorrespondAfterSelection() {
     //Setup
     let oldGraph = PrettyfyJSON();
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
+    SelectElement(new Element(graphJSON.nodes[0]), NodeType);
     let newGraph = PrettyfyJSON();
 
     let expr = oldGraph.nodes[0].isSelected != newGraph.nodes[0].isSelected;
@@ -938,7 +927,7 @@ function TestSubdivideEdgeOnSelectionCorrespondingElement() {
     //Setup
     let edge = CreateEdge(graphJSON.nodes[0],graphJSON.nodes[1]);
     MyManager.execute(new AddEdgeCommand(edge));
-    MyManager.execute(new SelectElementCommand(new Element(edge, EdgeType)));
+    SelectElement(new Element(edge, EdgeType));
     SubdivideEdgeOnSelection();
     
     let expr = true;
