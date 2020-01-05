@@ -343,6 +343,7 @@ import webbrowser
 
 def show_CustomJS(G):
   webbrowser.open('file://'+os.path.realpath(gen_html_code(G)))
+  connect()
 
 
 def GetBackJSON(pathRepo=path_To_JSON_Repo,
@@ -371,14 +372,9 @@ class DataGraph(object):
 import json
 from sage.graphs import graph
 
-
-def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
-                           nameJSON=JSON_name):
-  string = GetBackJSON(nameJSON=nameJSON)
+def ConstructGraphFromJSONString(string):
   JSONObject = DataGraph(string)
-
   posdict={}
-
   G = graphs.EmptyGraph()
 
   #Add nodes
@@ -401,6 +397,11 @@ def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
   for l in JSONObject.loops:
     G.add_edge(l.get("source"),l.get("target"))
 
-  
   return G
 
+
+def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
+                           nameJSON=JSON_name):
+  string = GetBackJSON(nameJSON=nameJSON)
+
+  return ConstructGraphFromJSONString(string)

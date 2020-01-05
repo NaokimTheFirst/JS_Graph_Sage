@@ -884,7 +884,7 @@ function PrettyfyJSON() {
 function DownloadJSON() {
     var prettyJSON = PrettyfyJSON();
 
-    var element = document.createElement('a');
+    /*var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(prettyJSON)));
     element.setAttribute('download', 'Graph_JSON');
 
@@ -893,7 +893,9 @@ function DownloadJSON() {
 
     element.click();
 
-    document.body.removeChild(element);
+    document.body.removeChild(element);*/
+
+    ws.send(JSON.stringify(prettyJSON))
 }
 
 //Change the group of a node

@@ -1,13 +1,15 @@
 def Update_Graph(gold, gnew):
-
-	if gold==gnew :
-		print ('Graphs are the same')
-		return None
+	# if gold==gnew :
+	# 	print ('Graphs are the same')
+	# 	return None
 	__Update_Graph_Nodes(gold, gnew, 0)
 	__Update_Graph_Edges(gold, gnew, 0)
+	print("graph updated")
 
 
 def __Update_Graph_Nodes(gold, gnew, test=1):
+
+	gold.set_pos(gnew.get_pos())
 
 	if gold.get_vertices()==gnew.get_vertices():
 		if test==1:

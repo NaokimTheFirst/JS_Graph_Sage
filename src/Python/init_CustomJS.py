@@ -23,5 +23,7 @@ try:
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/CustomJsGraph.py')
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Update.py')
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Tests.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/websocket_server.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Connection.py')
 except:
 	print('Files not found')
