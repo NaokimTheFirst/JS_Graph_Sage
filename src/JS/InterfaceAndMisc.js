@@ -203,7 +203,7 @@ function KeyboardEventInit() {
             case 81:
                 //Q to select
                 if (currentObject != null) {
-                    MyManager.execute(new SelectElementCommand(currentObject));
+                    SelectElement(currentObject);
                 } else {
                     CustomWarn("Nothing to select");
                 }

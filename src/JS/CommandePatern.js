@@ -29,10 +29,6 @@ var AddLoopCommand = function (value, firstAction = true)  {
     return new Command(AddLoop, RemoveLoop, value, firstAction);
 };
 
-var SelectElementCommand = function(value, firstAction = true)  {
-    return new Command(SelectElement, SelectElement, value, firstAction);
-};
-
 var ChangeGroupCommand = function(value, firstAction = true)  {
     return new Command(SetNodeGroup, SetNodeGroup, value, firstAction);
 };

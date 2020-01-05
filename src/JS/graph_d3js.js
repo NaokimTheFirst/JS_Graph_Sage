@@ -143,13 +143,11 @@ function ResetSelection() {
     currentSelection = GetCurrentSelection();
 
     if (currentSelection != null) {
-        let isFirst = true;
         //For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
-                MyManager.execute(new SelectElementCommand(new Element(element.data, element.type), isFirst));
-                isFirst = false;
+                SelectElement(new Element(element.data, element.type));
             });
         });
 
