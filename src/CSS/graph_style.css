@@ -29,6 +29,9 @@ rect {
     float: right;
 }
 
+#commandTable{
+    margin-bottom: 5%;
+}
 #commandTable th {
     padding : 3%;
 }

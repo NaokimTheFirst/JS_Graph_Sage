@@ -138,7 +138,7 @@ function KeyboardEventInit() {
                 break;
             case 67 :
                 //C for color
-                TryColorNode();
+                SetGroupOfSelection();
                 break;
             case 68:
                 //V for Divide nodes on selection
@@ -158,19 +158,11 @@ function KeyboardEventInit() {
                 break;
             case 76 :
                 //L for Loops
-                AddLoopOnNode();
+                AddLoopOnSelection();
                 break;
             case 78 : 
                 //N for Rename
                 TryRenameElement();
-                break;
-            case 81:
-                //Q to select
-                if (currentObject != null) {
-                    SelectElement(currentObject);
-                } else {
-                    CustomWarn("Nothing to select");
-                }
                 break;
             case 82:
                 //R to reset selection
@@ -251,23 +243,10 @@ function TryInvertEdge() {
         InvertEdgesOnSelection();
     }
     else {
-        CustomWarn("Nothing to invert");
+        CustomWarn("The graph is not directed");
     }
 }
 
-function TryColorNode() {
-    if (CheckCurrentObjectType(NodeType)) {
-        if (currentObject.data.group != groupList[currentGroupIndex]) {
-            MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(currentObject.data.group, groupList[currentGroupIndex], currentObject)));
-        }
-        else {
-            CustomWarn("The node is already in this group");
-        }
-    }
-    else {
-        CustomWarn("Nothing to color");
-    }
-}
 
 function CheckCurrentObjectType(types)
 {

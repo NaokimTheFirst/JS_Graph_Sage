@@ -365,6 +365,9 @@ function ManageLoops() {
         .on("mouseout", function () {
             currentObject = null;
         })
+        .on("dblclick", function (currentData) {
+            SelectElement(new Element(currentData,LoopType));
+        })
         .style("stroke", function (d) {
             return d.color;
         })
@@ -421,6 +424,9 @@ function ManageEdges() {
         })
         .on("mouseout", function () {
             currentObject = null;
+        })
+        .on("dblclick", function (currentData) {
+            SelectElement(new Element(currentData,EdgeType));
         })
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
@@ -505,17 +511,24 @@ function ManageNodes() {
         .on("mouseout", function () {
             currentObject = null;
         })
+        .on("dblclick", function (currentData) {
+            SelectElement(new Element(currentData,NodeType));
+        })
         .call(force.drag()
             .on('dragstart', function (d) {
                 drag_in_progress = true;
-                d.originPos = [d.x, d.y];
+                d.previousPos = [d.x, d.y];
             })
             .on('dragend', function (d) {
                 drag_in_progress = false;
-                d.finalPos = [d.x, d.y];
+                
+                if(d.previousPos[0] != d.x && d.previousPos[1] != d.y)
+                {
+                    let finalPos = [d.x, d.y];
+                    var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
+                    MyManager.execute(new MoveNodeCommand(positions));
+                }
 
-                var positions = new ValueRegisterer(d.originPos, d.finalPos, new Element(d, NodeType));
-                MyManager.execute(new MoveNodeCommand(positions));
             }));
 
     RefreshNodes();
@@ -644,28 +657,45 @@ function CreateNode(pos = null) {
     return newNode;
 }
 
-//Add loop on the node hovered
-function AddLoopOnNode() {
-    if (CheckCurrentObjectType(NodeType)) {
-        var newLoop = CreateLoop(edge);
-        MyManager.execute(new AddLoopCommand(newLoop));
-    } else {
-        CustomWarn("The element hovered is not a node");
-    }
+//Add loop on a node
+function AddLoopOnNode(node) {
+    var newLoop = CreateLoop(node);
+    MyManager.execute(new AddLoopCommand(newLoop));
 }
 
 //Add loop on all selected nodes
 function AddLoopOnSelection() {
     if (GetCurrentSelection()) {
-        selection = GetCurrentSelection().nodes;
+        selectedNodes = GetCurrentSelection().nodes;
 
         if (selectedNodes.length > 0) {
             for (let i = 0; i < selectedNodes.length; i++) {
-                var newLoop = CreateLoop(selectedNodes[i].data);
-                MyManager.execute(new AddLoopCommand(newLoop));
+                AddLoopOnNode(selectedNodes[i].data);
             }
         } else {
             CustomWarn("No nodes to add loop at on the selection");
+        }
+    }
+}
+
+
+//Set Group for all Selected Nodes
+function SetGroupOfSelection() {
+    if (GetCurrentSelection()) {
+        selectedNodes = GetCurrentSelection().nodes;
+        let isFirst = true;
+
+        if (selectedNodes.length > 0) {
+            for (let i = 0; i < selectedNodes.length; i++) {
+                if(selectedNodes[i].data.group != groupList[currentGroupIndex])
+                {
+                    let vr = new ValueRegisterer(selectedNodes[i].data.group, groupList[currentGroupIndex], selectedNodes[i]);
+                    MyManager.execute(new ChangeGroupCommand(vr, isFirst));
+                    isFirst = false;
+                }
+            }
+        } else {
+            CustomWarn("No nodes selected");
         }
     }
 }
@@ -857,7 +887,7 @@ function InvertEdgesOnSelection() {
                 isFirst = false;
             });
         } else {
-            CustomWarn("No edges to subdivide");
+            CustomWarn("No edges to invert");
         }
     }
 }
@@ -910,7 +940,7 @@ function DownloadJSON() {
 }
 
 //Change the group of a node
-function SetNodeGroup(valueRegisterer) {
+function SetGroupNode(valueRegisterer) {
     let node = FindElementInGraph(valueRegisterer.element);
     node.group = (node.group == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
     RefreshNodes();
