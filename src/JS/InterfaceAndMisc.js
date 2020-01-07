@@ -26,14 +26,6 @@ var overlayElements = {
         return this.promptResultElement;
     },
 
-    weightRelatedElements : null,
-    get weightRelated(){
-        if(!this.weightRelatedElements){
-            this.weightRelatedElements = document.getElementsByClassName("WeightRelated");
-        }
-        return this.weightRelatedElements;
-    },
-
     directedRelatedElements : null,
     get directedRelated(){
         if(!this.directedRelatedElements){
@@ -74,16 +66,6 @@ function ShowKeys(button){
     
     overlayElements.commandList.style.display = (show)? "inherit":"none";
     button.value =(show)?"Hide Key Helper": "Show Key Helper";
-}
-
-function DisplayWeight(checkbox){
-    displayWeight = checkbox.checked;
-    RefreshLoopLabels();
-    RefreshEdgeLabels();
-
-    for (let index = 0; index < overlayElements.weightRelated.length; index++) {
-        overlayElements.weightRelated[index].style.display = (displayWeight)? "":"none";
-    }
 }
 
 function PopulateGroupList(){
@@ -147,20 +129,7 @@ function KeyboardEventInit() {
     document.onkeyup = function (key) {
         switch (key.keyCode) {
             case 46:
-                //Suppr
-                if (key.altKey)
-                {
-                    RemoveSelection();
-                } 
-                else 
-                {
-                    if (currentObject != null) {
-                        RemoveElementFromGraph(currentObject);
-                        currentObject = null;
-                    } else {
-                        CustomWarn("Nothing to delete");
-                    }
-                }
+                RemoveSelection();
                 break;
             case 65:
                 //A for Add
@@ -172,13 +141,8 @@ function KeyboardEventInit() {
                 TryColorNode();
                 break;
             case 68:
-                //D for SubDivide
-                if (CheckCurrentObjectType(EdgeType)) {
-                    SubdivideEdge(currentObject.data);
-                    currentObject = null;
-                } else {
-                    CustomWarn("Nothing to subidivide");
-                }
+                //V for Divide nodes on selection
+                SubdivideEdgeOnSelection();
                 break;
             case 69:
                 //E for Edges
@@ -219,14 +183,6 @@ function KeyboardEventInit() {
             case 84:
                 //T for Test, to remove before build
                 LaunchAllTest();
-                break;
-            case 86:
-                //V for Divide nodes on selection
-                SubdivideEdgeOnSelection();
-                break;
-            case 87:
-                //W for Weight
-                TrySetWeight();
                 break;
             case 89:
                 //Y to redo
@@ -291,9 +247,8 @@ function CheckNewName(name, type){
 }
 
 function TryInvertEdge() {
-    if (isDirected && CheckCurrentObjectType(EdgeType)) {
-        let vr = new ValueRegisterer([currentObject.data.source, currentObject.data.target], [currentObject.data.target, currentObject.data.source], currentObject);
-        MyManager.execute(new InvertDirectionCommand(vr));
+    if (isDirected) {
+        InvertEdgesOnSelection();
     }
     else {
         CustomWarn("Nothing to invert");
@@ -311,35 +266,6 @@ function TryColorNode() {
     }
     else {
         CustomWarn("Nothing to color");
-    }
-}
-
-function TrySetWeight() {
-    if(displayWeight){
-        if (CheckCurrentObjectType([EdgeType,LoopType])) {
-            let newWeight = prompt("Enter the new weight",1);
-    
-            if (!isNaN(newWeight))
-            {
-                if (currentObject.data.weight != newWeight) 
-                {
-                    MyManager.execute(new ChangeWeightCommand(
-                        new ValueRegisterer(currentObject.data.weight, 
-                            newWeight, 
-                            currentObject)
-                        )
-                    );
-                }
-            }
-            else 
-            {
-                CustomWarn("The weight must be a number");
-            }
-        }
-        else 
-        {
-            CustomWarn("Only edge and loop can be weighted");
-        }
     }
 }
 

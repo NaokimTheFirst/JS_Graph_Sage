@@ -33,10 +33,6 @@ var ChangeGroupCommand = function(value, firstAction = true)  {
     return new Command(SetNodeGroup, SetNodeGroup, value, firstAction);
 };
 
-var ChangeWeightCommand = function(value, firstAction = true)  {
-    return new Command(SetWeight, SetWeight, value, firstAction);
-};
-
 var ChangeNameCommand = function(value, firstAction = true)  {
     return new Command(SetElementName, SetElementName, value, firstAction);
 };

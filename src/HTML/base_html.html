@@ -25,60 +25,12 @@
       <div id="commandList">
         <table id="commandTable">
           <tr>
-            <th>Action</th>
-            <th>Key</th>
+            <th>General :</th>
           </tr>
+
           <tr>
-            <td>Freeze/UnFreeze Positions</td>
+            <td>Freeze/Unfreeze Positions</td>
             <td>F</td>
-          </tr>
-          <tr>
-            <td>Select/Unselect Element</td>
-            <td>Q</td>
-          </tr>
-          <tr>
-            <td>Add to Group</td>
-            <td>C</td>
-          </tr>
-          <tr>
-            <td>Add Node</td>
-            <td>A</td>
-          </tr>
-          <tr>
-            <td>Delete Element</td>
-            <td>Del</td>
-          </tr>
-          <tr>
-            <td>Delete Selection</td>
-            <td>Alt + Del</td>
-          </tr>
-          <tr>
-            <td>Move Node</td>
-            <td>Drag</td>
-          </tr>
-          <tr>
-            <td>Add Edges On Selection</td>
-            <td>E</td>
-          </tr>
-          <tr>
-            <td>Reset Selection</td>
-            <td>R</td>
-          </tr>
-          <tr>
-            <td>Add Loop</td>
-            <td>L</td>
-          </tr>
-          <tr>
-            <td>Subdivide Edge</td>
-            <td>D</td>
-          </tr>
-          <tr>
-            <td>Subdivide Edge On Selection</td>
-            <td>V</td>
-          </tr>
-          <tr>
-            <td>Rename</td>
-            <td>N</td>
           </tr>
           <tr>
             <td>Undo</td>
@@ -92,9 +44,53 @@
             <td>Save graph</td>
             <td>S</td>
           </tr>
-          <tr class="WeightRelated">
-            <td>Set Weight</td>
-            <td>W</td>
+          
+          <tr>
+            <th>On Hover :</th>
+          </tr>
+          <tr>
+            <td>Select/Unselect Element</td>
+            <td>Q</td>
+          </tr>
+          <tr>
+            <td>Move Node</td>
+            <td>Drag</td>
+          </tr>
+          <tr>
+            <td>Add Node</td>
+            <td>A</td>
+          </tr>
+
+          <tr>
+            <th>On Selection :</th>
+          </tr>
+          <tr>
+            <td>Reset Selection</td>
+            <td>R</td>
+          </tr>
+          <tr>
+            <td>Add to Group</td>
+            <td>C</td>
+          </tr>
+          <tr>
+            <td>Delete</td>
+            <td>Del</td>
+          </tr>
+          <tr>
+            <td>Add Edges</td>
+            <td>E</td>
+          </tr>
+          <tr>
+            <td>Add Loop</td>
+            <td>L</td>
+          </tr>
+          <tr>
+            <td>Subdivide Edge</td>
+            <td>D</td>
+          </tr>
+          <tr>
+            <td>Set Label</td>
+            <td>N</td>
           </tr>
           <tr class="DirectedRelated">
             <td>Invert Edge</td>
@@ -106,20 +102,12 @@
       <table id="PropertiesPanel">
         <tr>
           <td>
-            <p>Current Group </p> 
+            <p style="padding-right: 10px">Current Group</p>
           </td>
           <td>
             <select id="groupList" onchange="ChangeSelectedGroup()">
               <option value="Add New Group" style="background-color: white;">Add New Group</option>
             </select>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <p>Display weight</p> 
-          </td>
-          <td>
-            <input type="checkbox" id="DisplayWeight" onclick="DisplayWeight(this)" checked>
           </td>
         </tr>
       </table>

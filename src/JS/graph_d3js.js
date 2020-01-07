@@ -6,7 +6,6 @@ var width;
 var height;
 var drag_in_progress = false;
 var is_frozen = false;
-var displayWeight = true;
 var isDirected = false;
 
 //DOM Elements / D3JS Elements
@@ -401,10 +400,7 @@ function RefreshLoopLabels() {
     l_labels.text(function (d) {
         let text = "";
         if (d.name != "None" && d.name != "") {
-            text += "n : " + d.name+" ";
-        }
-        if (d.weight && displayWeight) {
-            text += "w : " + d.weight;
+            text = d.name;
         }
         return text;
     });
@@ -462,14 +458,7 @@ function RefreshEdgeLabels() {
         let hasName = d.name != "None" && d.name != "";
 
         if (hasName) {
-            text += "n : " + d.name;
-        }
-
-        if (d.weight && displayWeight) {
-            if(hasName){
-                text += ", "
-            }
-            text += "w : " + d.weight;
+            text += d.name;
         }
         return text;
     });
@@ -658,7 +647,7 @@ function CreateNode(pos = null) {
 //Add loop on the node hovered
 function AddLoopOnNode() {
     if (CheckCurrentObjectType(NodeType)) {
-        var newLoop = CreateLoop(currentObject.data);
+        var newLoop = CreateLoop(edge);
         MyManager.execute(new AddLoopCommand(newLoop));
     } else {
         CustomWarn("The element hovered is not a node");
@@ -783,6 +772,9 @@ function RemoveSelection() {
         ManageEdges();
         ManageNodes();
     }
+    else {
+        CustomWarn("Nothing to delete");
+    }
 }
 
 function RemoveEdge(edgeData) {
@@ -854,6 +846,27 @@ function SubdivideEdgeOnSelection() {
         }
     }
 }
+
+function InvertEdgesOnSelection() {
+    if (GetCurrentSelection()) {
+        edges = GetCurrentSelection().edges;
+        if (edges.length > 0) {
+            let isFirst = true;
+            edges.forEach(edge => {
+                InvertEdge(edge, isFirst);
+                isFirst = false;
+            });
+        } else {
+            CustomWarn("No edges to subdivide");
+        }
+    }
+}
+
+function InvertEdge(edge, isFirst = true){
+    let vr = new ValueRegisterer([edge.data.source, edge.data.target], [edge.data.target, edge.data.source], edge);
+    MyManager.execute(new InvertDirectionCommand(vr, isFirst));
+}
+
 
 function WaitGraphLoadToFreeze(waitingTime) {
     setTimeout(function () {
@@ -930,15 +943,6 @@ function SetLinkDirection(valueRegisterer) {
     link.target = targetedValue[1];
 
     force.start();
-}
-
-function SetWeight(valueRegisterer) {
-    let element = FindElementInGraph(valueRegisterer.element);
-    let targetedValue = (element.weight == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
-
-    element.weight = targetedValue;
-
-    (valueRegisterer.element.type == EdgeType) ? RefreshEdgeLabels(): RefreshLoopLabels();
 }
 
 function FindElementInGraph(element) {

@@ -29,18 +29,19 @@ rect {
     float: right;
 }
 
-#commandList th:nth-child(1) {
+#commandTable th {
+    padding : 3%;
+}
+
+#commandTable th:nth-child(1) {
     text-align: left;
 }
-#commandList th:nth-child(2) {
+
+#commandTable th:nth-child(2) {
     text-align: right;
 }
 
-#commandList td:nth-child(2) {
-    text-align: right;
-}
-
-#PropertiesPanel td:nth-child(2) {
+#commandTable td:nth-child(2) {
     text-align: right;
 }
 
@@ -53,17 +54,7 @@ p {
     display:none;
 }
 
-input[type=checkbox]
-{
-  /* Increase Checkboxes size*/
-  -ms-transform: scale(1.5); /* IE */
-  -moz-transform: scale(1.5); /* FF */
-  -webkit-transform: scale(1.5); /* Safari and Chrome */
-  -o-transform: scale(1.5); /* Opera */
-  transform: scale(1.5);
-}
-
-select{
+#groupList{
     text-align-last:right;
     direction: rtl;
 }
