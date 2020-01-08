@@ -1,15 +1,71 @@
 /* graph_style.css */
 body {
     background-color: rgb(15, 15, 73);
+    margin : 0%;
 }
 
 rect {
     fill: rgb(15, 15, 73);
 }
 
+#Overlay{
+    width: 100%;
+    position: absolute;
+    background: none;
+    z-index: 10;
+    margin : none;
+    pointer-events:none;
+}
+
+#commandList, #PropertiesPanel{
+    pointer-events:auto;
+    color : white;
+    background: rgba(184, 184, 184, 0.473);
+    padding: 0.5%;
+    margin: 0.5%;
+}
+
+#commandList{
+    float: right;
+}
+
+#commandTable{
+    margin-bottom: 5%;
+}
+#commandTable th {
+    padding : 3%;
+}
+
+#commandTable th:nth-child(1) {
+    text-align: left;
+}
+
+#commandTable th:nth-child(2) {
+    text-align: right;
+}
+
+#commandTable td:nth-child(2) {
+    text-align: right;
+}
+
+p {
+    margin: 1%;
+    width:max-content;
+}
+
+#commandTable{
+    display:none;
+}
+
+#groupList{
+    text-align-last:right;
+    direction: rtl;
+}
+
 .node {
     stroke: #fff;
     stroke-width: 1.5px;
+    z-index: 100;
 }
 
 text {
@@ -17,18 +73,15 @@ text {
 }
 
 .link {
-    fill: none;
-    stroke: #000;
-    stroke-opacity: .6;
-    opacity: .6
+    opacity: .6;
+    fill:rgba(255, 255, 255, 0);
 }
 
-.directed {
-    fill: none;
-    stroke: #000;
-    stroke-opacity: .6;
-    opacity: .6
+.loop{
+    opacity: .6;
+    fill:rgba(255, 255, 255, 0);
 }
+
 
 marker {
     fill: #bbb;
