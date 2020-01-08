@@ -21,6 +21,11 @@ const cursorPosition = {
     x: 0,
     y: 0
 };
+const graphTranslation = {
+    x: 0,
+    y: 0,
+    zoom:0,
+};
 
 const LoopType = "loop";
 const NodeType = "Node";
@@ -158,6 +163,10 @@ function ResetSelection() {
 
 function redraw_on_zoom() {
     if (!drag_in_progress) {
+        graphTranslation.x = d3.event.translate[0];
+        graphTranslation.y = d3.event.translate[1];
+        graphTranslation.zoom = d3.event.scale;
+
         svg.attr("transform",
             "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
     }
@@ -635,14 +644,15 @@ function AddNode(newNode) {
 }
 
 function CreateNode(pos = null) {
-    var newX = cursorPosition.x;
-    var newY = cursorPosition.y;
+    var newX;
+    var newY;
     if (pos != null) {
         newX = pos[0];
         newY = pos[1];
     } else {
-        newX = cursorPosition.x;
-        newY = cursorPosition.y;
+        pos = GetCursorPositionInGraph();
+        newX = pos[0];
+        newY = pos[1];
     }
 
     IDCounter++
@@ -991,4 +1001,11 @@ function FindElementInGraph(element) {
             break;
     }
     return list[list.indexOf(element.data)];
+}
+
+function GetCursorPositionInGraph(){
+    newX = (cursorPosition.x - graphTranslation.x) * 1/graphTranslation.zoom;
+    newY = (cursorPosition.y - graphTranslation.y) * 1/graphTranslation.zoom;
+
+    return [newX, newY];
 }
