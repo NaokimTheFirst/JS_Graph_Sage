@@ -61,9 +61,7 @@ window.onload = function () {
     LoadGraphData();
     InitGraph();
     InitInterface();
-
     ManageAllGraphicsElements();
-
     InitForce();
 
     //Start the automatic force layout
@@ -71,7 +69,6 @@ window.onload = function () {
 
     //Freeze the graph after 2 sec
     WaitGraphLoadToFreeze(1500);
-
 }
 
 function handleMouseMove(event) {
@@ -92,8 +89,9 @@ function GetGraphFromHTML() {
 function LoadGraphData() {
     graphJSON = GetGraphFromHTML();
 
-    width = document.documentElement.clientWidth;
-    height = document.documentElement.clientHeight;
+    //-5 to avoid a scrollbar to appear
+    width = document.documentElement.clientWidth - 5;
+    height = document.documentElement.clientHeight - 5;
 
     // List of colors
     color = d3.scale.category10();
@@ -141,6 +139,18 @@ function InitGraph() {
     if (graphJSON.pos.length != 0) {
         center_and_scale();
     }
+
+    // The function 'line' takes as input a sequence of tuples, and returns a
+    // curve interpolating these points.
+    line = d3.svg.line()
+        .interpolate("cardinal")
+        .tension(.2)
+        .x(function (d) {
+            return d.x;
+        })
+        .y(function (d) {
+            return d.y;
+        })
 }
 
 function ResetSelection() {
@@ -311,11 +321,14 @@ function ManageAllGraphicsElements() {
         .attr('height', 2 * 10000);
 
 
-    ManageLoops();
-    ManageNodes();
     ManageNodeLabels();
     ManageEdges();
+    ManageLoops();
+    ManageNodes();
+    ManageArrows();
+}
 
+function ManageArrows(){
     // Arrows, for directed graphs
     if (isDirected) {
         svg.append("svg:defs").selectAll("marker")
@@ -334,19 +347,6 @@ function ManageAllGraphicsElements() {
             // triangles with endpoints (0,-2), (4,0), (0,2)
             .attr("d", "M0,-2L4,0L0,2");
     }
-
-    // The function 'line' takes as input a sequence of tuples, and returns a
-    // curve interpolating these points.
-    line = d3.svg.line()
-        .interpolate("cardinal")
-        .tension(.2)
-        .x(function (d) {
-            return d.x;
-        })
-        .y(function (d) {
-            return d.y;
-        })
-
 }
 
 //Enable or disable the forces
@@ -735,6 +735,7 @@ function AddEdgesOnSelection() {
 function AddEdge(newEdge) {
     graphJSON.links.push(newEdge);
     ManageEdges();
+    PlaceBeforeNode("link");
     force.start();
 }
 
@@ -754,7 +755,17 @@ function CreateEdge(src, dest) {
 function AddLoop(newLoop) {
     graphJSON.loops.push(newLoop);
     ManageLoops();
+    PlaceBeforeNode("loop");
     force.start();
+}
+
+function PlaceBeforeNode(className){
+
+    elements = document.getElementsByClassName(className);
+    let elem = elements[elements.length - 1];
+
+    let firstNode = document.getElementsByClassName("node")[0];
+    firstNode.parentNode.insertBefore(elem,firstNode);
 }
 
 function CreateLoop(src) {
