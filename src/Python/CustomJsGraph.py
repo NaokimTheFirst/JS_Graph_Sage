@@ -83,12 +83,11 @@ import os
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 
-
 def gen_html_code(G,
                   vertex_partition=[],
                   vertex_colors=None,
                   edge_partition=[],
-                  force_spring_layout=False,
+                  layout=None,
                   charge=-120,
                   link_distance=100,
                   link_strength=2,
@@ -274,9 +273,13 @@ def gen_html_code(G,
     edges = [e for e in edges if e["source"] != e["target"]]
 
     # Defines the vertices' layout if possible
-    Gpos = G.get_pos()
+    if layout is not None: 
+      Gpos = G.graphplot(layout=layout)._pos
+    else :
+      Gpos = G.get_pos()
     pos = []
-    if Gpos is not None and force_spring_layout is False:
+
+    if Gpos is not None:
         charge = 0
         link_strength = 0
         gravity = 0
@@ -341,8 +344,8 @@ def gen_html_code(G,
 import re
 import webbrowser
 
-def show_CustomJS(G):
-  webbrowser.open('file://'+os.path.realpath(gen_html_code(G)))
+def show_CustomJS(G, layout=None):
+  webbrowser.open('file://'+os.path.realpath(gen_html_code(G,layout=layout)))
   connect()
 
 
