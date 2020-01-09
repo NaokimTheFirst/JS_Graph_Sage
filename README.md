@@ -3,15 +3,6 @@
 New version of the Javascript visualization of Sage with D3.js
 Student project
 
-
-# IMPORTANT
-
-To make this project work, you need to find the "init_CustomJS.py" script, and change the
-variables according to your paths.
-Then the only script you'll have to attach in Sage is this one.
-
-
-
 Project's logbook :
 https://docs.google.com/document/d/1wu1qKDCjxPgVY6a5Im5XkJSdYcvF8YcselkqUSTHnds/edit?usp=sharing
 
@@ -27,7 +18,6 @@ https://www.d3-graph-gallery.com/interactivity.html (interactivity with displayi
 
 
 --------------
-
 
 Methods explanation : 
 
