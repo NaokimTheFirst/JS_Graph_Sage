@@ -275,7 +275,6 @@ function CheckCurrentObjectType(types)
 }
 
 function updateScroll(){
-    console.log(overlayElements.scrollText.style.display)
     overlayElements.scrollText.parentNode.style.display = "inherit";
     overlayElements.scrollText.scrollTop = overlayElements.scrollText.scrollHeight;
 }

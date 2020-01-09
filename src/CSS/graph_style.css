@@ -4,6 +4,10 @@ body {
     margin : 0%;
 }
 
+.extent{
+    fill: rgba(200, 200, 209,0.3);
+}
+
 rect {
     fill: rgb(15, 15, 73);
 }
