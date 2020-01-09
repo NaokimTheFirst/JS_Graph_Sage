@@ -12,6 +12,7 @@ def client_left(client, server):
 	graph_client_dict.pop(client['id'])
 	if not graph_client_dict :
 		server.server_close()
+		print("server closed")
 		global server_open
 		server_open = False
 
