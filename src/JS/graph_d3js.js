@@ -9,7 +9,7 @@ var is_frozen = false;
 var isDirected = false;
 
 //DOM Elements / D3JS Elements
-var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
+var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush;
 var IDCounter = 0;
 var groupList = [];
 var currentGroupIndex = 0;
@@ -154,7 +154,7 @@ function InitGraph() {
 }
 
 function ResetSelection() {
-    currentSelection = GetCurrentSelection();
+    currentSelection = GetCurrentSelection(true);
 
     if (currentSelection != null) {
         //For each list
@@ -168,17 +168,6 @@ function ResetSelection() {
         RefreshNodes();
         RefreshEdge();
         RefreshLoops();
-    }
-}
-
-function redraw_on_zoom() {
-    if (!drag_in_progress) {
-        graphTranslation.x = d3.event.translate[0];
-        graphTranslation.y = d3.event.translate[1];
-        graphTranslation.zoom = d3.event.scale;
-
-        svg.attr("transform",
-            "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
     }
 }
 
@@ -310,8 +299,6 @@ function ManageAllGraphicsElements() {
         .attr("height", height)
         .attr("pointer-events", "all") // Zoom+move management
         .append('svg:g')
-        .call(d3.behavior.zoom().on("zoom", redraw_on_zoom)).on("dblclick.zoom", null)
-        .append('svg:g');
 
     // Zooming
     svg.append('svg:rect')
@@ -320,12 +307,60 @@ function ManageAllGraphicsElements() {
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000);
 
+        
+    InitBrush();
+
 
     ManageNodeLabels();
     ManageEdges();
     ManageLoops();
     ManageNodes();
     ManageArrows();
+}
+
+
+function InitBrush(){
+    brush = svg.append("g")
+    .attr("class", "brush")
+    .call(d3.svg.brush()
+        .x(d3.scale.identity().domain([-100000, 100000]))
+        .y(d3.scale.identity().domain([-100000, 100000]))
+        .on("brushstart", function() {
+                ResetSelection();
+        })
+        .on("brushend", function() {
+                var extent = d3.event.target.extent();
+                SelectElementsInsideExtent(extent);
+
+                //Remove Selection rectangle
+                d3.event.target.clear();
+                d3.select(this).call(d3.event.target);
+        }));
+}
+
+function SelectElementsInsideExtent(extent) {
+    nodes.each(function (d) {
+        if (IsNodeInsideExtent(extent, d))
+        {
+            SelectElement(new Element(d,NodeType));
+        }
+    })
+    loops.each(function (d) {
+        if (IsNodeInsideExtent(extent, d.source))
+        {
+            SelectElement(new Element(d,LoopType));
+        }
+    })
+    links.each(function (d) {
+        if (IsNodeInsideExtent(extent, d.source) && IsNodeInsideExtent(extent, d.target))
+        {
+            SelectElement(new Element(d,EdgeType));
+        }
+    })
+}
+
+function IsNodeInsideExtent(extent, node){
+    return extent[0][0] <= node.x && node.x < extent[1][0] && extent[0][1] <= node.y && node.y < extent[1][1];
 }
 
 function ManageArrows(){
@@ -597,7 +632,7 @@ function SelectElement(element) {
     }
 }
 
-function GetCurrentSelection() {
+function GetCurrentSelection(allowEmpty = false) {
     var currentSelection = new GraphSelection([], [], []);
 
     let nodes = graphJSON.nodes.filter(function (currentNode) {
@@ -623,7 +658,7 @@ function GetCurrentSelection() {
     });
 
     //Null check
-    if (nodes.length == 0 && edges.length == 0 && loops.length == 0) {
+    if (!allowEmpty && nodes.length == 0 && edges.length == 0 && loops.length == 0) {
         CustomWarn("Nothing Selected");
         return null;
     } else {
@@ -650,7 +685,7 @@ function CreateNode(pos = null) {
         newX = pos[0];
         newY = pos[1];
     } else {
-        pos = GetCursorPositionInGraph();
+        pos = cursorPosition;
         newX = pos[0];
         newY = pos[1];
     }
@@ -668,19 +703,20 @@ function CreateNode(pos = null) {
 }
 
 //Add loop on a node
-function AddLoopOnNode(node) {
+function AddLoopOnNode(node, isFirst = true) {
     var newLoop = CreateLoop(node);
-    MyManager.execute(new AddLoopCommand(newLoop));
+    MyManager.execute(new AddLoopCommand(newLoop, isFirst));
 }
 
 //Add loop on all selected nodes
 function AddLoopOnSelection() {
     if (GetCurrentSelection()) {
         selectedNodes = GetCurrentSelection().nodes;
-
         if (selectedNodes.length > 0) {
+            let isFirst = true;
             for (let i = 0; i < selectedNodes.length; i++) {
-                AddLoopOnNode(selectedNodes[i].data);
+                AddLoopOnNode(selectedNodes[i].data,isFirst);
+                isFirst = false;
             }
         } else {
             CustomWarn("No nodes to add loop at on the selection");
@@ -740,6 +776,7 @@ function AddEdge(newEdge) {
 }
 
 function CreateEdge(src, dest) {
+    let selected = src.isSelected && dest.isSelected;
     var link = {
         "strength": 0,
         "target": dest,
@@ -747,6 +784,7 @@ function CreateEdge(src, dest) {
         "curve": 0,
         "source": src,
         "name": "",
+        "isSelected":selected,
     }
 
     return link;
@@ -769,6 +807,7 @@ function PlaceBeforeNode(className){
 }
 
 function CreateLoop(src) {
+    let selected = src.isSelected;
     var loop = {
         "strength": 0,
         "target": src,
@@ -776,6 +815,7 @@ function CreateLoop(src) {
         "curve": 20,
         "source": src,
         "name": "",
+        "isSelected":selected,
     }
 
     return loop;
@@ -1012,11 +1052,4 @@ function FindElementInGraph(element) {
             break;
     }
     return list[list.indexOf(element.data)];
-}
-
-function GetCursorPositionInGraph(){
-    newX = (cursorPosition.x - graphTranslation.x) * 1/graphTranslation.zoom;
-    newY = (cursorPosition.y - graphTranslation.y) * 1/graphTranslation.zoom;
-
-    return [newX, newY];
 }

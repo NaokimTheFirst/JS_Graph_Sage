@@ -76,7 +76,7 @@ var Manager = function () {
                 revertedCommandStack.push(command);
 
             } else {
-                console.warn("Nothing to revert");
+                CustomWarn("Nothing to revert");
             }
         },
 
@@ -94,7 +94,7 @@ var Manager = function () {
                 } 
                 while(revertedCommandStack.length > 0 && revertedCommandStack[revertedCommandStack.length - 1].firstAction == false)
             } else {
-                console.warn("Nothing to redo");
+                CustomWarn("Nothing to redo");
             }
         },
 
