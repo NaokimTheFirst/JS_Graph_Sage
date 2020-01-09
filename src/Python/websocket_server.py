@@ -60,8 +60,9 @@ class API():
             self.server_close()
             logger.info("Server terminated.")
         except Exception as e:
-            logger.error(str(e), exc_info=True)
-            exit(1)
+            # logger.error(str(e), exc_info=True)
+            # exit(1)
+            pass
 
     def new_client(self, client, server):
         pass
