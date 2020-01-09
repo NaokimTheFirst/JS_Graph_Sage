@@ -343,31 +343,49 @@ import webbrowser
 
 def show_CustomJS(G):
   webbrowser.open('file://'+os.path.realpath(gen_html_code(G)))
-  connect()
+
+  global _last_client
+  client = _last_client
+
+  global server_open
+  if not server_open:
+    launch_connection()
+
+  while _last_client==client :
+    pass
+
+  global graph_client_dict
+  graph_client_dict[_last_client] = G
+
+  print graph_client_dict
+
+  _last_client=0
 
 
-def GetBackJSON(pathRepo=path_To_JSON_Repo,
-                nameJSON=JSON_name):
 
-  filename = pathRepo+nameJSON
+# def GetBackJSON(pathRepo=path_To_JSON_Repo,
+#                 nameJSON=JSON_name):
+
+#   filename = pathRepo+nameJSON
   
-  try :
-    f = open(filename, 'r')
-  except :
-    print ('File '+pathRepo+nameJSON+' does not exist')
-    print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
-    print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
-    sys.exit(1)
+#   try :
+#     f = open(filename, 'r')
+#   except :
+#     print ('File '+pathRepo+nameJSON+' does not exist')
+#     print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
+#     print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
+#     sys.exit(1)
 
-  if f.mode == 'r':
-    lines = f.readlines()
+#   if f.mode == 'r':
+#     lines = f.readlines()
 
-  return lines[0]
+#   return lines[0]
 
 
 class DataGraph(object):
   def __init__(self, data):
     self.__dict__ = json.loads(data)
+
 
 import json
 from sage.graphs import graph
@@ -400,8 +418,8 @@ def ConstructGraphFromJSONString(string):
   return G
 
 
-def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
-                           nameJSON=JSON_name):
-  string = GetBackJSON(nameJSON=nameJSON)
+# def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
+#                            nameJSON=JSON_name):
+#   string = GetBackJSON(nameJSON=nameJSON)
 
-  return ConstructGraphFromJSONString(string)
+#   return ConstructGraphFromJSONString(string)

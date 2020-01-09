@@ -1,7 +1,4 @@
 def Update_Graph(gold, gnew):
-	# if gold==gnew :
-	# 	print ('Graphs are the same')
-	# 	return None
 	__Update_Graph_Nodes(gold, gnew, 0)
 	__Update_Graph_Edges(gold, gnew, 0)
 	print("graph updated")
