@@ -8,8 +8,23 @@ rect {
     fill: rgb(15, 15, 73);
 }
 
+.scroll{
+    width:100%;
+    height: 100%;
+    overflow:auto;
+    -ms-overflow-style: none; /* Hide scrollbar for Chrome, Safari and Opera */
+    color: yellow;
+    font-size: 110%;
+}
+
+/* Hide scrollbar for IE and Edge */
+.scroll::-webkit-scrollbar {
+    display: none;
+}
+
 #Overlay{
     width: 100%;
+    height: 100%;
     position: absolute;
     background: none;
     z-index: 10;
@@ -17,12 +32,20 @@ rect {
     pointer-events:none;
 }
 
-#commandList, #PropertiesPanel{
+#commandList, #PropertiesPanel, #scrollPanel{
     pointer-events:auto;
     color : white;
     background: rgba(184, 184, 184, 0.473);
     padding: 0.5%;
     margin: 0.5%;
+}
+
+#scrollPanel{
+    display: none;
+    width:fit-content;
+    height: 5%;
+    position: absolute; 
+    bottom: 0;
 }
 
 #commandList{
@@ -31,6 +54,8 @@ rect {
 
 #commandTable{
     margin-bottom: 5%;
+    display:none;
+
 }
 #commandTable th {
     padding : 3%;
@@ -51,10 +76,6 @@ rect {
 p {
     margin: 1%;
     width:max-content;
-}
-
-#commandTable{
-    display:none;
 }
 
 #groupList{

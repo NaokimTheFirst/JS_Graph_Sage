@@ -33,6 +33,14 @@ var overlayElements = {
         }
         return this.directedRelatedElements;
     },
+
+    scrollTextElement : null,
+    get scrollText(){
+        if(!this.scrollTextElement){
+            this.scrollTextElement = document.getElementsByClassName("scroll")[0];
+        }
+        return this.scrollTextElement;
+    },
 }
 
 //Return string with time on format "HH:MM""
@@ -46,7 +54,16 @@ function prettyDate2() {
 
 function CustomWarn(string, display = true){
     console.warn(prettyDate2()+" "+string);
-    if (display) window.alert(string);
+    if (display) {
+        let newLine = prettyDate2()+" : "+string;
+        let logs = overlayElements.scrollText.innerHTML.split(/<br(?: \/)?>/);
+        let lastLog = logs[logs.length - 2];
+        if (lastLog != newLine){
+            overlayElements.scrollText.innerHTML += newLine + "<br>"
+        }
+
+        updateScroll();
+    }
 }
 
 function InitInterface(){
@@ -255,4 +272,10 @@ function CheckCurrentObjectType(types)
         result = types.includes(currentObject.type);
     }
     return result;
+}
+
+function updateScroll(){
+    console.log(overlayElements.scrollText.style.display)
+    overlayElements.scrollText.parentNode.style.display = "inherit";
+    overlayElements.scrollText.scrollTop = overlayElements.scrollText.scrollHeight;
 }
