@@ -58,6 +58,8 @@ var Manager = function () {
             revertedCommandStack = [];
             this.do(command);
             log.add(action(command) + ": " + command.value);
+
+            UpdateGraphAttributes();
         },
 
         undo: function () {

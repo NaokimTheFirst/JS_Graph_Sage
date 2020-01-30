@@ -17,13 +17,42 @@ def client_left(client, server):
 		server_open = False
 
 
+from json import JSONEncoder
 # Called when a client sends a message
 def message_received(client, server, message):
-	newG = ConstructGraphFromJSONString(message)
 	global graph_client_dict
 	targetGraph = graph_client_dict[client['id']]
-	Update_Graph(targetGraph, newG)
+	JSONObject = DataGraph(message)
+	newG = ConstructGraphFromJSONObject(JSONObject)
+	result = Check_Parameter(JSONObject.parameter,newG)
+	if result != None :
+		returnMessage = JSONEncoder().encode({"result": result})
+		server.send_message(client,returnMessage)
+	Update_Graph(g, newG)
 
+
+def Check_Parameter(parameter,graph):
+	result = []
+	if parameter == "Radius" :
+		result = Check_Radius_Diameter(graph)
+	else :
+		result = None
+
+	return result
+
+def Check_Radius_Diameter(graph):
+	result = []
+	radius = graph.radius()
+	diameter = graph.diameter()
+	if isinstance(radius, sage.rings.infinity.PlusInfinity):
+		radius = "+Infinity"
+	if isinstance(diameter, sage.rings.infinity.PlusInfinity):
+		diameter = "+Infinity"
+
+	result.append(radius)
+	result.append(diameter)
+
+	return result
 
 def connect():
 	PORT=9001

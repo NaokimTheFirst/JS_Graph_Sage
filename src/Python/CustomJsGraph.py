@@ -394,8 +394,7 @@ class DataGraph(object):
 import json
 from sage.graphs import graph
 
-def ConstructGraphFromJSONString(string):
-  JSONObject = DataGraph(string)
+def ConstructGraphFromJSONObject(JSONObject):
   posdict={}
   G = graphs.EmptyGraph()
 
