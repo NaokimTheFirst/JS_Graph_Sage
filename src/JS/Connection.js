@@ -11,8 +11,9 @@ function initCon() {
   };
   
   ws.onmessage = function(e) {
-    // e.data contains received string.
-    output("onmessage: " + e.data);
+    let object = eval('(' + e.data + ')');
+    SetRadius(object.result[0]);
+    SetDiameter(object.result[1]);
   };
   
   ws.onclose = function() {
@@ -24,13 +25,12 @@ function initCon() {
   };
 }
 
-function onSubmit() {
-  var input = document.getElementById("input");
-  // You can send message to the Web Socket using ws.send.
-  ws.send(input.value);
-  output("send: " + input.value);
-  input.value = "";
-  input.focus();
+function SubmitMessage() {
+  if(!graphJSON.parameter){
+    graphJSON.parameter = null;
+  }
+  var prettyJSON = PrettyfyJSON();
+  ws.send(JSON.stringify(prettyJSON))
 }
 
 function onCloseClick() {

@@ -41,6 +41,22 @@ var overlayElements = {
         }
         return this.scrollTextElement;
     },
+
+    radiusLabelElement : null,
+    get radiusLabel(){
+        if(!this.radiusLabelElement){
+            this.radiusLabelElement = document.getElementById("radiusLabel");
+        }
+        return this.radiusLabelElement;
+    },
+
+    diameterLabelElement : null,
+    get diameterLabel(){
+        if(!this.diameterLabelElement){
+            this.diameterLabelElement = document.getElementById("diameterLabel");
+        }
+        return this.diameterLabelElement;
+    },
 }
 
 //Return string with time on format "HH:MM""
@@ -64,6 +80,14 @@ function CustomWarn(string, display = true){
 
         updateScroll();
     }
+}
+
+function SetRadius(radius){
+    overlayElements.radiusLabel.innerHTML = radius;
+}
+
+function SetDiameter(diameter){
+    overlayElements.diameterLabel.innerHTML = diameter;
 }
 
 function InitInterface(){
@@ -187,7 +211,7 @@ function KeyboardEventInit() {
                 break;
             case 83:
                 //S to save
-                DownloadJSON();
+                SubmitMessage();
                 break;
             case 84:
                 //T for Test, to remove before build
