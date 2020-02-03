@@ -1037,6 +1037,6 @@ function FindElementInGraph(element) {
 }
 
 function UpdateGraphAttributes(){
-    graphJSON.parameter = "Radius";
+    graphJSON.parameter = "Properties";
     SubmitMessage();
 }

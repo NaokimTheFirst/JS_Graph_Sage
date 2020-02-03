@@ -2,6 +2,7 @@
 _last_client = 0
 graph_client_dict = {}
 server_open = False
+JS_functions_dict = {}
 
 #Your path to the repository JS_Graph_Sage
 path_To_Project_Repo = 'Mes Documents/Git'
@@ -33,5 +34,6 @@ try:
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Tests.py')
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/websocket_server.py')
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Connection.py')
+	update_functions_dict()
 except:
 	print('Files not found')
