@@ -2,7 +2,6 @@
 _last_client = 0
 graph_client_dict = {}
 server_open = False
-JS_functions_dict = {}
 
 #Your path to the repository JS_Graph_Sage
 path_To_Project_Repo = 'Mes Documents/Git'

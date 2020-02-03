@@ -1,3 +1,9 @@
+
+JS_functions_dict = {'Radius'='',
+					 'Properties'=Check_Properties,
+					 'Coloring'=Generate_Coloring}
+
+
 # Called for every client connecting
 def new_client(client, server):
 	print("New client connected and was given id %d" % client['id'])
@@ -52,12 +58,6 @@ def message_received(client, server, message):
 
 	Update_Graph(targetGraph, newG)
 
-
-def update_functions_dict():
-	global JS_functions_dict
-	JS_functions_dict['Radius']=''
-	JS_functions_dict['Properties']=Check_Properties
-	JS_functions_dict['Coloring']=Generate_Coloring
 
 
 def Check_Parameter(parameter,graph):
