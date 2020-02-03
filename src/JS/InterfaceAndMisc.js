@@ -1,61 +1,88 @@
 //Structure that allow to search DOM element only once
 var overlayElements = {
-    groupListElement : null,
+    _groupListElement : null,
     get groupList() {
-        if(!this.groupListElement)
+        if(!this._groupListElement)
         {
-            this.groupListElement = document.getElementById("groupList");
+            this._groupListElement = document.getElementById("groupList");
         }
-        return this.groupListElement;
+        return this._groupListElement;
     },
 
-    commandListElement : null,
-    get commandList(){
-        if(!this.commandListElement)
+    _keyPanelContent : null,
+    get keyPanelContent(){
+        if(!this._keyPanelContent)
         {
-            this.commandListElement = document.getElementById("commandTable");
+            this._keyPanelContent = document.getElementById("KeyPanelContent");
         }
-        return this.commandListElement;
+        return this._keyPanelContent;
     },
 
-    promptResultElement : null,
+    _propertyPanelContent : null,
+    get propertyPanelContent(){
+        if(!this._propertyPanelContent)
+        {
+            this._propertyPanelContent = document.getElementById("PropertyPanelContent");
+        }
+        return this._propertyPanelContent;
+    },
+
+    _toolPanelContent : null,
+    get toolPanelContent(){
+        if(!this._toolPanelContent)
+        {
+            this._toolPanelContent = document.getElementById("ToolPanelContent");
+        }
+        return this._toolPanelContent;
+    },
+
+    _algorithmPanelContent : null,
+    get algorithmPanelContent(){
+        if(!this._algorithmPanelContent)
+        {
+            this._algorithmPanelContent = document.getElementById("AlgorithmPanelContent");
+        }
+        return this._algorithmPanelContent;
+    },
+
+    _promptResultElement : null,
     get promptResult(){
-        if(!this.promptResultElement){
-            this.promptResultElement = document.getElementById("PromptResult");
+        if(!this._promptResultElement){
+            this._promptResultElement = document.getElementById("PromptResult");
         }
-        return this.promptResultElement;
+        return this._promptResultElement;
     },
 
-    directedRelatedElements : null,
+    _directedRelatedElements : null,
     get directedRelated(){
-        if(!this.directedRelatedElements){
-            this.directedRelatedElements = document.getElementsByClassName("DirectedRelated");
+        if(!this._directedRelatedElements){
+            this._directedRelatedElements = document.getElementsByClassName("DirectedRelated");
         }
-        return this.directedRelatedElements;
+        return this._directedRelatedElements;
     },
 
-    scrollTextElement : null,
+    _scrollTextElement : null,
     get scrollText(){
-        if(!this.scrollTextElement){
-            this.scrollTextElement = document.getElementsByClassName("scroll")[0];
+        if(!this._scrollTextElement){
+            this._scrollTextElement = document.getElementsByClassName("scroll")[0];
         }
-        return this.scrollTextElement;
+        return this._scrollTextElement;
     },
 
-    radiusLabelElement : null,
+    _radiusLabelElement : null,
     get radiusLabel(){
-        if(!this.radiusLabelElement){
-            this.radiusLabelElement = document.getElementById("radiusLabel");
+        if(!this._radiusLabelElement){
+            this._radiusLabelElement = document.getElementById("radiusLabel");
         }
-        return this.radiusLabelElement;
+        return this._radiusLabelElement;
     },
 
-    diameterLabelElement : null,
+    _diameterLabelElement : null,
     get diameterLabel(){
-        if(!this.diameterLabelElement){
-            this.diameterLabelElement = document.getElementById("diameterLabel");
+        if(!this._diameterLabelElement){
+            this._diameterLabelElement = document.getElementById("diameterLabel");
         }
-        return this.diameterLabelElement;
+        return this._diameterLabelElement;
     },
 }
 
@@ -91,22 +118,35 @@ function SetDiameter(diameter){
 }
 
 function InitInterface(){
+    InitPanels();
     InitKeyHelper()
     KeyboardEventInit();
 }
 
+function InitPanels(){
+    InitKeyHelper();
+    DisplayElement(overlayElements.propertyPanelContent,false);
+    DisplayElement(overlayElements.algorithmPanelContent,false);
+}
+
+function DisplayElement(element, show){
+    element.style.display = (show)? "":"none";
+}
+
 function InitKeyHelper(){
+    DisplayElement(overlayElements.keyPanelContent,false);
     for (let index = 0; index < overlayElements.directedRelated.length; index++) {
-        overlayElements.directedRelated[index].style.display = (isDirected)? "":"none";
+        DisplayElement(overlayElements.directedRelated[index],isDirected);
     }
 }
-//Hide or show key helper
-function ShowKeys(button){
-    let show = (overlayElements.commandList.style.display == "" 
-    || overlayElements.commandList.style.display == "none");
+
+//Hide or show panel content
+function ShowPanelContent(button){
+    let panelContent = button.previousElementSibling;
+    let show = (panelContent.style.display == "none");
     
-    overlayElements.commandList.style.display = (show)? "inherit":"none";
-    button.value =(show)?"Hide Key Helper": "Show Key Helper";
+    DisplayElement(panelContent,show);
+    button.value =(show)? "Hide": "Show";
 }
 
 function PopulateGroupList(){
