@@ -206,28 +206,29 @@ function TryAddNewGroup(){
 }
 
 function KeyboardEventInit() {
+    
     //Keyboard Event
     document.onkeyup = function (key) {
+        var action = null;
         switch (key.keyCode) {
             case 46:
-                RemoveSelection();
+                action = RemoveSelection();
                 break;
             case 65:
                 //A for Add
-                var newNode = CreateNode();
-                MyManager.execute(new AddNodeCommand(newNode));
+                action = AddNewNode();
                 break;
             case 67 :
                 //C for color
-                SetGroupOfSelection();
+                action = SetGroupOfSelection();
                 break;
             case 68:
                 //V for Divide nodes on selection
-                SubdivideEdgeOnSelection();
+                action = SubdivideEdgeOnSelection();
                 break;
             case 69:
                 //E for Edges
-                AddEdgesOnSelection();
+                action = AddEdgesOnSelection();
                 break;
             case 70:
                 //F for Freeze
@@ -235,15 +236,15 @@ function KeyboardEventInit() {
                 break;
             case 73 :
                 //I for invert
-                TryInvertEdge();
+                action = TryInvertEdge();
                 break;
             case 76 :
                 //L for Loops
-                AddLoopOnSelection();
+                action = AddLoopOnSelection();
                 break;
             case 78 : 
                 //N for Rename
-                TryRenameElement();
+                action = TryRenameElement();
                 break;
             case 82:
                 //R to reset selection
@@ -260,18 +261,32 @@ function KeyboardEventInit() {
             case 89:
                 //Y to redo
                 MyManager.redo();
+                action = true;
                 break;
             case 90:
                 //Z to undo
                 MyManager.undo();
+                action = true;
                 break;
             default:
                 //Affiche le code de la touche pressée
                 console.log("Keycode : " + key.keyCode);
                 break;
         }
+        if(action){
+            TryUserAction(action);
+        }
     }
 }
+
+function TryUserAction(action){
+    if(action == true)
+    {
+        UpdateGraphProperties();
+    }
+}
+
+
 
 function TryRenameElement(){
     if(currentObject)
@@ -283,6 +298,7 @@ function TryRenameElement(){
         {
             let vr = new ValueRegisterer(currentObject.data.name, newName, currentObject);
             MyManager.execute(new ChangeNameCommand(vr));
+            return true;
         }
         else 
         {
@@ -293,6 +309,7 @@ function TryRenameElement(){
     {
         CustomWarn("Nothing to rename");
     }
+    return false;
 }
 
 function AskForNewName(){
@@ -321,11 +338,12 @@ function CheckNewName(name, type){
 
 function TryInvertEdge() {
     if (isDirected) {
-        InvertEdgesOnSelection();
+        return InvertEdgesOnSelection();
     }
     else {
         CustomWarn("The graph is not directed");
     }
+    return false;
 }
 
 

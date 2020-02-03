@@ -74,7 +74,6 @@ var Manager = function () {
                 current = command.undo(command.value);
                 log.add("Undo " + action(command) + ": " + command.value);
                 revertedCommandStack.push(command)
-                UpdateGraphAttributes();
 
             } else {
                 CustomWarn("Nothing to revert");
@@ -84,7 +83,6 @@ var Manager = function () {
         do: function (command) {
             command.execute(command.value);
             commandsStack.push(command);
-            UpdateGraphAttributes();
         },
 
         redo: function () {
