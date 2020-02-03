@@ -1,9 +1,4 @@
 
-JS_functions_dict = {'Radius'='',
-					 'Properties'=Check_Properties,
-					 'Coloring'=Generate_Coloring}
-
-
 # Called for every client connecting
 def new_client(client, server):
 	print("New client connected and was given id %d" % client['id'])
@@ -84,6 +79,10 @@ def Check_Properties(graph):
 
 	return result
 
+
 def Generate_Coloring(graph):
 	result = graph.coloring()
 	return result
+
+JS_functions_dict = {'Properties':Check_Properties,
+					 'Coloring':Generate_Coloring}
