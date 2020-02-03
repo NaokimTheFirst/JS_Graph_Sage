@@ -571,6 +571,7 @@ function ManageNodes() {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
                     MyManager.execute(new MoveNodeCommand(positions));
+                    UpdateGraphProperties();
                 }
 
             }));
@@ -676,6 +677,8 @@ function AddNode(newNode) {
 
     //Restart the force layout with the new elements
     force.start();
+    
+    return true;
 }
 
 function CreateNode(pos = null) {
@@ -718,10 +721,12 @@ function AddLoopOnSelection() {
                 AddLoopOnNode(selectedNodes[i].data,isFirst);
                 isFirst = false;
             }
+            return true;
         } else {
             CustomWarn("No nodes to add loop at on the selection");
         }
     }
+    return false;
 }
 
 
@@ -740,9 +745,12 @@ function SetGroupOfSelection() {
                     isFirst = false;
                 }
             }
+
+            return true;
         } else {
             CustomWarn("No nodes selected");
         }
+        return false;
     }
 }
 
@@ -762,9 +770,12 @@ function AddEdgesOnSelection() {
                     isFirst = false;
                 }
             }
+            return true;
         } else {
             CustomWarn("No nodes to add loop at on the selection");
         }
+
+        return false;
     }
 }
 
@@ -845,6 +856,12 @@ function RemoveElementFromGraph(element, _isFirst = true) {
     }
 }
 
+function AddNewNode() {
+    var newNode = CreateNode();
+    MyManager.execute(new AddNodeCommand(newNode));
+    return true; 
+}
+
 function RemoveSelection() {
     let currentSelection = GetCurrentSelection();
     let isFirst = true;
@@ -862,10 +879,13 @@ function RemoveSelection() {
         ManageLoops();
         ManageEdges();
         ManageNodes();
+
+        return true;
     }
     else {
         CustomWarn("Nothing to delete");
     }
+    return false;
 }
 
 function RemoveEdge(edgeData) {
@@ -932,9 +952,11 @@ function SubdivideEdgeOnSelection() {
                 SubdivideEdge(edge.data, isFirst);
                 isFirst = false;
             });
+            return true;
         } else {
             CustomWarn("No edges to subdivide");
         }
+        return false;
     }
 }
 
@@ -947,9 +969,11 @@ function InvertEdgesOnSelection() {
                 InvertEdge(edge, isFirst);
                 isFirst = false;
             });
+            return true;
         } else {
             CustomWarn("No edges to invert");
         }
+        return false;
     }
 }
 
@@ -1036,7 +1060,7 @@ function FindElementInGraph(element) {
     return list[list.indexOf(element.data)];
 }
 
-function UpdateGraphAttributes(){
+function UpdateGraphProperties(){
     graphJSON.parameter = "Radius";
     SubmitMessage();
 }
