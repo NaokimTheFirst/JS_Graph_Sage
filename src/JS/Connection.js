@@ -7,7 +7,7 @@ function initCon() {
   ws = new WebSocket("ws://localhost:9001/");
   // Set event handlers.
   ws.onopen = function() {
-    output("onopen");
+    //console.log("onopen");
   };
   
   ws.onmessage = function(e) {
@@ -17,10 +17,11 @@ function initCon() {
   };
   
   ws.onclose = function() {
-    output("onclose");
+    //console.log("onclose");
   };
+
   ws.onerror = function(e) {
-    output("onerror");
+    //console.log("onerror");
     console.log(e)
   };
 }
@@ -35,9 +36,5 @@ function SubmitMessage() {
 
 function onCloseClick() {
   ws.close();
-}
-
-function output(str) {
-  console.log(str)
 }
 
