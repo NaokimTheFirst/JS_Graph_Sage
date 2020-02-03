@@ -1060,7 +1060,8 @@ function FindElementInGraph(element) {
     return list[list.indexOf(element.data)];
 }
 
+
 function UpdateGraphProperties(){
-    graphJSON.parameter = "Radius";
+    graphJSON.parameter = "Properties";
     SubmitMessage();
 }
