@@ -1,40 +1,96 @@
 /* graph_style.css */
 body {
     background-color: rgb(15, 15, 73);
+    margin : 0%;
+}
+
+.extent{
+    fill: rgba(200, 200, 209,0.3);
 }
 
 rect {
     fill: rgb(15, 15, 73);
 }
 
-#commandList{
-    position: absolute;
-    color : white;
-    z-index: 10;
-    border-right:3px solid black ;
-    border-bottom:3px solid black;
-    background: rgba(184, 184, 184, 0.473);
-    padding: 1%;
-    margin : none;
+.scroll{
+    width:100%;
+    height: 100%;
+    overflow:auto;
+    -ms-overflow-style: none; /* Hide scrollbar for Chrome, Safari and Opera */
+    color: yellow;
+    font-size: 110%;
 }
 
-#commandList th:nth-child(1) {
-    text-align: left;
+/* Hide scrollbar for IE and Edge */
+.scroll::-webkit-scrollbar {
+    display: none;
 }
-#commandList th:nth-child(2) {
-    text-align: right;
+
+#Overlay{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: none;
+    z-index: 10;
+    margin : none;
+    pointer-events:none;
 }
-#commandList td:nth-child(2) {
-    text-align: right;
+
+#commandList, #PropertiesPanel, #scrollPanel{
+    pointer-events:auto;
+    color : white;
+    background: rgba(184, 184, 184, 0.473);
+    padding: 0.5%;
+    margin: 0.5%;
+}
+
+#scrollPanel{
+    display: none;
+    width:fit-content;
+    height: 5%;
+    position: absolute; 
+    bottom: 0;
+}
+
+#commandList{
+    float: right;
 }
 
 #commandTable{
+    margin-bottom: 5%;
     display:none;
+
+}
+#commandTable th {
+    padding : 3%;
+}
+
+#commandTable th:nth-child(1) {
+    text-align: left;
+}
+
+#commandTable th:nth-child(2) {
+    text-align: right;
+}
+
+#commandTable td:nth-child(2) {
+    text-align: right;
+}
+
+p {
+    margin: 1%;
+    width:max-content;
+}
+
+#groupList{
+    text-align-last:right;
+    direction: rtl;
 }
 
 .node {
     stroke: #fff;
     stroke-width: 1.5px;
+    z-index: 100;
 }
 
 text {
@@ -50,6 +106,7 @@ text {
     opacity: .6;
     fill:rgba(255, 255, 255, 0);
 }
+
 
 marker {
     fill: #bbb;

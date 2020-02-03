@@ -6,27 +6,36 @@ var width;
 var height;
 var drag_in_progress = false;
 var is_frozen = false;
+var isDirected = false;
 
 //DOM Elements / D3JS Elements
-var nodes, links, loops, v_labels, e_labels, l_labels, line, svg;
+var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush;
 var IDCounter = 0;
+var groupList = [];
+var currentGroupIndex = 0;
 var currentObject = null;
 const MyManager = new Manager();
+
 
 const cursorPosition = {
     x: 0,
     y: 0
+};
+const graphTranslation = {
+    x: 0,
+    y: 0,
+    zoom:0,
 };
 
 const LoopType = "loop";
 const NodeType = "Node";
 const EdgeType = "link directed";
 
-class PositionRegisterer {
-    constructor(oldPos, newPos, node) {
-        this.oldPos = oldPos;
-        this.newPos = newPos;
-        this.node = node;
+class ValueRegisterer {
+    constructor(oldValue, newValue, element) {
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+        this.element = element;
     }
 }
 
@@ -51,18 +60,15 @@ window.onload = function () {
 
     LoadGraphData();
     InitGraph();
-    KeyboardEventInit();
-
+    InitInterface();
     ManageAllGraphicsElements();
-
     InitForce();
 
     //Start the automatic force layout
     force.start();
 
     //Freeze the graph after 2 sec
-    WaitGraphLoadToFreeze(1000);
-
+    WaitGraphLoadToFreeze(1500);
 }
 
 function handleMouseMove(event) {
@@ -83,13 +89,31 @@ function GetGraphFromHTML() {
 function LoadGraphData() {
     graphJSON = GetGraphFromHTML();
 
-    width = document.documentElement.clientWidth;
-    height = document.documentElement.clientHeight;
+    //-5 to avoid a scrollbar to appear
+    width = document.documentElement.clientWidth - 5;
+    height = document.documentElement.clientHeight - 5;
+
     // List of colors
     color = d3.scale.category10();
+
+    //Init group
+    FillGroupFromGraph(graphJSON);
+    PopulateGroupList();
+
+
+}
+
+function FillGroupFromGraph(graph) {
+    graph.nodes.forEach(element => {
+        if (!groupList.includes(element.group)) {
+            groupList.push(element.group);
+        }
+    });
 }
 
 function InitGraph() {
+    isDirected = graphJSON.directed;
+
     //Find the highest  ID in the graph
     graphJSON.nodes.forEach(element => {
         if (element.name > IDCounter) {
@@ -115,32 +139,35 @@ function InitGraph() {
     if (graphJSON.pos.length != 0) {
         center_and_scale();
     }
+
+    // The function 'line' takes as input a sequence of tuples, and returns a
+    // curve interpolating these points.
+    line = d3.svg.line()
+        .interpolate("cardinal")
+        .tension(.2)
+        .x(function (d) {
+            return d.x;
+        })
+        .y(function (d) {
+            return d.y;
+        })
 }
 
 function ResetSelection() {
-    currentSelection = GetCurrentSelection();
+    currentSelection = GetCurrentSelection(true);
 
-    let isFirst = true;
     if (currentSelection != null) {
         //For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
-                MyManager.execute(new SelectElementCommand(new Element(element.data, element.type),isFirst));
-                isFirst = false;
+                SelectElement(new Element(element.data, element.type));
             });
         });
 
         RefreshNodes();
         RefreshEdge();
         RefreshLoops();
-    }
-}
-
-function redraw_on_zoom() {
-    if (!drag_in_progress) {
-        svg.attr("transform",
-            "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
     }
 }
 
@@ -240,32 +267,28 @@ function InitForce() {
         }
 
         // Position of vertex labels
-        if (graphJSON.vertex_labels) {
-            v_labels
-                .attr("x", function (d) {
-                    return d.x + graphJSON.vertex_size;
-                })
-                .attr("y", function (d) {
-                    return d.y;
-                })
-        }
+        v_labels
+            .attr("x", function (d) {
+                return d.x + graphJSON.vertex_size;
+            })
+            .attr("y", function (d) {
+                return d.y;
+            })
         // Position of the edge labels
-        if (graphJSON.edge_labels) {
-            e_labels
-                .attr("x", function (d) {
-                    return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[0];
-                })
-                .attr("y", function (d) {
-                    return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[1];
-                })
-            l_labels
-                .attr("x", function (d, i) {
-                    return force.nodes()[d.source].x;
-                })
-                .attr("y", function (d, i) {
-                    return force.nodes()[d.source].y - 2 * d.curve - 1;
-                })
-        }
+        e_labels
+            .attr("x", function (d) {
+                return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[0];
+            })
+            .attr("y", function (d) {
+                return third_point_of_curved_edge(d.source, d.target, d.curve + 3)[1];
+            })
+        l_labels
+            .attr("x", function (d) {
+                return d.source.x;
+            })
+            .attr("y", function (d) {
+                return d.source.y - 2 * d.curve - 1;
+            })
     });
 }
 
@@ -276,8 +299,6 @@ function ManageAllGraphicsElements() {
         .attr("height", height)
         .attr("pointer-events", "all") // Zoom+move management
         .append('svg:g')
-        .call(d3.behavior.zoom().on("zoom", redraw_on_zoom)).on("dblclick.zoom", null)
-        .append('svg:g');
 
     // Zooming
     svg.append('svg:rect')
@@ -286,35 +307,65 @@ function ManageAllGraphicsElements() {
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000);
 
+        
+    InitBrush();
 
+
+    ManageNodeLabels();
+    ManageEdges();
     ManageLoops();
     ManageNodes();
-    ManageVertexLabel();
-    ManageEdges();
+    ManageArrows();
+}
 
-    // Edge labels
-    if (graphJSON.edge_labels) {
-        e_labels = svg.selectAll(".e_label")
-            .data(force.links())
-            .enter()
-            .append("svg:text")
-            .attr("text-anchor", "middle")
-            .text(function (d) {
-                return d.name;
-            })
 
-        l_labels = svg.selectAll(".l_label")
-            .data(graphJSON.loops)
-            .enter()
-            .append("svg:text")
-            .attr("text-anchor", "middle")
-            .text(function (d, i) {
-                return graphJSON.loops[i].name;
-            })
-    }
+function InitBrush(){
+    brush = svg.append("g")
+    .attr("class", "brush")
+    .call(d3.svg.brush()
+        .x(d3.scale.identity().domain([-100000, 100000]))
+        .y(d3.scale.identity().domain([-100000, 100000]))
+        .on("brushstart", function() {
+                ResetSelection();
+        })
+        .on("brushend", function() {
+                var extent = d3.event.target.extent();
+                SelectElementsInsideExtent(extent);
 
+                //Remove Selection rectangle
+                d3.event.target.clear();
+                d3.select(this).call(d3.event.target);
+        }));
+}
+
+function SelectElementsInsideExtent(extent) {
+    nodes.each(function (d) {
+        if (IsNodeInsideExtent(extent, d))
+        {
+            SelectElement(new Element(d,NodeType));
+        }
+    })
+    loops.each(function (d) {
+        if (IsNodeInsideExtent(extent, d.source))
+        {
+            SelectElement(new Element(d,LoopType));
+        }
+    })
+    links.each(function (d) {
+        if (IsNodeInsideExtent(extent, d.source) && IsNodeInsideExtent(extent, d.target))
+        {
+            SelectElement(new Element(d,EdgeType));
+        }
+    })
+}
+
+function IsNodeInsideExtent(extent, node){
+    return extent[0][0] <= node.x && node.x < extent[1][0] && extent[0][1] <= node.y && node.y < extent[1][1];
+}
+
+function ManageArrows(){
     // Arrows, for directed graphs
-    if (graphJSON.directed) {
+    if (isDirected) {
         svg.append("svg:defs").selectAll("marker")
             .data(["directed"])
             .enter().append("svg:marker")
@@ -326,25 +377,11 @@ function ManageAllGraphicsElements() {
             .attr("refY", 0)
             .attr("markerWidth", 4)
             .attr("markerHeight", 4)
-            .attr("preserveAspectRatio", false)
             .attr("orient", "auto")
             .append("svg:path")
             // triangles with endpoints (0,-2), (4,0), (0,2)
             .attr("d", "M0,-2L4,0L0,2");
     }
-
-    // The function 'line' takes as input a sequence of tuples, and returns a
-    // curve interpolating these points.
-    line = d3.svg.line()
-        .interpolate("cardinal")
-        .tension(.2)
-        .x(function (d) {
-            return d.x;
-        })
-        .y(function (d) {
-            return d.y;
-        })
-
 }
 
 //Enable or disable the forces
@@ -372,21 +409,51 @@ function ManageLoops() {
         .on("mouseout", function () {
             currentObject = null;
         })
+        .on("dblclick", function (currentData) {
+            SelectElement(new Element(currentData,LoopType));
+        })
         .style("stroke", function (d) {
             return d.color;
         })
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
     RefreshLoops();
+    ManageLoopLabels();
 
     loops.exit().remove();
 };
 
 function RefreshLoops() {
     loops.style("stroke", function (d) {
-        return (d.selectionGroup != null) ? "red" : d.color;
+        return (d.isSelected == true) ? "red" : d.color;
     });
 }
+
+function ManageLoopLabels() {
+    l_labels = svg.selectAll(".l_label")
+        .data(graphJSON.loops);
+
+    l_labels.enter()
+        .append("svg:text")
+        .attr("class", "l_label")
+        .attr("text-anchor", "middle");
+
+    l_labels.exit().remove();
+
+    RefreshLoopLabels();
+}
+
+function RefreshLoopLabels() {
+    l_labels.text(function (d) {
+        let text = "";
+        if (d.name != "None" && d.name != "") {
+            text = d.name;
+        }
+        return text;
+    });
+}
+
+
 
 function ManageEdges() {
     // Edges
@@ -402,35 +469,74 @@ function ManageEdges() {
         .on("mouseout", function () {
             currentObject = null;
         })
+        .on("dblclick", function (currentData) {
+            SelectElement(new Element(currentData,EdgeType));
+        })
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
     RefreshEdge();
 
     links.exit().remove();
+
+    ManageEdgeLabels();
 }
 
 function RefreshEdge() {
     links.style("stroke", function (d) {
-        return (d.selectionGroup != null) ? "red" : d.color;
+        return (d.isSelected == true) ? "red" : d.color;
     });
 }
 
-function ManageVertexLabel() {
+function ManageEdgeLabels() {
+    e_labels = svg.selectAll(".e_label")
+        .data(force.links());
+
+    e_labels.enter()
+        .append("svg:text")
+        .attr("class", "e_label")
+        .attr("text-anchor", "middle");
+
+    e_labels.exit().remove();
+
+    RefreshEdgeLabels();
+}
+
+
+function RefreshEdgeLabels() {
+    e_labels.text(function (d) {
+        let text = "";
+        let hasName = d.name != "None" && d.name != "";
+
+        if (hasName) {
+            text += d.name;
+        }
+        return text;
+    });
+}
+
+function ManageNodeLabels() {
     // Vertex labels
-    if (graphJSON.vertex_labels) {
-        v_labels = svg.selectAll(".v_label")
-            .data(graphJSON.nodes)
+    v_labels = svg.selectAll(".v_label")
+        .data(graphJSON.nodes)
 
-        v_labels.enter()
-            .append("svg:text")
-            .attr("class", "v_label")
-            .attr("vertical-align", "middle")
-        v_labels.text(function (d) {
-            return d.name;
-        });
+    v_labels.enter()
+        .append("svg:text")
+        .attr("class", "v_label")
+        .attr("vertical-align", "middle")
 
-        v_labels.exit().remove();
-    }
+    v_labels.exit().remove();
+
+    RefreshNodeLabels();
+}
+
+function RefreshNodeLabels() {
+    v_labels.text(function (d) {
+        let text = "";
+        if (d.name != "") {
+            text += d.name;
+        }
+        return text;
+    });
 }
 
 //Assure that all the current data correspond to a node
@@ -449,17 +555,24 @@ function ManageNodes() {
         .on("mouseout", function () {
             currentObject = null;
         })
+        .on("dblclick", function (currentData) {
+            SelectElement(new Element(currentData,NodeType));
+        })
         .call(force.drag()
             .on('dragstart', function (d) {
                 drag_in_progress = true;
-                d.originPos = [d.x, d.y];
+                d.previousPos = [d.x, d.y];
             })
             .on('dragend', function (d) {
                 drag_in_progress = false;
-                d.finalPos = [d.x, d.y];
+                
+                if(d.previousPos[0] != d.x && d.previousPos[1] != d.y)
+                {
+                    let finalPos = [d.x, d.y];
+                    var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
+                    MyManager.execute(new MoveNodeCommand(positions));
+                }
 
-                var positions = new PositionRegisterer(d.originPos, d.finalPos, d);
-                MyManager.execute(new MoveNodeCommand(positions));
             }));
 
     RefreshNodes();
@@ -469,37 +582,43 @@ function ManageNodes() {
 }
 
 function SetNewPosition(registeredPos) {
-    var currrentNode = graphJSON.nodes.filter(function name(current) {
-        return current.name == registeredPos.node.name;
-    })[0];
+    SetNodePosition(registeredPos.newValue, registeredPos.element);
+}
+
+function SetNodePosition(Pos, nodeData) {
+    let currrentNode = FindElementInGraph(nodeData);
     force.stop();
-    currrentNode.px = registeredPos.newPos[0];
-    currrentNode.py = registeredPos.newPos[1];
+    currrentNode.px = Pos[0];
+    currrentNode.py = Pos[1];
     force.start();
 }
 
 function SetOldPosition(registeredPos) {
-    var currrentNode = graphJSON.nodes.filter(function name(current) {
-        return current.name == registeredPos.node.name;
-    })[0];
-
-    force.stop();
-    currrentNode.px = registeredPos.oldPos[0];
-    currrentNode.py = registeredPos.oldPos[1];
-    force.start();
+    SetNodePosition(registeredPos.oldValue, registeredPos.element);;
 }
 
 function RefreshNodes() {
     nodes.attr("name", function (d) {
             return d.name;
         })
-        .style("fill", function (d) {
-            return (d.selectionGroup != null) ? "red" : color(d.group);
+        .attr("fill", function (d) {
+            return color(groupList.indexOf(d.group));
         });
+
+    RefreshNodeOutline();
+}
+
+function RefreshNodeOutline() {
+    nodes.style("stroke", function (d) {
+            return (d.isSelected == true) ? "red" : "white";
+        })
+        .style("stroke-width", function (d) {
+            return (d.isSelected == true) ? "3" : "2";
+        })
 }
 
 function SelectElement(element) {
-    element.data.selectionGroup = (element.data.selectionGroup == null) ? -1 : null;
+    element.data.isSelected = (element.data.isSelected == true) ? false : true;
     switch (element.type) {
         case NodeType:
             RefreshNodes();
@@ -513,11 +632,11 @@ function SelectElement(element) {
     }
 }
 
-function GetCurrentSelection() {
+function GetCurrentSelection(allowEmpty = false) {
     var currentSelection = new GraphSelection([], [], []);
 
     let nodes = graphJSON.nodes.filter(function (currentNode) {
-        return currentNode.selectionGroup == -1;
+        return currentNode.isSelected == true;
     });
     nodes.forEach(element => {
         currentSelection.nodes.push(new Element(element, NodeType))
@@ -525,21 +644,21 @@ function GetCurrentSelection() {
 
 
     let edges = graphJSON.links.filter(function (currentLink) {
-        return currentLink.selectionGroup == -1;
+        return currentLink.isSelected == true;
     });
     edges.forEach(element => {
         currentSelection.edges.push(new Element(element, EdgeType))
     });
 
     let loops = graphJSON.loops.filter(function (currentLoop) {
-        return currentLoop.selectionGroup == -1;
+        return currentLoop.isSelected == true;
     });
     loops.forEach(element => {
         currentSelection.loops.push(new Element(element, LoopType))
     });
 
     //Null check
-    if (nodes.length == 0 && edges.length == 0 && loops.length == 0) {
+    if (!allowEmpty && nodes.length == 0 && edges.length == 0 && loops.length == 0) {
         CustomWarn("Nothing Selected");
         return null;
     } else {
@@ -553,23 +672,22 @@ function AddNode(newNode) {
 
     //Apply nodes rules to the data
     ManageNodes();
-    ManageVertexLabel();
+    ManageNodeLabels();
 
     //Restart the force layout with the new elements
     force.start();
 }
 
 function CreateNode(pos = null) {
-    var newX = cursorPosition.x;
-    var newY = cursorPosition.y;
-    if(pos != null){
+    var newX;
+    var newY;
+    if (pos != null) {
         newX = pos[0];
         newY = pos[1];
-    }
-    else 
-    {
-        newX = cursorPosition.x;
-        newY = cursorPosition.y;
+    } else {
+        pos = cursorPosition;
+        newX = pos[0];
+        newY = pos[1];
     }
 
     IDCounter++
@@ -584,26 +702,21 @@ function CreateNode(pos = null) {
     return newNode;
 }
 
-//Add loop on the node hovered
-function AddLoopOnNode() {
-    if (currentObject != null && currentObject.type == NodeType) {
-        var newLoop = CreateLoop(currentObject.data);
-        MyManager.execute(new AddLoopCommand(newLoop));
-    } else {
-        CustomWarn("The element hovered is not a node");
-    }
+//Add loop on a node
+function AddLoopOnNode(node, isFirst = true) {
+    var newLoop = CreateLoop(node);
+    MyManager.execute(new AddLoopCommand(newLoop, isFirst));
 }
 
 //Add loop on all selected nodes
 function AddLoopOnSelection() {
-    if(GetCurrentSelection())
-    {
-        selection = GetCurrentSelection().nodes;
-    
+    if (GetCurrentSelection()) {
+        selectedNodes = GetCurrentSelection().nodes;
         if (selectedNodes.length > 0) {
+            let isFirst = true;
             for (let i = 0; i < selectedNodes.length; i++) {
-                var newLoop = CreateLoop(selectedNodes[i].data);
-                MyManager.execute(new AddLoopCommand(newLoop));
+                AddLoopOnNode(selectedNodes[i].data,isFirst);
+                isFirst = false;
             }
         } else {
             CustomWarn("No nodes to add loop at on the selection");
@@ -611,12 +724,33 @@ function AddLoopOnSelection() {
     }
 }
 
+
+//Set Group for all Selected Nodes
+function SetGroupOfSelection() {
+    if (GetCurrentSelection()) {
+        selectedNodes = GetCurrentSelection().nodes;
+        let isFirst = true;
+
+        if (selectedNodes.length > 0) {
+            for (let i = 0; i < selectedNodes.length; i++) {
+                if(selectedNodes[i].data.group != groupList[currentGroupIndex])
+                {
+                    let vr = new ValueRegisterer(selectedNodes[i].data.group, groupList[currentGroupIndex], selectedNodes[i]);
+                    MyManager.execute(new ChangeGroupCommand(vr, isFirst));
+                    isFirst = false;
+                }
+            }
+        } else {
+            CustomWarn("No nodes selected");
+        }
+    }
+}
+
 //Add edges between all selected nodes
 function AddEdgesOnSelection() {
-    if(GetCurrentSelection())
-    {
+    if (GetCurrentSelection()) {
         selectedNodes = GetCurrentSelection().nodes;
-    
+
         let isFirst = true;
         if (selectedNodes.length > 0) {
             let j;
@@ -624,7 +758,7 @@ function AddEdgesOnSelection() {
                 j = i + 1;
                 for (; j < selectedNodes.length; j++) {
                     var newLink = CreateEdge(selectedNodes[i].data, selectedNodes[j].data);
-                    MyManager.execute(new AddEdgeCommand(newLink,isFirst));
+                    MyManager.execute(new AddEdgeCommand(newLink, isFirst));
                     isFirst = false;
                 }
             }
@@ -637,10 +771,12 @@ function AddEdgesOnSelection() {
 function AddEdge(newEdge) {
     graphJSON.links.push(newEdge);
     ManageEdges();
+    PlaceBeforeNode("link");
     force.start();
 }
 
 function CreateEdge(src, dest) {
+    let selected = src.isSelected && dest.isSelected;
     var link = {
         "strength": 0,
         "target": dest,
@@ -648,6 +784,7 @@ function CreateEdge(src, dest) {
         "curve": 0,
         "source": src,
         "name": "",
+        "isSelected":selected,
     }
 
     return link;
@@ -656,10 +793,21 @@ function CreateEdge(src, dest) {
 function AddLoop(newLoop) {
     graphJSON.loops.push(newLoop);
     ManageLoops();
+    PlaceBeforeNode("loop");
     force.start();
 }
 
+function PlaceBeforeNode(className){
+
+    elements = document.getElementsByClassName(className);
+    let elem = elements[elements.length - 1];
+
+    let firstNode = document.getElementsByClassName("node")[0];
+    firstNode.parentNode.insertBefore(elem,firstNode);
+}
+
 function CreateLoop(src) {
+    let selected = src.isSelected;
     var loop = {
         "strength": 0,
         "target": src,
@@ -667,6 +815,7 @@ function CreateLoop(src) {
         "curve": 20,
         "source": src,
         "name": "",
+        "isSelected":selected,
     }
 
     return loop;
@@ -677,21 +826,21 @@ function RemoveElementFromGraph(element, _isFirst = true) {
         case NodeType:
             let isFirst = _isFirst;
             GetEdgesByVertex(element.data).forEach(edge => {
-                MyManager.execute(new SupprEdgeCommand(edge,isFirst));
+                MyManager.execute(new SupprEdgeCommand(edge, isFirst));
                 isFirst = false;
             });
-            
+
             GetLoopsByVertex(element.data).forEach(loop => {
-                MyManager.execute(new SupprLoopCommand(loop,false));
+                MyManager.execute(new SupprLoopCommand(loop, false));
             });
 
-            MyManager.execute(new SupprNodeCommand(element.data,false));
+            MyManager.execute(new SupprNodeCommand(element.data, false));
             break;
         case EdgeType:
-            MyManager.execute(new SupprEdgeCommand(element.data,_isFirst));
+            MyManager.execute(new SupprEdgeCommand(element.data, _isFirst));
             break;
         case LoopType:
-            MyManager.execute(new SupprLoopCommand(element.data,_isFirst));
+            MyManager.execute(new SupprLoopCommand(element.data, _isFirst));
             break;
     }
 }
@@ -699,13 +848,13 @@ function RemoveElementFromGraph(element, _isFirst = true) {
 function RemoveSelection() {
     let currentSelection = GetCurrentSelection();
     let isFirst = true;
-    
+
     if (currentSelection != null) {
         //For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
-                RemoveElementFromGraph(element,isFirst)
+                RemoveElementFromGraph(element, isFirst)
                 isFirst = false;
             });
         });
@@ -713,6 +862,9 @@ function RemoveSelection() {
         ManageLoops();
         ManageEdges();
         ManageNodes();
+    }
+    else {
+        CustomWarn("Nothing to delete");
     }
 }
 
@@ -756,38 +908,56 @@ function GetLoopsByVertex(currentNode) {
 //Remove a node, his name and the links bound to it
 function RemoveNode(nodeData) {
     graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData), 1);
-    ManageNodes(); 
-    ManageVertexLabel();
+    ManageNodes();
+    ManageNodeLabels();
     force.start();
 }
 
-function SubdivideEdge(edge, isFirst = true)
-{
-    let pos = third_point_of_curved_edge(edge.source,edge.target,0);
+function SubdivideEdge(edge, isFirst = true) {
+    let pos = third_point_of_curved_edge(edge.source, edge.target, 0);
     let newNode = CreateNode(pos);
 
     MyManager.execute(new AddNodeCommand(newNode, isFirst));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode,edge.source),false));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode,edge.target),false));
-    MyManager.execute(new SupprEdgeCommand(edge,false));
+    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.source), false));
+    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.target), false));
+    MyManager.execute(new SupprEdgeCommand(edge, false));
 }
 
-function SubdivideEdgeOnSelection(){
-    if(GetCurrentSelection())
-    {
+function SubdivideEdgeOnSelection() {
+    if (GetCurrentSelection()) {
         edges = GetCurrentSelection().edges;
-        if(edges.length > 0){
+        if (edges.length > 0) {
             let isFirst = true;
             edges.forEach(edge => {
-                SubdivideEdge(edge.data,isFirst);
+                SubdivideEdge(edge.data, isFirst);
                 isFirst = false;
             });
-        }
-        else {
+        } else {
             CustomWarn("No edges to subdivide");
         }
     }
 }
+
+function InvertEdgesOnSelection() {
+    if (GetCurrentSelection()) {
+        edges = GetCurrentSelection().edges;
+        if (edges.length > 0) {
+            let isFirst = true;
+            edges.forEach(edge => {
+                InvertEdge(edge, isFirst);
+                isFirst = false;
+            });
+        } else {
+            CustomWarn("No edges to invert");
+        }
+    }
+}
+
+function InvertEdge(edge, isFirst = true){
+    let vr = new ValueRegisterer([edge.data.source, edge.data.target], [edge.data.target, edge.data.source], edge);
+    MyManager.execute(new InvertDirectionCommand(vr, isFirst));
+}
+
 
 function WaitGraphLoadToFreeze(waitingTime) {
     setTimeout(function () {
@@ -814,18 +984,59 @@ function PrettyfyJSON() {
     return prettyJSON;
 }
 
-//Save the JSON to a txt
-function DownloadJSON() {
-    var prettyJSON = PrettyfyJSON();
+//Change the group of a node
+function SetGroupNode(valueRegisterer) {
+    let node = FindElementInGraph(valueRegisterer.element);
+    node.group = (node.group == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
+    RefreshNodes();
+}
 
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(prettyJSON)));
-    element.setAttribute('download', 'Graph_JSON');
+//Change the name of an element
+function SetElementName(valueRegisterer) {
+    let element = FindElementInGraph(valueRegisterer.element);
+    element.name = (element.name == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
 
-    element.style.display = 'none';
-    document.body.appendChild(element);
+    switch (valueRegisterer.element.type) {
+        case EdgeType:
+            RefreshEdgeLabels();
+            break;
+        case LoopType:
+            RefreshLoopLabels();
+            break;
+        case NodeType:
+            RefreshNodeLabels();
+            break;
+    }
+}
 
-    element.click();
+//Change the direction of a directedLink
+function SetLinkDirection(valueRegisterer) {
+    let link = FindElementInGraph(valueRegisterer.element);
+    let targetedValue = (link.source == valueRegisterer.newValue[0]) ? valueRegisterer.oldValue : valueRegisterer.newValue;
 
-    document.body.removeChild(element);
+    link.source = targetedValue[0];
+    link.target = targetedValue[1];
+
+    force.start();
+}
+
+function FindElementInGraph(element) {
+    let list;
+    switch (element.type) {
+        case NodeType:
+            list = graphJSON.nodes;
+            break;
+        case EdgeType:
+            list = graphJSON.links;
+            break;
+        case LoopType:
+            list = graphJSON.loops;
+            break;
+    }
+    return list[list.indexOf(element.data)];
+}
+
+function UpdateGraphAttributes(){
+    graphJSON.parameter = "Radius";
+    SubmitMessage();
 }

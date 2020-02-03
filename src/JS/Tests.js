@@ -11,12 +11,20 @@ const TestList = [new TestGroup("Test AddNode()", [TestAddCorrectNumberOfNode, T
     new TestGroup("Test RemoveLoop()", [TestRemoveCorrectNumberOfLoop, TestRemoveWantedLoop, TestRemoveLoopDontModifyOthersElements]),
     new TestGroup("Test AddEdge()", [TestAddCorrectNumberOfLink, TestAddWantedLink, TestAddLinkDontModifyOthersElements]),
     new TestGroup("Test RemoveEdge()", [TestRemoveCorrectNumberOfLink, TestRemoveWantedLink, TestRemoveLinkDontModifyOthersElements]),
-    new TestGroup("Test Undo()", [TestUndoAddNode, TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoSelect, TestUndoMove,TestUndoSubdivide]),
+    new TestGroup("Test Undo()", [TestUndoInvertEdgeDirection, TestUndoSetName, TestUndoChangeGroup, TestUndoAddNode, 
+        TestUndoAddEdge, TestUndoAddLoop, TestUndoRemoveNode, TestUndoRemoveLink, TestUndoRemoveLoop, TestUndoMove,TestUndoSubdivide]),
     new TestGroup("Test MoveNode()", [TestMoveOnWantedPosition]),
     new TestGroup("Test SelectElement()", [TestSelectNode, TestSelectLink, TestSelectLoop, TestUnselectNode]),
     new TestGroup("Test Subdivide Edge()", [TestSubdivideEdgeElementCount,TestSubdivideEdgeCorrespondingElement,TestSubdivideEdgeOnSelectionCorrespondingElement]),
-    new TestGroup("Test GetGraphFromHTML()", [TestInitialGraphIsntModifyByAddNode, TestInitialGraphIsntModifyByAddLink, TestInitialGraphIsntModifyByAddLoop, TestInitialGraphIsntModifyByRemoveNode, TestInitialGraphIsntModifyByRemoveEdge, TestInitialGraphIsntModifyByRemoveLoop, TestInitialGraphIsntModifyByMovements, TestInitialGraphIsntModifyBySelection]),
-    new TestGroup("Test PretyfyJSON()", [TestFinalGraphCorrespondAfterAddNode, TestFinalGraphCorrespondAfterAddLink, TestFinalGraphCorrespondAfterAddLoop, TestFinalGraphCorrespondAfterRemoveNode, TestFinalGraphCorrespondAfterRemoveEdge, TestFinalGraphCorrespondAfterRemoveLoop, TestFinalGraphCorrespondAfterMove, TestFinalGraphCorrespondAfterSelection, TestFinalGraphInverseYCoordinates, TestFinalGraphSimplifyTargetSourceOfEdges, TestFinalGraphSimplifyTargetSourceOfLoops]),
+    new TestGroup("Test GetGraphFromHTML()", [TestInitialGraphIsntModifyByAddNode, TestInitialGraphIsntModifyByAddLink, TestInitialGraphIsntModifyByAddLoop, 
+        TestInitialGraphIsntModifyByRemoveNode, TestInitialGraphIsntModifyByRemoveEdge, TestInitialGraphIsntModifyByRemoveLoop, TestInitialGraphIsntModifyByMovements, 
+        TestInitialGraphIsntModifyBySelection]),
+    new TestGroup("Test PretyfyJSON()", [TestFinalGraphCorrespondAfterAddNode, TestFinalGraphCorrespondAfterAddLink, TestFinalGraphCorrespondAfterAddLoop, 
+        TestFinalGraphCorrespondAfterRemoveNode, TestFinalGraphCorrespondAfterRemoveEdge, TestFinalGraphCorrespondAfterRemoveLoop, TestFinalGraphCorrespondAfterMove, 
+        TestFinalGraphCorrespondAfterSelection, TestFinalGraphInverseYCoordinates, TestFinalGraphSimplifyTargetSourceOfEdges, TestFinalGraphSimplifyTargetSourceOfLoops]),
+    new TestGroup("Test ChangeGroup()",[TestChangeToCorrectGroup]),
+    new TestGroup("Test SetName()",[TestNodeNameIsChange,TestEdgeNameIsChange,TestLoopNameIsChange,TestChangeToExistingName]),
+    new TestGroup("Test InvertDirection()",[TestDirectionIsInverted]),
 ];
 
 function testOutput(expr, message) {
@@ -32,11 +40,174 @@ function LaunchAllTest() {
     TestList.forEach(testGroup => {
         console.log(prettyDate2() + testGroup.label);
         testGroup.tests.forEach(test => {
+            BeforeAllTest();
             (test()) ? passTest++ : failedTest++;
         });
     });
 
     console.log("%c" + prettyDate2() + "Test passed : " + passTest + "/" + (passTest + failedTest), 'font-weight: bold');
+}
+
+function BeforeAllTest(){
+    while(graphJSON.nodes.length < 3){
+        let newNode = CreateNode();
+        MyManager.execute(new AddNodeCommand(newNode));
+    }
+    while(graphJSON.links.length < 3){
+        let newElement = CreateEdge(graphJSON.nodes[0], graphJSON.nodes[1]);
+        MyManager.execute(new AddEdgeCommand(newElement));
+    }
+    while(graphJSON.loops.length < 3){
+        let newLoop = CreateLoop(graphJSON.nodes[0]);
+        MyManager.execute(new AddLoopCommand(newLoop));
+    }
+}
+
+function TestUndoInvertEdgeDirection()
+{
+    //Setup
+    let newValue = [graphJSON.links[0].target,graphJSON.links[0].source];
+    let oldValue = [graphJSON.links[0].source,graphJSON.links[0].target];
+    let vr = new ValueRegisterer(oldValue, newValue, new Element(graphJSON.links[0],EdgeType));
+
+    MyManager.execute(new InvertDirectionCommand(vr));
+
+    MyManager.undo();
+
+    let expr =  graphJSON.links[0].source == oldValue[0] && graphJSON.links[0].target == oldValue[1];
+
+    testOutput(expr, "The edge direction has been revert correctly");
+
+    return expr;
+}
+
+function TestDirectionIsInverted(){
+    //Setup
+    let newValue = [graphJSON.links[0].target,graphJSON.links[0].source];
+    let vr = new ValueRegisterer([graphJSON.links[0].source,graphJSON.links[0].target], newValue, new Element(graphJSON.links[0],EdgeType));
+
+    MyManager.execute(new InvertDirectionCommand(vr));
+
+    let expr =  graphJSON.links[0].source == newValue[0] && graphJSON.links[0].target == newValue[1];
+    testOutput(expr, "The edge direction has been correctly inverted");
+
+    return expr;
+}
+
+function TestUndoSetName()
+{
+    //Setup
+    let oldName = graphJSON.nodes[0].name;
+    let newName = "test1";
+    let vr = new ValueRegisterer(graphJSON.nodes[0].name, newName, new Element(graphJSON.nodes[0],NodeType));
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    MyManager.undo();
+
+    expr = graphJSON.nodes[0].name == oldName;
+
+    testOutput(expr, "The node name has been revert correctly");
+
+    return expr;
+}
+
+
+function TestChangeToExistingName()
+{
+   //Setup
+   let newName = "test2";
+   let vr = new ValueRegisterer(graphJSON.links[0].name, newName, new Element(graphJSON.links[0],EdgeType));
+   MyManager.execute(new ChangeNameCommand(vr));
+
+   let expr = !CheckNewName(newName, EdgeType);
+
+   testOutput(expr, "The name hasn't change");
+
+   return expr;
+}
+
+function TestNodeNameIsChange(){
+    //Setup
+    let newName = "test3";
+    let vr = new ValueRegisterer(graphJSON.nodes[0].name, newName, new Element(graphJSON.nodes[0],NodeType));
+
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    let expr =  graphJSON.nodes[0].name == newName;
+
+    testOutput(expr, "The node name has been correctly change");
+
+    return expr;
+}
+
+function TestEdgeNameIsChange(){
+    //Setup
+    let newName = "test4";
+    let vr = new ValueRegisterer(graphJSON.links[0].name, newName, new Element(graphJSON.links[0],EdgeType));
+
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    let expr =  graphJSON.links[0].name == newName;
+
+    testOutput(expr, "The edge name has been correctly change");
+
+    return expr;
+}
+
+function TestLoopNameIsChange(){
+    //Setup
+    let newName = "test5";
+    let vr = new ValueRegisterer(graphJSON.loops[0].name, newName, new Element(graphJSON.loops[0],LoopType));
+
+    MyManager.execute(new ChangeNameCommand(vr));
+
+    let expr =  graphJSON.loops[0].name == newName;
+
+    testOutput(expr, "The loop name has been correctly change");
+
+    return expr;
+}
+
+
+function TestUndoChangeGroup() {
+    //Setup
+    let newGroupName = "test6";
+    groupList.push(newGroupName);
+    CreateGroupElement(newGroupName);
+    SetCurrentGroup();
+    let oldGroup = graphJSON.nodes[0].group;
+
+    MyManager.execute(new ChangeGroupCommand(new ValueRegisterer(
+        graphJSON.nodes[0].group, 
+        newGroupName, 
+        new Element(graphJSON.nodes[0],NodeType))));
+    MyManager.undo();
+
+    let expr =  graphJSON.nodes[0].group == oldGroup;
+
+    testOutput(expr, "Group changement has been revert correctly");
+
+    return expr;
+}
+
+function TestChangeToCorrectGroup(){
+    let currentGroup = groupList[currentGroupIndex];
+
+    MyManager.execute(
+        new ChangeGroupCommand(
+            new ValueRegisterer(
+                graphJSON.nodes[0].group, 
+                currentGroup, 
+                new Element(graphJSON.nodes[0],NodeType)
+            )
+        )
+    );
+
+    let expr =  graphJSON.nodes[0].group == currentGroup;
+
+    testOutput(expr,"Node change to the correct group");
+
+    return expr;
 }
 
 function TestAddCorrectNumberOfNode() {
@@ -98,13 +269,14 @@ function TestRemoveWantedNode() {
 
 function TestRemoveNodeDontModifyOthersElements() {
     //Setup
-    let graphJSONCopy = JSON.parse(JSON.stringify(graphJSON));
+    let linksCount = graphJSON.links.length, loopsCount = graphJSON.loops.length;
     let newNode = CreateNode();
     MyManager.execute(new AddNodeCommand(newNode));
     let node = new Element(newNode, NodeType);
+
     RemoveElementFromGraph(node);;
 
-    let expr = graphJSONCopy.links.length == graphJSON.links.length && graphJSONCopy.loops.length == graphJSON.loops.length;
+    let expr = linksCount == graphJSON.links.length && loopsCount == graphJSON.loops.length;
     testOutput(expr, "Les autres élements du graph ne sont pas modifiés");
 
     return expr;
@@ -251,9 +423,8 @@ function TestInitialGraphIsntModifyByRemoveEdge() {
 function TestInitialGraphIsntModifyByRemoveLoop() {
     //Setup
     let oldGraph = GetGraphFromHTML();
-    let newLoop = CreateLoop(graphJSON.nodes[0]);
-    MyManager.execute(new AddLoopCommand(newLoop));
     let elem = new Element(graphJSON.loops[0], LoopType);
+    
     RemoveElementFromGraph(elem);
     let newGraph = GetGraphFromHTML();
 
@@ -267,7 +438,10 @@ function TestInitialGraphIsntModifyByRemoveLoop() {
 function TestInitialGraphIsntModifyByMovements() {
     //Setup
     let oldGraph = GetGraphFromHTML();
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
     let newGraph = GetGraphFromHTML();
 
@@ -280,10 +454,10 @@ function TestInitialGraphIsntModifyByMovements() {
 function TestInitialGraphIsntModifyBySelection() {
     //Setup
     let oldGraph = GetGraphFromHTML();
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
+    SelectElement(new Element(graphJSON.nodes[0]), NodeType);
     let newGraph = GetGraphFromHTML();
 
-    let expr = oldGraph.nodes[0].selectionGroup == newGraph.nodes[0].selectionGroup;
+    let expr = oldGraph.nodes[0].isSelected == newGraph.nodes[0].isSelected;
     testOutput(expr, "Le graph initial n'est pas modifié après une sélection");
 
     return expr;
@@ -326,8 +500,6 @@ function TestRemoveLinkDontModifyOthersElements() {
 
 function TestRemoveCorrectNumberOfLoop() {
     //Setup
-    let newLoop = CreateLoop(graphJSON.nodes[0]);
-    MyManager.execute(new AddLoopCommand(newLoop));
     let elementCount = graphJSON.loops.length;
 
     let elem = new Element(graphJSON.loops[0], LoopType);
@@ -341,8 +513,6 @@ function TestRemoveCorrectNumberOfLoop() {
 
 function TestRemoveWantedLoop() {
     //Setup
-    let newLoop = CreateLoop(graphJSON.nodes[0]);
-    MyManager.execute(new AddLoopCommand(newLoop));
     let elem = new Element(graphJSON.loops[0], LoopType);
     RemoveElementFromGraph(elem);
 
@@ -355,8 +525,6 @@ function TestRemoveWantedLoop() {
 function TestRemoveLoopDontModifyOthersElements() {
     //Setup
     let graphJSONCopy = JSON.parse(JSON.stringify(graphJSON));
-    let newLoop = CreateLoop(graphJSON.nodes[0]);
-    MyManager.execute(new AddLoopCommand(newLoop));
     let elem = new Element(graphJSON.loops[0], LoopType);
     RemoveElementFromGraph(elem);
 
@@ -365,6 +533,8 @@ function TestRemoveLoopDontModifyOthersElements() {
 
     return expr;
 }
+
+
 
 function TestUndoAddNode() {
     //Setup
@@ -429,8 +599,7 @@ function TestUndoRemoveLink() {
 
 function TestUndoRemoveLoop() {
     //Setup
-    let element = CreateLoop(graphJSON.nodes[0]);
-    MyManager.execute(new AddLoopCommand(element));
+    let element = graphJSON.loops[0];
     RemoveElementFromGraph(new Element(element, LoopType));
     MyManager.undo()
 
@@ -440,24 +609,16 @@ function TestUndoRemoveLoop() {
     return expr;
 }
 
-function TestUndoSelect() {
-    //Setup
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
-    MyManager.undo()
-
-    let expr = graphJSON.nodes[0].selectionGroup == null;
-    testOutput(expr, "La sélection est bien annulée");
-
-    return expr;
-}
-
 function TestUndoMove() {
     //Setup
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
     MyManager.undo()
 
-    let expr = graphJSON.nodes[0].px == pos.oldPos[0];
+    let expr = graphJSON.nodes[0].px == pos.oldValue[0];
     testOutput(expr, "Le déplacement est bien annulé");
 
     return expr;
@@ -466,9 +627,7 @@ function TestUndoMove() {
 
 function TestUndoSubdivide() {
     //Setup
-    let edge = CreateEdge(graphJSON.nodes[0],graphJSON.nodes[1]);
-    MyManager.execute(new AddEdgeCommand(edge));
-    MyManager.execute(new SelectElementCommand(new Element(edge, EdgeType)));
+    let edge = graphJSON.links[0]
     SubdivideEdge(edge);
     MyManager.undo()
 
@@ -480,10 +639,13 @@ function TestUndoSubdivide() {
 
 function TestMoveOnWantedPosition() {
     //Setup
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
 
-    let expr = graphJSON.nodes[0].px == pos.newPos[0] && graphJSON.nodes[0].py == pos.newPos[1];
+    let expr = graphJSON.nodes[0].px == pos.newValue[0] && graphJSON.nodes[0].py == pos.newValue[1];
     testOutput(expr, "Le déplacement est bien effectué");
 
     return expr;
@@ -492,7 +654,7 @@ function TestMoveOnWantedPosition() {
 
 function TestSelectNode() {
     //Setup
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
+    SelectElement(new Element(graphJSON.nodes[0]), NodeType);
 
     let expr = GetCurrentSelection().nodes[0].data == graphJSON.nodes[0];
     testOutput(expr, "La sélection du noeud est bien effectué");
@@ -503,7 +665,7 @@ function TestSelectNode() {
 
 function TestSelectLink() {
     //Setup
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.links[0]), EdgeType));
+    SelectElement(new Element(graphJSON.links[0]), EdgeType);
 
     let expr = GetCurrentSelection().edges[0].data == graphJSON.links[0];
     testOutput(expr, "La sélection du lien est bien effectué");
@@ -514,9 +676,7 @@ function TestSelectLink() {
 
 function TestSelectLoop() {
     //Setup
-    let newLoop = CreateLoop(graphJSON.nodes[0]);
-    MyManager.execute(new AddLoopCommand(newLoop));
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.loops[0]), LoopType));
+    SelectElement(new Element(graphJSON.loops[0]), LoopType);
 
     let expr = GetCurrentSelection().loops[0].data == graphJSON.loops[0];
     testOutput(expr, "La sélection de la boucle est bien effectué");
@@ -528,8 +688,8 @@ function TestUnselectNode() {
     //Setup
     let element = new Element(graphJSON.nodes[2], NodeType);
     let nodesCount = GetCurrentSelection().nodes.length;
-    MyManager.execute(new SelectElementCommand(element));
-    MyManager.execute(new SelectElementCommand(element));
+    SelectElement(element);
+    SelectElement(element);
 
     let expr = GetCurrentSelection().nodes.length == nodesCount;
     testOutput(expr, "La déselection de l'élement est bien effectué");
@@ -592,8 +752,6 @@ function TestFinalGraphCorrespondAfterRemoveNode() {
 
 function TestFinalGraphCorrespondAfterRemoveEdge() {
     //Setup
-    let edge = CreateEdge(graphJSON.nodes[0], graphJSON.nodes[1]);
-    MyManager.execute(new AddEdgeCommand(edge));
     let oldGraph = PrettyfyJSON();
     let elem = new Element(graphJSON.links[0], EdgeType);
     RemoveElementFromGraph(elem);
@@ -608,8 +766,6 @@ function TestFinalGraphCorrespondAfterRemoveEdge() {
 
 function TestFinalGraphCorrespondAfterRemoveLoop() {
     //Setup
-    let loop = CreateLoop(graphJSON.nodes[0]);
-    MyManager.execute(new AddLoopCommand(loop));
     let oldGraph = PrettyfyJSON();
     let elem = new Element(graphJSON.loops[0], LoopType);
     RemoveElementFromGraph(elem);
@@ -625,11 +781,14 @@ function TestFinalGraphCorrespondAfterRemoveLoop() {
 function TestFinalGraphCorrespondAfterMove() {
     //Setup
     let oldGraph = PrettyfyJSON();
-    let pos = new PositionRegisterer([graphJSON.nodes[0].px, graphJSON.nodes[0].py], [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], graphJSON.nodes[0])
+    let pos = new ValueRegisterer(
+        [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
+        [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
+        new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
     let newGraph = PrettyfyJSON();
 
-    let expr = oldGraph.nodes[0].px != newGraph.nodes[0].px && oldGraph.nodes[0].py != newGraph.nodes[0].py && newGraph.nodes[0].px == pos.newPos[0];
+    let expr = oldGraph.nodes[0].px != newGraph.nodes[0].px && oldGraph.nodes[0].py != newGraph.nodes[0].py && newGraph.nodes[0].px == pos.newValue[0];
     testOutput(expr, "Le graph final correspond après un déplacement");
 
     return expr;
@@ -638,10 +797,10 @@ function TestFinalGraphCorrespondAfterMove() {
 function TestFinalGraphCorrespondAfterSelection() {
     //Setup
     let oldGraph = PrettyfyJSON();
-    MyManager.execute(new SelectElementCommand(new Element(graphJSON.nodes[0]), NodeType));
+    SelectElement(new Element(graphJSON.nodes[0]), NodeType);
     let newGraph = PrettyfyJSON();
 
-    let expr = oldGraph.nodes[0].selectionGroup != newGraph.nodes[0].selectionGroup;
+    let expr = oldGraph.nodes[0].isSelected != newGraph.nodes[0].isSelected;
     testOutput(expr, "Le graph final correspond après une sélection");
 
     return expr;
@@ -696,7 +855,6 @@ function TestFinalGraphSimplifyTargetSourceOfLoops() {
 
 function TestSubdivideEdgeElementCount() {
     //Setup
-    MyManager.execute(new AddEdgeCommand(CreateEdge(graphJSON.nodes[0],graphJSON.nodes[1])))
     let edgesCount = graphJSON.links.length, nodesCount = graphJSON.nodes.length;
     SubdivideEdge(graphJSON.links[0]);
 
@@ -709,7 +867,6 @@ function TestSubdivideEdgeElementCount() {
 
 function TestSubdivideEdgeCorrespondingElement() {
     //Setup
-    MyManager.execute(new AddEdgeCommand(CreateEdge(graphJSON.nodes[0],graphJSON.nodes[1])))
     let edge = graphJSON.links[0];
     SubdivideEdge(edge);
 
@@ -721,9 +878,7 @@ function TestSubdivideEdgeCorrespondingElement() {
 
 function TestSubdivideEdgeOnSelectionCorrespondingElement() {
     //Setup
-    let edge = CreateEdge(graphJSON.nodes[0],graphJSON.nodes[1]);
-    MyManager.execute(new AddEdgeCommand(edge));
-    MyManager.execute(new SelectElementCommand(new Element(edge, EdgeType)));
+    SelectElement(new Element(graphJSON.links[0], EdgeType));
     SubdivideEdgeOnSelection();
     
     let expr = true;

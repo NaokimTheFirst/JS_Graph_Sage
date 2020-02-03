@@ -12,6 +12,7 @@
   <script src="../src/JS/CommandePatern.js"></script>
   <script src="../src/JS/graph_d3js.js"></script>
   <script src='../src/JS/Tests.js'></script>
+  <script src='../src/JS/Connection.js'></script>
 
 </head>
 
@@ -21,70 +22,117 @@
     // GRAPH_DATA_HEREEEEEEEEEEE
   </div>
   <div id="graphFrame">
-    <div id="commandList">
-      <table id="commandTable">
+    <div id="Overlay">
+      <div id="commandList">
+        <table id="commandTable">
+          <tr>
+            <th>General :</th>
+          </tr>
+
+          <tr>
+            <td>Freeze/Unfreeze Positions</td>
+            <td>F</td>
+          </tr>
+          <tr>
+            <td>Undo</td>
+            <td>Z</td>
+          </tr>
+          <tr>
+            <td>Redo</td>
+            <td>Y</td>
+          </tr>
+          <tr>
+            <td>Save graph</td>
+            <td>S</td>
+          </tr>
+          
+          <tr>
+            <th>On Hover :</th>
+          </tr>
+          <tr>
+            <td>Un/Select Element</td>
+            <td>Double click</td>
+          </tr>
+          <tr>
+            <td>Move Node</td>
+            <td>Drag</td>
+          </tr>
+          <tr>
+            <td>Add Node</td>
+            <td>A</td>
+          </tr>
+          <tr>
+            <td>Set Label</td>
+            <td>N</td>
+          </tr>
+
+          <tr>
+            <th>On Selection :</th>
+          </tr>
+          <tr>
+            <td>Reset Selection</td>
+            <td>R</td>
+          </tr>
+          <tr>
+            <td>Add to Group</td>
+            <td>C</td>
+          </tr>
+          <tr>
+            <td>Delete</td>
+            <td>Del</td>
+          </tr>
+          <tr>
+            <td>Add Edges</td>
+            <td>E</td>
+          </tr>
+          <tr>
+            <td>Add Loop</td>
+            <td>L</td>
+          </tr>
+          <tr>
+            <td>Subdivide Edge</td>
+            <td>D</td>
+          </tr>
+          <tr class="DirectedRelated">
+            <td>Invert Edge</td>
+            <td>I</td>
+          </tr>
+        </table>
+        <input type="button" onclick="ShowKeys(this)" value="Show Key Helper">
+      </div>
+      
+      <table id="PropertiesPanel">
         <tr>
-          <th>Action</th>
-          <th>Key</th>
+          <td>
+            <p style="padding-right: 10px">Radius </p>
+          </td>
+          <td>
+            <p id="radiusLabel">0 </p>
+          </td>
         </tr>
         <tr>
-          <td>Freeze/UnFreeze Positions</td>
-          <td>F</td>
+          <td>
+            <p style="padding-right: 10px">Diameter </p>
+          </td>
+          <td>
+            <p id="diameterLabel">0 </p>
+          </td>
         </tr>
         <tr>
-          <td>Select/Unselect Element</td>
-          <td>Q</td>
-        </tr>
-        <tr>
-          <td>Add Node</td>
-          <td>A</td>
-        </tr>
-        <tr>
-          <td>Delete Element</td>
-          <td>Del</td>
-        </tr>
-        <tr>
-          <td>Delete Selection</td>
-          <td>Alt + Del</td>
-        </tr>
-        <tr>
-          <td>Move Node</td>
-          <td>Drag</td>
-        </tr>
-        <tr>
-          <td>Add Edges On Selection</td>
-          <td>E</td>
-        </tr>
-        <tr>
-          <td>Reset Selection</td>
-          <td>R</td>
-        </tr>
-        <tr>
-          <td>Add Loop</td>
-          <td>L</td>
-        </tr>
-        <tr>
-          <td>Subdivide Edge</td>
-          <td>D</td>
-        </tr>
-        <tr>
-          <td>Subdivide Edge On Selection</td>
-          <td>V</td>
-        </tr>
-        <tr>
-          <td>Undo</td>
-          <td>Z</td>
-        </tr>
-        <tr>
-          <td>Redo</td>
-          <td>Y</td>
-        </tr>
-        <tr>
-          <td>Save graph</td>
-          <td>S</td>
+          <td>
+            <p style="padding-right: 10px">Current Group</p>
+          </td>
+          <td>
+            <select id="groupList" onchange="ChangeSelectedGroup()">
+              <option value="Add New Group" style="background-color: white;">Add New Group</option>
+            </select>
+          </td>
         </tr>
       </table>
-      <input type="button" onclick="ShowKeys(this)" value="Show Key Helper">
+
+      <div id="scrollPanel">
+        <div class="scroll"></div>
+      </div>
     </div>
   </div>
 </body>

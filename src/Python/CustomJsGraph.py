@@ -83,14 +83,11 @@ import os
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 
-
 def gen_html_code(G,
-                  vertex_labels=True,
-                  edge_labels=False,
                   vertex_partition=[],
                   vertex_colors=None,
                   edge_partition=[],
-                  force_spring_layout=False,
+                  layout=None,
                   charge=-120,
                   link_distance=100,
                   link_strength=2,
@@ -106,12 +103,6 @@ def gen_html_code(G,
     INPUT:
 
     - ``G`` -- the graph
-
-    - ``vertex_labels`` -- boolean (default: ``False``); whether to display
-      vertex labels
-
-    - ``edge_labels`` -- boolean (default: ``False``); whether to display edge
-      labels
 
     - ``vertex_partition`` -- list (default: ``[]``); a list of lists
       representing a partition of the vertex set. Vertices are then colored in
@@ -176,7 +167,7 @@ def gen_html_code(G,
         sage: g.add_edge("10", "10", "c")
         sage: g.add_edge("10", "10", "d")
         sage: g.add_edge("01", "11", "1")
-        sage: g.show(method="js", vertex_labels=True,edge_labels=True,
+        sage: g.show(method="js"
         ....:        link_distance=200, gravity=.05, charge=-500,
         ....:        edge_partition=[[("11", "12", "2"), ("21", "21", "a")]],
         ....:        edge_thickness=4) # optional -- internet
@@ -276,15 +267,19 @@ def gen_html_code(G,
                       "strength": 0,
                       "color": color,
                       "curve": curve,
-                      "name": str(l) if edge_labels else ""})
+                      "name": str(l)})
 
     loops = [e for e in edges if e["source"] == e["target"]]
     edges = [e for e in edges if e["source"] != e["target"]]
 
     # Defines the vertices' layout if possible
-    Gpos = G.get_pos()
+    if layout is not None: 
+      Gpos = G.graphplot(layout=layout)._pos
+    else :
+      Gpos = G.get_pos()
     pos = []
-    if Gpos is not None and force_spring_layout is False:
+
+    if Gpos is not None:
         charge = 0
         link_strength = 0
         gravity = 0
@@ -304,8 +299,6 @@ def gen_html_code(G,
                                    "link_distance": int(link_distance),
                                    "link_strength": int(link_strength),
                                    "gravity": float(gravity),
-                                   "vertex_labels": bool(vertex_labels),
-                                   "edge_labels": bool(edge_labels),
                                    "vertex_size": int(vertex_size),
                                    "edge_thickness": int(edge_thickness)})
 
@@ -351,44 +344,58 @@ def gen_html_code(G,
 import re
 import webbrowser
 
-def show_CustomJS(G):
-  webbrowser.open('file://'+os.path.realpath(gen_html_code(G)))
+
+def show_CustomJS(G, layout=None):
+  webbrowser.open('file://'+os.path.realpath(gen_html_code(G,layout=layout)))
+
+  global _last_client
+  client = _last_client
+
+  global server_open
+  if not server_open:
+    launch_connection()
+
+  while _last_client==client :
+    pass
+
+  global graph_client_dict
+  graph_client_dict[_last_client] = G
+
+  print graph_client_dict
+
+  _last_client=0
 
 
-def GetBackJSON(pathRepo=path_To_JSON_Repo,
-                nameJSON=JSON_name):
 
-  filename = pathRepo+nameJSON
+# def GetBackJSON(pathRepo=path_To_JSON_Repo,
+#                 nameJSON=JSON_name):
+
+#   filename = pathRepo+nameJSON
   
-  try :
-    f = open(filename, 'r')
-  except :
-    print ('File '+pathRepo+nameJSON+' does not exist')
-    print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
-    print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
-    sys.exit(1)
+#   try :
+#     f = open(filename, 'r')
+#   except :
+#     print ('File '+pathRepo+nameJSON+' does not exist')
+#     print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
+#     print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
+#     sys.exit(1)
 
-  if f.mode == 'r':
-    lines = f.readlines()
+#   if f.mode == 'r':
+#     lines = f.readlines()
 
-  return lines[0]
+#   return lines[0]
 
 
 class DataGraph(object):
   def __init__(self, data):
     self.__dict__ = json.loads(data)
 
+
 import json
 from sage.graphs import graph
 
-
-def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
-                           nameJSON=JSON_name):
-  string = GetBackJSON(nameJSON=nameJSON)
-  JSONObject = DataGraph(string)
-
+def ConstructGraphFromJSONObject(JSONObject):
   posdict={}
-
   G = graphs.EmptyGraph()
 
   #Add nodes
@@ -411,6 +418,11 @@ def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
   for l in JSONObject.loops:
     G.add_edge(l.get("source"),l.get("target"))
 
-  
   return G
 
+
+# def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,
+#                            nameJSON=JSON_name):
+#   string = GetBackJSON(nameJSON=nameJSON)
+
+#   return ConstructGraphFromJSONString(string)

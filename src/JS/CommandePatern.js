@@ -29,10 +29,17 @@ var AddLoopCommand = function (value, firstAction = true)  {
     return new Command(AddLoop, RemoveLoop, value, firstAction);
 };
 
-var SelectElementCommand = function(value, firstAction = true)  {
-    return new Command(SelectElement, SelectElement, value, firstAction);
+var ChangeGroupCommand = function(value, firstAction = true)  {
+    return new Command(SetGroupNode, SetGroupNode, value, firstAction);
 };
 
+var ChangeNameCommand = function(value, firstAction = true)  {
+    return new Command(SetElementName, SetElementName, value, firstAction);
+};
+
+var InvertDirectionCommand = function(value, firstAction = true)  {
+    return new Command(SetLinkDirection, SetLinkDirection, value, firstAction);
+};
 var MoveNodeCommand = function(value, firstAction = true)  {
     return new Command(SetNewPosition, SetOldPosition, value, firstAction);
 };
@@ -51,6 +58,8 @@ var Manager = function () {
             revertedCommandStack = [];
             this.do(command);
             log.add(action(command) + ": " + command.value);
+
+            UpdateGraphAttributes();
         },
 
         undo: function () {
@@ -69,7 +78,7 @@ var Manager = function () {
                 revertedCommandStack.push(command);
 
             } else {
-                console.warn("Nothing to revert");
+                CustomWarn("Nothing to revert");
             }
         },
 
@@ -87,7 +96,7 @@ var Manager = function () {
                 } 
                 while(revertedCommandStack.length > 0 && revertedCommandStack[revertedCommandStack.length - 1].firstAction == false)
             } else {
-                console.warn("Nothing to redo");
+                CustomWarn("Nothing to redo");
             }
         },
 
