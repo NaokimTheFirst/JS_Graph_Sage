@@ -690,9 +690,8 @@ function CreateNode(pos = null) {
         newX = pos[0];
         newY = pos[1];
     } else {
-        pos = cursorPosition;
-        newX = pos[0];
-        newY = pos[1];
+        newX = cursorPosition.x;
+        newY = cursorPosition.y;
     }
 
     IDCounter++
