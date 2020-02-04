@@ -16,15 +16,38 @@ function initCon() {
   
   webSocket.onmessage = function(e) {
     let object = eval('(' + e.data + ')');
-    SetProperties(object.result[0],object.result[1],object.result[2],object.result[3],object.result[4]);
+
+    switch (object.request) {
+      case propertiesRequestParameter:
+        SetProperties(object.result[0],object.result[1],object.result[2],object.result[3],object.result[4]);
+        break;
+      case strongOrientationRequestParameter :
+        //Reload Graph
+        CustomWarn("New oriented graph receive");
+        break;
+      case randomOrientationRequestParameter :
+          //Reload Graph
+          CustomWarn("New oriented graph receive");
+          break;
+      case vertexColoringRequestParameter:
+        CustomWarn("New vertex coloration receive");
+        //change vertex color
+        break;
+      case edgeColoringRequestParameter:
+        CustomWarn("New edges coloration  receive");
+        //change edge color
+        break;
+      default :
+        console.error("Unknown request parameter :"+ object.request);
+        break;
+    }
+      
   };
   
   webSocket.onclose = function() {
-    //console.log("onclose");
   };
 
   webSocket.onerror = function(e) {
-    //console.log("onerror");
     console.log(e)
   };
 }
