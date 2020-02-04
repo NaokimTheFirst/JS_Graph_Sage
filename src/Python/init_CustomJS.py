@@ -23,7 +23,7 @@ def _update_JS_Repo(path) :
 
 
 
-_update_JS_Repo(raw_input('Please enter the path to the repository containing the project : '))
+_update_JS_Repo(input('Please enter the path to the repository containing the project : '))
 
 # _update_JSON_Repo(path_To_Project_Repo+'/JS_Graph_Sage/obj/')
 

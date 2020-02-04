@@ -361,8 +361,6 @@ def show_CustomJS(G, layout=None):
   global graph_client_dict
   graph_client_dict[_last_client] = G
 
-  print graph_client_dict
-
   _last_client=0
 
 
