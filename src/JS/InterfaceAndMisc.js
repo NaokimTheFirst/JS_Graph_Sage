@@ -137,8 +137,8 @@ function SetProperties(radius,diameter,regular,planar,bipartite){
     overlayElements.radiusLabel.innerHTML = radius;
     overlayElements.diameterLabel.innerHTML = diameter;
     overlayElements.regularLabel.innerHTML = regular;
-    overlayElements.planarLabel.innerHTML = regular;
-    overlayElements.bipartiteLabel.innerHTML = regular;
+    overlayElements.planarLabel.innerHTML = planar;
+    overlayElements.bipartiteLabel.innerHTML = bipartite;
 }
 
 function InitInterface(){
