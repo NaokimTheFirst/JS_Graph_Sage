@@ -2,20 +2,20 @@ def _Test_ConstuctGraphFromJson():
 	g=ConstructGraphFromJSON(nameJSON='Graph_JSON_test')
 
 	string = GetBackJSON(nameJSON='Graph_JSON_test')
-  	JSONObject = DataGraph(string)
+	JSONObject = DataGraph(string)
 
-  	passedtests=0
-  	failedtests=0
+	passedtests=0
+	failedtests=0
 
-  	#Compare graph created from JSON and JSON itself
-  	__Pass_Test('nodes', __TestConstructNodes(g, JSONObject), True)
-  	__Pass_Test('edges (non-loops)', __TestConstructEdges(g, JSONObject), True)
-  	__Pass_Test('loops', __TestConstructLoops(g, JSONObject), True)
+	#Compare graph created from JSON and JSON itself
+	__Pass_Test('nodes', __TestConstructNodes(g, JSONObject), True)
+	__Pass_Test('edges (non-loops)', __TestConstructEdges(g, JSONObject), True)
+	__Pass_Test('loops', __TestConstructLoops(g, JSONObject), True)
 
-  	#Modify graph in Sage
+	#Modify graph in Sage
 	g.delete_edge(g.edges()[0])
 	g.delete_edge(g.loop_edges()[0])
-  	i=0
+	i=0
 	while str(i) in g.get_vertices().keys():
 		i+=1
 
@@ -33,11 +33,11 @@ def _Test_ConstuctGraphFromJson():
 	po=g.get_pos()
 	po[g.vertices()[0]]=(po[g.vertices()[0]][0]+1,0)
 	g.set_pos(po, 2)
-  	
-  	#Compare modified graph and JSON
-  	__Pass_Test('nodes (Failed)', __TestConstructNodes(g, JSONObject), False)
-  	__Pass_Test('edges (non-loops) (Failed)', __TestConstructEdges(g, JSONObject), False)
-  	__Pass_Test('loops (Failed)', __TestConstructLoops(g, JSONObject), False)
+
+	#Compare modified graph and JSON
+	__Pass_Test('nodes (Failed)', __TestConstructNodes(g, JSONObject), False)
+	__Pass_Test('edges (non-loops) (Failed)', __TestConstructEdges(g, JSONObject), False)
+	__Pass_Test('loops (Failed)', __TestConstructLoops(g, JSONObject), False)
 
 def __TestConstructNodes(g, JSON):
 	
@@ -109,7 +109,7 @@ def _Compare_Graphs(g1, g2) :
 	valedges=Compare_Graphs_Edges(g1,g2,0)
 	if valedges!=0:
 		same=False
-		print valedges
+		print(valedges)
 
 
 
