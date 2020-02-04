@@ -7,13 +7,12 @@ function initCon() {
   ws = new WebSocket("ws://localhost:9001/");
   // Set event handlers.
   ws.onopen = function() {
-    //console.log("onopen");
+    UpdateGraphProperties();
   };
   
   ws.onmessage = function(e) {
     let object = eval('(' + e.data + ')');
-    SetRadius(object.result[0]);
-    SetDiameter(object.result[1]);
+    SetProperties(object.result[0],object.result[1],object.result[2],object.result[3],object.result[4]);
   };
   
   ws.onclose = function() {

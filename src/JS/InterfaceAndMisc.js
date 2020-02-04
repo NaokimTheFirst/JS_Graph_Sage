@@ -84,6 +84,30 @@ var overlayElements = {
         }
         return this._diameterLabelElement;
     },
+
+    _regularLabelElement : null,
+    get regularLabel(){
+        if(!this._regularLabelElement){
+            this._regularLabelElement = document.getElementById("regularLabel");
+        }
+        return this._regularLabelElement;
+    },
+
+    _planarLabelElement : null,
+    get planarLabel(){
+        if(!this._planarLabelElement){
+            this._planarLabelElement = document.getElementById("planarLabel");
+        }
+        return this._planarLabelElement;
+    },
+
+    _bipartiteLabelElement : null,
+    get bipartiteLabel(){
+        if(!this._bipartiteLabelElement){
+            this._bipartiteLabelElement = document.getElementById("bipartiteLabel");
+        }
+        return this._bipartiteLabelElement;
+    },
 }
 
 //Return string with time on format "HH:MM""
@@ -109,12 +133,12 @@ function CustomWarn(string, display = true){
     }
 }
 
-function SetRadius(radius){
+function SetProperties(radius,diameter,regular,planar,bipartite){
     overlayElements.radiusLabel.innerHTML = radius;
-}
-
-function SetDiameter(diameter){
     overlayElements.diameterLabel.innerHTML = diameter;
+    overlayElements.regularLabel.innerHTML = regular;
+    overlayElements.planarLabel.innerHTML = regular;
+    overlayElements.bipartiteLabel.innerHTML = regular;
 }
 
 function InitInterface(){
