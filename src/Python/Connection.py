@@ -46,29 +46,34 @@ def message_received(client, server, message):
 
 	newG = ConstructGraphFromJSONObject(JSONmessage)
 	result = Check_Parameter(JSONmessage.parameter,newG)
+	Update_Graph(targetGraph, newG)
 
 	if result != None :
-		returnMessage = JSONEncoder().encode({"result": result})
+		returnMessage = JSONEncoder().encode({"request":JSONmessage.parameter, "result": result})
 		server.send_message(client,returnMessage)
-
-	Update_Graph(targetGraph, newG)
 
 
 
 def Check_Parameter(parameter,graph):
-	result = JS_functions_dict[parameter](graph)
+	result = None
+	if parameter is not None:
+		result = JS_functions_dict[parameter](graph)
 	return result
 
 
 def Check_Properties(graph):
 	result = []
 
-	radius = graph.radius()
-	if isinstance(radius, sage.rings.infinity.PlusInfinity):
+	radius = None
+	if len(graph.vertices()) is not 1 :
+		radius = graph.radius()
+	if len(graph.vertices())==1 :
+		radius = 1
+	if isinstance(radius, sage.rings.infinity.PlusInfinity) :
 		radius = "+Infinity"
 
 	diameter = graph.diameter()
-	if isinstance(diameter, sage.rings.infinity.PlusInfinity):
+	if isinstance(diameter, sage.rings.infinity.PlusInfinity) :
 		diameter = "+Infinity"
 
 	result.append(radius)
@@ -80,9 +85,32 @@ def Check_Properties(graph):
 	return result
 
 
-def Generate_Coloring(graph):
-	result = graph.coloring()
+def Strong_Orientation(graph):
+	result = None
+	try :
+		result = list(graph.strong_orientations_iterator())[0]
+		return graph_to_JSON(result)
+	except :
+		pass
 	return result
 
-JS_functions_dict = {'Properties':Check_Properties,
-					 'Coloring':Generate_Coloring}
+
+def Random_Orientation(graph):
+	graph = DiGraph([(a, b, c) if randint(0, 1) else (b, a, c) for a, b, c in graph.edge_iterator()])
+	return graph_to_JSON(graph)
+
+
+def Generate_Vertex_Coloring(graph):
+	return graph.coloring()
+
+
+import sage.graphs.graph_coloring
+def Generate_Edge_Coloring(graph):
+	return graph_coloring.edge_coloring(graph)
+
+
+JS_functions_dict = {'Properties': Check_Properties,
+					 'strongOrientation': Strong_Orientation,
+					 'randomOrientation': Random_Orientation,
+					 'vertexColoring': Generate_Vertex_Coloring,
+					 'edgeColoring':Generate_Edge_Coloring}

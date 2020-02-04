@@ -41,10 +41,6 @@ def __Update_Graph_Edges(gold, gnew, test=1):
 
 	for e in edges_new :
 		if e not in edges_old :
-			if e[0] == e[1]:
-				try :
-					gold.add_edge(e[0], e[0])
-				except :
-					print('Loops not allowed, could not create loop on node '+str(e[0]))
-			else :
-				gold.add_edge(e[0], e[1])
+			if e[0] == e[1] and not gold.allows_loops():
+				gold.allow_loops(True)
+			gold.add_edge(e[0], e[1])
