@@ -143,12 +143,13 @@ function SetProperties(radius,diameter,regular,planar,bipartite){
 
 function InitInterface(){
     InitPanels();
-    InitKeyHelper()
+    UpdateDirectedRelatedElements();
     KeyboardEventInit();
 }
 
-function InitPanels(){
-    InitKeyHelper();
+function InitPanels()
+{
+    DisplayElement(overlayElements.keyPanelContent,false);
     DisplayElement(overlayElements.propertyPanelContent,false);
     DisplayElement(overlayElements.algorithmPanelContent,false);
 }
@@ -157,8 +158,7 @@ function DisplayElement(element, show){
     element.style.display = (show)? "":"none";
 }
 
-function InitKeyHelper(){
-    DisplayElement(overlayElements.keyPanelContent,false);
+function UpdateDirectedRelatedElements(){
     for (let index = 0; index < overlayElements.directedRelated.length; index++) {
         DisplayElement(overlayElements.directedRelated[index],isDirected);
     }

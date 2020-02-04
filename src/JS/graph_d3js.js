@@ -9,7 +9,7 @@ var is_frozen = false;
 var isDirected = false;
 
 //DOM Elements / D3JS Elements
-var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush;
+var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
 var IDCounter = 0;
 var groupList = [];
 var currentGroupIndex = 0;
@@ -54,6 +54,14 @@ class GraphSelection {
     }
 }
 
+function SetIsDirected(bool){
+    isDirected = bool;
+    graphJSON.directed = bool;
+
+    DisplayArrows();
+    UpdateDirectedRelatedElements();
+}
+
 
 window.onload = function () {
     initCon();
@@ -78,7 +86,6 @@ function handleMouseMove(event) {
     cursorPosition.y = event.pageY;
 }
 
-//
 function GetGraphFromHTML() {
     var mydiv = document.getElementById("mygraphdata")
     var graph_as_string = mydiv.innerHTML
@@ -367,23 +374,29 @@ function IsNodeInsideExtent(extent, node){
 
 function ManageArrows(){
     // Arrows, for directed graphs
-    if (isDirected) {
-        svg.append("svg:defs").selectAll("marker")
-            .data(["directed"])
-            .enter().append("svg:marker")
-            .attr("id", String)
-            // viewbox is a rectangle with bottom-left corder (0,-2), width 4 and height 4
-            .attr("viewBox", "0 -2 4 4")
-            // This formula took some time ... :-P
-            .attr("refX", Math.ceil(2 * Math.sqrt(graphJSON.vertex_size)))
-            .attr("refY", 0)
-            .attr("markerWidth", 4)
-            .attr("markerHeight", 4)
-            .attr("orient", "auto")
-            .append("svg:path")
-            // triangles with endpoints (0,-2), (4,0), (0,2)
-            .attr("d", "M0,-2L4,0L0,2");
-    }
+    arrows = svg.append("svg:defs").selectAll("marker")
+    .data(["directed"])
+    .enter().append("svg:marker")
+    .attr("id", String)
+    // viewbox is a rectangle with bottom-left corder (0,-2), width 4 and height 4
+    .attr("viewBox", "0 -2 4 4")
+    // This formula took some time ... :-P
+    .attr("refX", Math.ceil(2 * Math.sqrt(graphJSON.vertex_size)))
+    .attr("refY", 0)
+    .attr("markerWidth", 4)
+    .attr("markerHeight", 4)
+    .attr("orient", "auto")
+    .append("svg:path")
+    // triangles with endpoints (0,-2), (4,0), (0,2)
+    .attr("d", "M0,-2L4,0L0,2");
+    
+    DisplayArrows();
+}
+
+function DisplayArrows() {
+    arrows.style("fill", function () {
+        return (isDirected) ? "" : "#ffffff00";
+    });
 }
 
 //Enable or disable the forces
