@@ -56,6 +56,8 @@ class GraphSelection {
 
 
 window.onload = function () {
+    initCon();
+
     document.body.onmousemove = handleMouseMove;
 
     LoadGraphData();
@@ -1062,6 +1064,5 @@ function FindElementInGraph(element) {
 
 
 function UpdateGraphProperties(){
-    graphJSON.parameter = "Properties";
-    SubmitMessage();
+    SubmitMessage(propertiesRequestParameter);
 }
