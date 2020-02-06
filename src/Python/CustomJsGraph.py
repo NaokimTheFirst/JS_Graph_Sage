@@ -159,48 +159,26 @@ def graph_to_JSON(G,
 
 
 
-import re
-import webbrowser
-
-
+import re, webbrowser, time
 def show_CustomJS(G, layout=None):
+  global current_server
+
+  if not current_server:
+    launch_connection()
+    WaitServer()
+
+  graph_client_dict[current_server.id_counter + 1] = G
+
   JSONgraph = graph_to_JSON(G, layout=layout)
   webbrowser.open('file://'+os.path.realpath(gen_html_code(JSONgraph)))
 
-  global _last_client
-  client = _last_client
+def WaitServer():
+  global current_server
 
-  global server_open
-  if not server_open:
-    launch_connection()
-
-  while _last_client==client :
-    pass
-
-  global graph_client_dict
-  graph_client_dict[_last_client] = G
-
-  _last_client=0
-
-
-
-# def GetBackJSON(pathRepo=path_To_JSON_Repo,
-#                 nameJSON=JSON_name):
-
-#   filename = pathRepo+nameJSON
+  while current_server is None :
+    time.sleep(1)
   
-#   try :
-#     f = open(filename, 'r')
-#   except :
-#     print ('File '+pathRepo+nameJSON+' does not exist')
-#     print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
-#     print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
-#     sys.exit(1)
 
-#   if f.mode == 'r':
-#     lines = f.readlines()
-
-#   return lines[0]
 
 
 class DataGraph(object):
@@ -231,7 +209,7 @@ def ConstructGraphFromJSONObject(JSONObject):
 
   #Add loops
   if len(JSONObject.loops)>0:
-    G.allow_loops(true)
+    G.allow_loops(True)
   for l in JSONObject.loops:
     G.add_edge(l.get("source"),l.get("target"))
 
@@ -243,3 +221,24 @@ def ConstructGraphFromJSONObject(JSONObject):
 #   string = GetBackJSON(nameJSON=nameJSON)
 
 #   return ConstructGraphFromJSONString(string)
+
+
+
+# def GetBackJSON(pathRepo=path_To_JSON_Repo,
+#                 nameJSON=JSON_name):
+
+#   filename = pathRepo+nameJSON
+
+#   try :
+#     f = open(filename, 'r')
+#   except :
+#     print ('File '+pathRepo+nameJSON+' does not exist')
+#     print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
+#     print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
+#     sys.exit(1)
+
+#   if f.mode == 'r':
+#     lines = f.readlines()
+
+#   return lines[0]
+
