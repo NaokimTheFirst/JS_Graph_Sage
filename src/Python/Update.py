@@ -1,46 +1,49 @@
 def Update_Graph(gold, gnew):
-	__Update_Graph_Nodes(gold, gnew, 0)
-	__Update_Graph_Edges(gold, gnew, 0)
+	__Update_Graph_Nodes(gold, gnew)
+	__Update_Graph_Edges(gold, gnew)
 	print("graph updated")
 
 
-def __Update_Graph_Nodes(gold, gnew, test=1):
+def __Update_Graph_Nodes(gold, gnew):
+	if gold.get_vertices() != gnew.get_vertices():
+		vert_old = gold.get_vertices().keys()
+		vert_new = gnew.get_vertices().keys()
 
-	gold.set_pos(gnew.get_pos())
+		for n in vert_old:
+			if n not in vert_new:
+				gold.delete_vertex(n)
 
-	if gold.get_vertices()==gnew.get_vertices():
-		if test==1:
-			print ('Graphs have the same nodes')
-		return None
-
-	vert_old = gold.get_vertices().keys()
-	vert_new = gnew.get_vertices().keys()
-
-	for n in vert_old:
-		if n not in vert_new:
-			gold.delete_vertex(n)
-
-	for n in vert_new:
-		if n not in vert_old:
-			gold.add_vertex(n)
+		for n in vert_new:
+			if n not in vert_old:
+				gold.add_vertex(n)
 
 
-def __Update_Graph_Edges(gold, gnew, test=1):
+	if gnew.get_pos() != gold.get_pos():
+		gold.set_pos(gnew.get_pos())
 
-	if gold.edges() == gnew.edges():
-		if test==1:
-			print ('Graphs have the same edges')
-		return None
 
-	edges_old = gold.edges()
-	edges_new = gnew.edges()
+def __Update_Graph_Edges(gold, gnew):
+	if not __CompareGraphEdges(gold, gnew):
+		edges_old = gold.edges()
+		edges_new = gnew.edges()
 
-	for e in edges_old:
-		if e not in edges_new:
-			gold.delete_edge(e[0], e[1])
+		for currentEdge in edges_old:
+			if currentEdge not in edges_new:
+				gold.delete_edge(currentEdge[0], currentEdge[1])
 
-	for e in edges_new :
-		if e not in edges_old :
-			if e[0] == e[1] and not gold.allows_loops():
-				gold.allow_loops(True)
-			gold.add_edge(e[0], e[1])
+		if gnew.allows_loops():
+			gold.allow_loops(True)
+
+		for currentEdge in edges_new :
+			if currentEdge not in edges_old :
+				gold.add_edge(currentEdge[0], currentEdge[1])
+
+def __CompareGraphEdges(firstGraph, secondGraph):
+	if len(firstGraph.edges()) != len(secondGraph.edges()):
+		return False
+
+	for edge in firstGraph.edges():
+		if edge not in secondGraph.edges():
+			return False
+	
+	return True

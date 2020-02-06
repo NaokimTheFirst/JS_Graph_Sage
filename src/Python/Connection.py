@@ -1,21 +1,23 @@
+graph_client_dict = {}
+current_server = None
 
 # Called for every client connecting
 def new_client(client, server):
 	print("New client connected and was given id %d" % client['id'])
-	global _last_client
-	_last_client = client['id']
+	
 
 
 # Called for every client disconnecting
 def client_left(client, server):
+	global graph_client_dict,current_server
+
 	print("Client(%d) disconnected" % client['id'])
-	global graph_client_dict
 	graph_client_dict.pop(client['id'])
+
 	if not graph_client_dict :
 		server.server_close()
 		print("server closed")
-		global server_open
-		server_open = False
+		current_server = None
 
 
 import threading
@@ -32,8 +34,8 @@ def connect():
 	server.set_fn_new_client(new_client)
 	server.set_fn_client_left(client_left)
 	server.set_fn_message_received(message_received)
-	global server_open
-	server_open = True
+	global current_server
+	current_server = server
 	server.run_forever()
 
 
@@ -44,9 +46,11 @@ def message_received(client, server, message):
 	targetGraph = graph_client_dict[client['id']]
 	JSONmessage = DataGraph(message)
 
-	newG = ConstructGraphFromJSONObject(JSONmessage)
-	result = Check_Parameter(JSONmessage.parameter,newG)
-	Update_Graph(targetGraph, newG)
+	newGraph = ConstructGraphFromJSONObject(JSONmessage)
+	result = Check_Parameter(JSONmessage.parameter,newGraph)
+	
+	Update_Graph(targetGraph, newGraph)
+
 
 	if result != None :
 		returnMessage = JSONEncoder().encode({"request":JSONmessage.parameter, "result": result})
@@ -59,7 +63,6 @@ def Check_Parameter(parameter,graph):
 	if parameter is not None:
 		result = JS_functions_dict[parameter](graph)
 	return result
-
 
 def Check_Properties(graph):
 	result = []
