@@ -30,7 +30,7 @@ var AddLoopCommand = function (value, firstAction = true)  {
 };
 
 var ChangeGroupCommand = function(value, firstAction = true)  {
-    return new Command(SetGroupNode, SetGroupNode, value, firstAction);
+    return new Command(SetGroupElement, SetGroupElement, value, firstAction);
 };
 
 var ChangeNameCommand = function(value, firstAction = true)  {

@@ -204,7 +204,7 @@ function ChangeSelectedGroup(){
 
 function SetCurrentGroup(){
     currentGroupIndex = overlayElements.groupList.selectedIndex;
-    overlayElements.groupList.style.backgroundColor = color(currentGroupIndex); 
+    overlayElements.groupList.style.backgroundColor = customColorScale(currentGroupIndex); 
 }
 
 function CreateGroupElement(name){
@@ -214,7 +214,7 @@ function CreateGroupElement(name){
     
     let list = overlayElements.groupList;
     let lastIndex = list.childElementCount - 1;
-    newElem.style.backgroundColor = color(lastIndex);
+    newElem.style.backgroundColor = customColorScale(lastIndex);
     list.insertBefore(newElem,list.childNodes[lastIndex]);
 
     overlayElements.groupList.selectedIndex = lastIndex;

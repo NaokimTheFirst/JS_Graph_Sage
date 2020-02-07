@@ -35,6 +35,9 @@ function TreatResponse(response){
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
       break;
+    case edgeColoringRequestParameter :
+      SetLinksColoration(response.result)
+      break;
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;
