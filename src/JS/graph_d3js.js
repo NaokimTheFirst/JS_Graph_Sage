@@ -1,7 +1,7 @@
 //The graph properties
 var graphJSON;
 var force;
-var color;
+var customColorScale;
 var width;
 var height;
 var drag_in_progress = false;
@@ -98,7 +98,7 @@ function LoadGraphData() {
     height = document.documentElement.clientHeight - 5;
 
     // List of colors
-    color = d3.scale.category10();
+    customColorScale = d3.scale.category20();
 
     //Init group
     FillGroupFromGraph(graphJSON);
@@ -491,7 +491,7 @@ function ManageEdges() {
 
 function RefreshEdge() {
     links.style("stroke", function (d) {
-        return (d.isSelected == true) ? "red" : d.color;
+        return (d.isSelected == true) ? "red" : customColorScale(d.group);
     });
 }
 
@@ -611,7 +611,7 @@ function RefreshNodes() {
             return d.name;
         })
         .attr("fill", function (d) {
-            return color(groupList.indexOf(d.group));
+            return customColorScale(groupList.indexOf(d.group));
         });
 
     RefreshNodeOutline();
@@ -752,7 +752,6 @@ function SetGroupOfSelection() {
                     isFirst = false;
                 }
             }
-
             return true;
         } else {
             CustomWarn("No nodes selected");
@@ -1020,10 +1019,9 @@ function PrettifyJSON() {
     return prettyJSON;
 }
 
-//Change the group of a node
-function SetGroupNode(valueRegisterer) {
-    let node = FindElementInGraph(valueRegisterer.element);
-    node.group = (node.group == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
+function SetGroupElement(valueRegisterer) {
+    let element = FindElementInGraph(valueRegisterer.element);
+    element.group = (element.group == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
     RefreshNodes();
 }
 
@@ -1084,7 +1082,7 @@ function SetNodesColoration(colorationList){
             node = graphJSON.nodes.find(function(node){
                 return node.name == name;
             });
-            SetGroupNode(new ValueRegisterer(id,id,new Element(node,NodeType)));
+            SetGroupElement(new ValueRegisterer(id,id,new Element(node,NodeType)));
         });
         id ++;
     });
@@ -1093,4 +1091,20 @@ function SetNodesColoration(colorationList){
     FillGroupFromGraph(graphJSON);
     PopulateGroupList();
     ManageNodes();
+}
+
+
+function SetLinksColoration(colorationList){
+    var id = 0;
+    colorationList.forEach(coloration => {
+        coloration.forEach(tuple => {
+            link = graphJSON.links.find(function(link){
+                return link.source.name == tuple[0] && link.target.name == tuple[1];
+            });
+            SetGroupElement(new ValueRegisterer(id,id,new Element(link,EdgeType)));
+        });
+        id ++;
+    });
+
+    ManageEdges();
 }
