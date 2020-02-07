@@ -173,7 +173,15 @@ function ShowPanelContent(button){
     button.value =(show)? "Hide": "Show";
 }
 
+
+function EmptyGroupList(){
+    for (let index = overlayElements.groupList.childElementCount - 2; index >= 0 ; index--) {
+        overlayElements.groupList.removeChild(overlayElements.groupList.childNodes[index]);
+    }   
+}
+
 function PopulateGroupList(){
+    EmptyGroupList();
     for(var i = 0; i < groupList.length; i++) {
         CreateGroupElement(groupList[i]);
     }

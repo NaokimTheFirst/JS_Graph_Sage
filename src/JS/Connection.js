@@ -16,7 +16,7 @@ function initCon() {
   
   webSocket.onmessage = function(e) {
     let object = eval('(' + e.data + ')');
-    SetProperties(object.result[0],object.result[1],object.result[2],object.result[3],object.result[4]);
+    TreatResponse(object);
   };
   
   webSocket.onclose = function() {
@@ -27,6 +27,20 @@ function initCon() {
     //console.log("onerror");
     console.log(e)
   };
+}
+
+function TreatResponse(response){
+  switch (response.request) {
+    case propertiesRequestParameter:
+      SetProperties(response.result[0],response.result[1],response.result[2],response.result[3],response.result[4]);
+      break;
+    case vertexColoringRequestParameter :
+      SetNodesColoration(response.result);
+      break;
+    default:
+      CustomWarn("Undefined response behavior for parameter :" + response.request);
+      break;
+  }
 }
 
 function RequestVertexColoring(){
