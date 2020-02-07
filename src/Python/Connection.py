@@ -64,20 +64,15 @@ def Check_Parameter(parameter,graph):
 		result = JS_functions_dict[parameter](graph)
 	return result
 
-def Check_Properties(graph):
+def GetGraphProperties(graph):
 	result = []
 
-	radius = None
-	if len(graph.vertices()) is not 1 :
-		radius = graph.radius()
-	if len(graph.vertices())==1 :
+	if len(graph.vertices()) == 1 :
 		radius = 1
-	if isinstance(radius, sage.rings.infinity.PlusInfinity) :
-		radius = "+Infinity"
-
-	diameter = graph.diameter()
-	if isinstance(diameter, sage.rings.infinity.PlusInfinity) :
-		diameter = "+Infinity"
+	else :
+		radius = ConvertSpecialType(graph.radius())
+	
+	diameter = ConvertSpecialType(graph.diameter())
 
 	result.append(radius)
 	result.append(diameter)
@@ -86,6 +81,14 @@ def Check_Properties(graph):
 	result.append(graph.is_bipartite())
 
 	return result
+
+def ConvertSpecialType(target) :
+	if isinstance(target, sage.rings.integer.Integer) :
+		target = int(target)
+	elif isinstance(target, sage.rings.infinity.PlusInfinity) :
+		target = "+Infinity"
+
+	return target
 
 
 def Strong_Orientation(graph):
@@ -112,7 +115,7 @@ def Generate_Edge_Coloring(graph):
 	return graph_coloring.edge_coloring(graph)
 
 
-JS_functions_dict = {'Properties': Check_Properties,
+JS_functions_dict = {'Properties': GetGraphProperties,
 					 'strongOrientation': Strong_Orientation,
 					 'randomOrientation': Random_Orientation,
 					 'vertexColoring': Generate_Vertex_Coloring,

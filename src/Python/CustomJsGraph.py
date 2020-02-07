@@ -141,7 +141,7 @@ def graph_to_JSON(G,
         for v in G:
             x, y = Gpos[v]
             pos.append([float(x), float(-y)])
-
+            
     # Encodes the data as a JSON string
     from json import JSONEncoder
     string = JSONEncoder().encode({"nodes": nodes,
@@ -191,7 +191,13 @@ from sage.graphs import graph
 
 def ConstructGraphFromJSONObject(JSONObject):
   posdict={}
-  G = graphs.EmptyGraph()
+
+  G = None
+
+  if JSONObject.directed :
+    G = DiGraph()
+  else :
+    G = Graph()
 
   #Add nodes
   for n in JSONObject.nodes:

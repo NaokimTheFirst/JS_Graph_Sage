@@ -21,10 +21,6 @@ const cursorPosition = {
     x: 0,
     y: 0
 };
-const graphTranslation = {
-    x: 0,
-    y: 0,
-    zoom:0,
 };
 
 const LoopType = "loop";
@@ -108,8 +104,6 @@ function LoadGraphData() {
     //Init group
     FillGroupFromGraph(graphJSON);
     PopulateGroupList();
-
-
 }
 
 function FillGroupFromGraph(graph) {
@@ -1003,20 +997,25 @@ function WaitGraphLoadToFreeze(waitingTime) {
     }, waitingTime);
 }
 
-function PrettyfyJSON() {
+function PrettifyJSON() {
     var prettyJSON = JSON.parse(JSON.stringify(graphJSON));
     prettyJSON.links.forEach(element => {
         element.source = element.source.name;
         element.target = element.target.name;
     });
+
     prettyJSON.loops.forEach(element => {
-        element.source = element.source.name;
-        element.target = element.target.name;
+        element.source = element.target = element.source.name;
     });
 
     //Return the Y to correspond with Sage Plan
     prettyJSON.nodes.forEach(element => {
         element.y = -element.y;
+    });
+
+    prettyJSON.nodes.forEach(function (node, i) {
+        node.x = node.x/100;
+        node.y = node.y/100;
     });
 
     return prettyJSON;
