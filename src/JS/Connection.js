@@ -16,32 +16,7 @@ function initCon() {
   
   webSocket.onmessage = function(e) {
     let object = eval('(' + e.data + ')');
-
-    switch (object.request) {
-      case propertiesRequestParameter:
-        SetProperties(object.result[0],object.result[1],object.result[2],object.result[3],object.result[4]);
-        break;
-      case strongOrientationRequestParameter :
-        //Reload Graph
-        CustomWarn("New oriented graph receive");
-        break;
-      case randomOrientationRequestParameter :
-          //Reload Graph
-          CustomWarn("New oriented graph receive");
-          break;
-      case vertexColoringRequestParameter:
-        CustomWarn("New vertex coloration receive");
-        //change vertex color
-        break;
-      case edgeColoringRequestParameter:
-        CustomWarn("New edges coloration  receive");
-        //change edge color
-        break;
-      default :
-        console.error("Unknown request parameter :"+ object.request);
-        break;
-    }
-      
+    TreatResponse(object);
   };
   
   webSocket.onclose = function() {
@@ -50,6 +25,20 @@ function initCon() {
   webSocket.onerror = function(e) {
     console.log(e)
   };
+}
+
+function TreatResponse(response){
+  switch (response.request) {
+    case propertiesRequestParameter:
+      SetProperties(response.result[0],response.result[1],response.result[2],response.result[3],response.result[4]);
+      break;
+    case vertexColoringRequestParameter :
+      SetNodesColoration(response.result);
+      break;
+    default:
+      CustomWarn("Undefined response behavior for parameter :" + response.request);
+      break;
+  }
 }
 
 function RequestVertexColoring(){

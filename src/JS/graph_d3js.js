@@ -21,7 +21,6 @@ const cursorPosition = {
     x: 0,
     y: 0
 };
-};
 
 const LoopType = "loop";
 const NodeType = "Node";
@@ -1076,4 +1075,22 @@ function FindElementInGraph(element) {
 
 function UpdateGraphProperties(){
     SubmitMessage(propertiesRequestParameter);
+}
+
+function SetNodesColoration(colorationList){
+    var id = 0;
+    colorationList.forEach(coloration => {
+        coloration.forEach(name => {
+            node = graphJSON.nodes.find(function(node){
+                return node.name == name;
+            });
+            SetGroupNode(new ValueRegisterer(id,id,new Element(node,NodeType)));
+        });
+        id ++;
+    });
+
+    groupList = [];
+    FillGroupFromGraph(graphJSON);
+    PopulateGroupList();
+    ManageNodes();
 }
