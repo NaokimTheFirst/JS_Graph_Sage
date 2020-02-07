@@ -47,7 +47,7 @@ function RequestRandomOrientation(){
 
 function SubmitMessage(parameter) {
   graphJSON.parameter = parameter;
-  var prettyJSON = PrettyfyJSON();
+  var prettyJSON = PrettifyJSON();
   webSocket.send(JSON.stringify(prettyJSON))
 }
 

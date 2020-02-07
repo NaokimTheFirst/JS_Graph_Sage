@@ -700,9 +700,9 @@ function TestUnselectNode() {
 
 function TestFinalGraphCorrespondAfterAddNode() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     MyManager.execute(new AddNodeCommand(CreateNode()));
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
     let expr = oldGraph.nodes.length + 1 == newGraph.nodes.length;
     testOutput(expr, "Le graph final correspond après ajout d'un noeud");
@@ -712,10 +712,10 @@ function TestFinalGraphCorrespondAfterAddNode() {
 
 function TestFinalGraphCorrespondAfterAddLink() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     let newElement = CreateEdge(graphJSON.nodes[0], graphJSON.nodes[1]);
     MyManager.execute(new AddEdgeCommand(newElement));
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
     let expr = oldGraph.links.length + 1 == newGraph.links.length;
     testOutput(expr, "Le graph final correspond après ajout d'un lien");
@@ -725,10 +725,10 @@ function TestFinalGraphCorrespondAfterAddLink() {
 
 function TestFinalGraphCorrespondAfterAddLoop() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     let newLoop = CreateLoop(graphJSON.nodes[0]);
     MyManager.execute(new AddLoopCommand(newLoop));
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
     let expr = oldGraph.loops.length + 1 == newGraph.loops.length;
     testOutput(expr, "Le graph final correspond après ajout d'une boucle");
@@ -738,10 +738,10 @@ function TestFinalGraphCorrespondAfterAddLoop() {
 
 function TestFinalGraphCorrespondAfterRemoveNode() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     let node = new Element(graphJSON.nodes[0], NodeType);
     RemoveElementFromGraph(node);;
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
 
     let expr = oldGraph.nodes.length - 1 == newGraph.nodes.length;
@@ -752,10 +752,10 @@ function TestFinalGraphCorrespondAfterRemoveNode() {
 
 function TestFinalGraphCorrespondAfterRemoveEdge() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     let elem = new Element(graphJSON.links[0], EdgeType);
     RemoveElementFromGraph(elem);
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
 
     let expr = oldGraph.links.length - 1 == newGraph.links.length;
@@ -766,10 +766,10 @@ function TestFinalGraphCorrespondAfterRemoveEdge() {
 
 function TestFinalGraphCorrespondAfterRemoveLoop() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     let elem = new Element(graphJSON.loops[0], LoopType);
     RemoveElementFromGraph(elem);
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
     let expr = oldGraph.loops.length - 1 == newGraph.loops.length;
     testOutput(expr, "Le graph final correspond après suppresion d'une boucle");
@@ -780,13 +780,13 @@ function TestFinalGraphCorrespondAfterRemoveLoop() {
 
 function TestFinalGraphCorrespondAfterMove() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     let pos = new ValueRegisterer(
         [graphJSON.nodes[0].px, graphJSON.nodes[0].py], 
         [graphJSON.nodes[0].px + 1, graphJSON.nodes[0].py + 1], 
         new Element(graphJSON.nodes[0],NodeType))
     MyManager.execute(new MoveNodeCommand(pos));
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
     let expr = oldGraph.nodes[0].px != newGraph.nodes[0].px && oldGraph.nodes[0].py != newGraph.nodes[0].py && newGraph.nodes[0].px == pos.newValue[0];
     testOutput(expr, "Le graph final correspond après un déplacement");
@@ -796,9 +796,9 @@ function TestFinalGraphCorrespondAfterMove() {
 
 function TestFinalGraphCorrespondAfterSelection() {
     //Setup
-    let oldGraph = PrettyfyJSON();
+    let oldGraph = PrettifyJSON();
     SelectElement(new Element(graphJSON.nodes[0]), NodeType);
-    let newGraph = PrettyfyJSON();
+    let newGraph = PrettifyJSON();
 
     let expr = oldGraph.nodes[0].isSelected != newGraph.nodes[0].isSelected;
     testOutput(expr, "Le graph final correspond après une sélection");
@@ -809,7 +809,7 @@ function TestFinalGraphCorrespondAfterSelection() {
 
 function TestFinalGraphInverseYCoordinates() {
     //Setup
-    let graph = PrettyfyJSON();
+    let graph = PrettifyJSON();
 
     let expr = true;
     for (let index = 0; index < graph.nodes.length; index++) {
@@ -824,7 +824,7 @@ function TestFinalGraphInverseYCoordinates() {
 
 function TestFinalGraphSimplifyTargetSourceOfEdges() {
     //Setup
-    let graph = PrettyfyJSON();
+    let graph = PrettifyJSON();
 
     let expr = true;
     for (let index = 0; index < graph.links.length; index++) {
@@ -839,7 +839,7 @@ function TestFinalGraphSimplifyTargetSourceOfEdges() {
 
 function TestFinalGraphSimplifyTargetSourceOfLoops() {
     //Setup
-    let graph = PrettyfyJSON();
+    let graph = PrettifyJSON();
 
     let expr = true;
     for (let index = 0; index < graph.loops.length; index++) {
