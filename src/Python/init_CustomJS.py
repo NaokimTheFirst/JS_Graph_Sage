@@ -24,10 +24,11 @@ _update_JS_Repo(input('Please enter the path to the repository containing the pr
 # _update_JSON_Repo(path_To_Project_Repo+'/JS_Graph_Sage/obj/')
 
 try:
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/CustomJsGraph.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Update.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Tests.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/customJsGraph.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/update.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/tests.py')
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/websocket_server.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/Connection.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/connection.py')
+	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/message_handler.py')
 except:
 	print('Files not found')

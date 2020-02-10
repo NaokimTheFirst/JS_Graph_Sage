@@ -172,14 +172,13 @@ def show_CustomJS(G, layout=None):
   JSONgraph = graph_to_JSON(G, layout=layout)
   webbrowser.open('file://'+os.path.realpath(gen_html_code(JSONgraph)))
 
+
 def WaitServer():
   global current_server
 
   while current_server is None :
-    time.sleep(1)
+    time.sleep(0.5)
   
-
-
 
 class DataGraph(object):
   def __init__(self, data):
@@ -188,7 +187,6 @@ class DataGraph(object):
 
 import json
 from sage.graphs import graph
-
 def ConstructGraphFromJSONObject(JSONObject):
   posdict={}
 

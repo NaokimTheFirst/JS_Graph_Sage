@@ -47,76 +47,11 @@ def message_received(client, server, message):
 	JSONmessage = DataGraph(message)
 
 	newGraph = ConstructGraphFromJSONObject(JSONmessage)
-	result = Check_Parameter(JSONmessage.parameter,newGraph)
+	result = handle_message(JSONmessage.parameter,newGraph)
 	
-	Update_Graph(targetGraph, newGraph)
+	update_graph(targetGraph, newGraph)
 
 
 	if result != None :
 		returnMessage = JSONEncoder().encode({"request":JSONmessage.parameter, "result": result})
 		server.send_message(client,returnMessage)
-
-
-
-def Check_Parameter(parameter,graph):
-	result = None
-	if parameter is not None:
-		result = JS_functions_dict[parameter](graph)
-	return result
-
-def GetGraphProperties(graph):
-	result = []
-
-	if len(graph.vertices()) == 1 :
-		radius = 1
-	else :
-		radius = ConvertSpecialType(graph.radius())
-	
-	diameter = ConvertSpecialType(graph.diameter())
-
-	result.append(radius)
-	result.append(diameter)
-	result.append(graph.is_regular())
-	result.append(graph.is_planar())
-	result.append(graph.is_bipartite())
-
-	return result
-
-def ConvertSpecialType(target) :
-	if isinstance(target, sage.rings.integer.Integer) :
-		target = int(target)
-	elif isinstance(target, sage.rings.infinity.PlusInfinity) :
-		target = "+Infinity"
-
-	return target
-
-
-def Strong_Orientation(graph):
-	result = None
-	try :
-		result = list(graph.strong_orientations_iterator())[0]
-		return graph_to_JSON(result)
-	except :
-		pass
-	return result
-
-
-def Random_Orientation(graph):
-	graph = DiGraph([(a, b, c) if randint(0, 1) else (b, a, c) for a, b, c in graph.edge_iterator()])
-	return graph_to_JSON(graph)
-
-
-def Generate_Vertex_Coloring(graph):
-	return graph.coloring()
-
-
-import sage.graphs.graph_coloring
-def Generate_Edge_Coloring(graph):
-	return graph_coloring.edge_coloring(graph)
-
-
-JS_functions_dict = {'Properties': GetGraphProperties,
-					 'strongOrientation': Strong_Orientation,
-					 'randomOrientation': Random_Orientation,
-					 'vertexColoring': Generate_Vertex_Coloring,
-					 'edgeColoring':Generate_Edge_Coloring}
