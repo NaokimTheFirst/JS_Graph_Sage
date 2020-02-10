@@ -50,31 +50,29 @@ class GraphSelection {
     }
 }
 
-function SetIsDirected(bool){
-    isDirected = bool;
-    graphJSON.directed = bool;
-
-    DisplayArrows();
-    UpdateDirectedRelatedElements();
-}
-
-
 window.onload = function () {
-    initCon();
+    InitWebSocketConnection();
 
     document.body.onmousemove = handleMouseMove;
+    // List of colors
+    customColorScale = d3.scale.category20();
+    KeyboardEventInit();
 
-    LoadGraphData();
+    InitNewGraph();
+}
+
+function InitNewGraph(graph = null)
+{
+    if(force){force.stop();}
+    LoadGraphData(graph);
     InitGraph();
     InitInterface();
     ManageAllGraphicsElements();
     InitForce();
-
     //Start the automatic force layout
     force.start();
-
     //Freeze the graph after 2 sec
-    WaitGraphLoadToFreeze(1500);
+    WaitGraphLoadToFreeze(2000);
 }
 
 function handleMouseMove(event) {   
@@ -85,24 +83,22 @@ function handleMouseMove(event) {
 function GetGraphFromHTML() {
     var mydiv = document.getElementById("mygraphdata")
     var graph_as_string = mydiv.innerHTML
-    let graph = eval('(' + graph_as_string + ')');
+    let graph = StringToObject(graph_as_string);
 
     return graph;
 }
 
 // Loads the graph data
-function LoadGraphData() {
-    graphJSON = GetGraphFromHTML();
+function LoadGraphData(newGraph) {
+    graphJSON = (newGraph) ? newGraph : GetGraphFromHTML();
     
-    // List of colors
-    customColorScale = d3.scale.category20();
-
     //Init group
     FillGroupFromGraph(graphJSON);
     PopulateGroupList();
 }
 
 function FillGroupFromGraph(graph) {
+    groupList=[];
     graph.nodes.forEach(element => {
         if (!groupList.includes(element.group)) {
             groupList.push(element.group);
@@ -291,9 +287,16 @@ function InitForce() {
     });
 }
 
-function ManageAllGraphicsElements() {
+function ManageAllGraphicsElements() 
+{
+    if(svg){
+        let oldSVG = document.getElementById("svg");
+        oldSVG.parentElement.removeChild(oldSVG);
+    }
+
     // SVG window
     svg = d3.select("#graphFrame").append("svg")
+        .attr("id","svg")
         .attr("width", width())
         .attr("height", height())
         .attr("pointer-events", "all") // Zoom+move management
@@ -308,7 +311,6 @@ function ManageAllGraphicsElements() {
 
         
     InitBrush();
-
 
     ManageNodeLabels();
     ManageEdges();
@@ -1084,7 +1086,6 @@ function SetNodesColoration(colorationList){
         id ++;
     });
 
-    groupList = [];
     FillGroupFromGraph(graphJSON);
     PopulateGroupList();
     ManageNodes();
