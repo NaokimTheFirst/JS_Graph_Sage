@@ -2,8 +2,9 @@
 var graphJSON;
 var force;
 var customColorScale;
-var width;
-var height;
+var width = function() {return document.documentElement.clientWidth * 0.8};
+var height = function() {return document.documentElement.clientHeight};
+var xshift = function() {return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;};
 var drag_in_progress = false;
 var is_frozen = false;
 var isDirected = false;
@@ -76,8 +77,8 @@ window.onload = function () {
     WaitGraphLoadToFreeze(1500);
 }
 
-function handleMouseMove(event) {
-    cursorPosition.x = event.pageX;
+function handleMouseMove(event) {   
+    cursorPosition.x = event.pageX - xshift();
     cursorPosition.y = event.pageY;
 }
 
@@ -92,11 +93,7 @@ function GetGraphFromHTML() {
 // Loads the graph data
 function LoadGraphData() {
     graphJSON = GetGraphFromHTML();
-
-    //-5 to avoid a scrollbar to appear
-    width = document.documentElement.clientWidth - 5;
-    height = document.documentElement.clientHeight - 5;
-
+    
     // List of colors
     customColorScale = d3.scale.category20();
 
@@ -133,7 +130,7 @@ function InitGraph() {
         .linkDistance(graphJSON.link_distance)
         .linkStrength(graphJSON.link_strength)
         .gravity(graphJSON.gravity)
-        .size([width, height])
+        .size([width(), height()])
         .links(graphJSON.links)
         .nodes(graphJSON.nodes);
 
@@ -209,9 +206,9 @@ function center_and_scale() {
     var xspan = maxx - minx;
     var yspan = maxy - miny;
 
-    var scale = Math.min((height - border) / yspan, (width - border) / xspan);
-    var xshift = (width - scale * xspan) / 2
-    var yshift = (height - scale * yspan) / 2
+    var scale = Math.min((height() - border) / yspan, (width() - border) / xspan);
+    var xshift = (width() - scale * xspan) / 2
+    var yshift = (height() - scale * yspan) / 2
 
     force.nodes().forEach(function (d, i) {
         d.x = scale * (graphJSON.pos[i][0] - minx) + xshift;
@@ -297,8 +294,8 @@ function InitForce() {
 function ManageAllGraphicsElements() {
     // SVG window
     svg = d3.select("#graphFrame").append("svg")
-        .attr("width", width)
-        .attr("height", height)
+        .attr("width", width())
+        .attr("height", height())
         .attr("pointer-events", "all") // Zoom+move management
         .append('svg:g')
 

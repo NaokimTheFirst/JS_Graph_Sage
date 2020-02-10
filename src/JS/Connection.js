@@ -19,11 +19,10 @@ function initCon() {
     TreatResponse(object);
   };
   
-  webSocket.onclose = function() {
-  };
+  webSocket.onclose = function() {};
 
-  webSocket.onerror = function(e) {
-    console.log(e)
+  webSocket.onerror = function(error) {
+    CustomWarn("Fail to connect with SageMath");
   };
 }
 
@@ -58,12 +57,13 @@ function RequestStrongOrientation(){
 
 function RequestRandomOrientation(){
   SubmitMessage(randomOrientationRequestParameter);
+  SetIsDirected(true);
 }
 
 function SubmitMessage(parameter) {
   graphJSON.parameter = parameter;
   var prettyJSON = PrettifyJSON();
-  webSocket.send(JSON.stringify(prettyJSON))
+  webSocket.send(JSON.stringify(prettyJSON));
 }
 
 function onCloseClick() {
