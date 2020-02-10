@@ -6,22 +6,24 @@ const randomOrientationRequestParameter = "randomOrientation";
 const vertexColoringRequestParameter = "vertexColoring";
 const edgeColoringRequestParameter = "edgeColoring";
 
-function initCon() {
+function InitWebSocketConnection() {
   // Connect to Web Socket
   webSocket = new WebSocket("ws://localhost:9001/");
   // Set event handlers.
-  webSocket.onopen = function() {
+  webSocket.onopen = function() 
+  {
     UpdateGraphProperties();
   };
   
-  webSocket.onmessage = function(e) {
-    let object = eval('(' + e.data + ')');
-    TreatResponse(object);
+  webSocket.onmessage = function(message) 
+  {
+    TreatResponse(StringToObject(message.data));
   };
   
   webSocket.onclose = function() {};
 
-  webSocket.onerror = function(error) {
+  webSocket.onerror = function(error) 
+  {
     CustomWarn("Fail to connect with SageMath");
   };
 }
@@ -37,6 +39,10 @@ function TreatResponse(response){
     case edgeColoringRequestParameter :
       SetLinksColoration(response.result)
       break;
+    case strongOrientationRequestParameter :
+    case randomOrientationRequestParameter :
+      InitNewGraph(StringToObject(response.result));
+      break;
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;
@@ -51,13 +57,13 @@ function RequestEdgeColoring(){
   SubmitMessage(edgeColoringRequestParameter);
 }
 
-function RequestStrongOrientation(){
+function RequestStrongOrientation()
+{
   SubmitMessage(strongOrientationRequestParameter);
 }
 
 function RequestRandomOrientation(){
   SubmitMessage(randomOrientationRequestParameter);
-  SetIsDirected(true);
 }
 
 function SubmitMessage(parameter) {

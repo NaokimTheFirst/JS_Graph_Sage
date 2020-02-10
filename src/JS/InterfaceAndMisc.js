@@ -143,7 +143,6 @@ function SetProperties(radius,diameter,regular,planar,bipartite){
 
 function InitInterface(){
     UpdateDirectedRelatedElements();
-    KeyboardEventInit();
 }
 
 function DisplayElement(element, show){
@@ -221,7 +220,6 @@ function TryAddNewGroup(){
 }
 
 function KeyboardEventInit() {
-    
     //Keyboard Event
     document.onkeyup = function (key) {
         var action = null;
@@ -374,4 +372,9 @@ function CheckCurrentObjectType(types)
 function updateScroll(){
     overlayElements.scrollText.parentNode.style.display = "inherit";
     overlayElements.scrollText.scrollTop = overlayElements.scrollText.scrollHeight;
+}
+
+function StringToObject(string)
+{
+    return eval('(' + string + ')');
 }
