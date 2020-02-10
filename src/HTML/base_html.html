@@ -23,8 +23,7 @@
   </div>
   <div id="graphFrame">
     <div id="Overlay">
-      
-      <div id ="topBar">
+      <div id ="leftSide">
         <div class="Panel">
           <p class="PanelHeader">Tools</p>
           <div id="ToolPanelContent" class="PanelContent">
@@ -39,13 +38,8 @@
                   </select>
                 </td>
               </tr>
-              <tr>
-                <td><p style="padding-right: 10px">Is directed</p></td>
-                <td><input type="checkbox" id="myCheck" onclick="SetIsDirected(this.checked)"></td>
-              </tr>
             </table>
           </div>
-          <input type="button" onclick="ShowPanelContent(this)" value="Hide">
         </div>
         <div class="Panel">
           <p class="PanelHeader">Properties</p>
@@ -73,7 +67,6 @@
               </tr>
             </table>
           </div>
-          <input type="button" onclick="ShowPanelContent(this)" value="Show">
         </div>
         <div class="Panel">
           <p class="PanelHeader">Algorithms</p>
@@ -105,9 +98,7 @@
               </tr>
             </table>
           </div>
-          <input type="button" onclick="ShowPanelContent(this)" value="Show">
         </div>
-        
         <div class="Panel">
           <p class="PanelHeader">Key Helper</p>
           <div id="KeyPanelContent" class="PanelContent">
@@ -186,12 +177,10 @@
               </tr>
             </table>
           </div>
-          <input type="button" onclick="ShowPanelContent(this)" value="Show">
-        </div>  
-      </div>
-      
-      <div class="Panel" id="scrollPanel">
-        <div class="scroll"></div>
+        </div>
+        <div class="Panel" id="scrollPanel">
+          <div class="scroll"></div>
+        </div>
       </div>
     </div>
   </div>

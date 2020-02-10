@@ -142,16 +142,8 @@ function SetProperties(radius,diameter,regular,planar,bipartite){
 }
 
 function InitInterface(){
-    InitPanels();
     UpdateDirectedRelatedElements();
     KeyboardEventInit();
-}
-
-function InitPanels()
-{
-    DisplayElement(overlayElements.keyPanelContent,false);
-    DisplayElement(overlayElements.propertyPanelContent,false);
-    DisplayElement(overlayElements.algorithmPanelContent,false);
 }
 
 function DisplayElement(element, show){
@@ -162,15 +154,6 @@ function UpdateDirectedRelatedElements(){
     for (let index = 0; index < overlayElements.directedRelated.length; index++) {
         DisplayElement(overlayElements.directedRelated[index],isDirected);
     }
-}
-
-//Hide or show panel content
-function ShowPanelContent(button){
-    let panelContent = button.previousElementSibling;
-    let show = (panelContent.style.display == "none");
-    
-    DisplayElement(panelContent,show);
-    button.value =(show)? "Hide": "Show";
 }
 
 
