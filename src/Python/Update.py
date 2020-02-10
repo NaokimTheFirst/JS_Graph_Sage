@@ -1,4 +1,4 @@
-def update_uraph(gold, gnew):
+def update_graph(gold, gnew):
 	__Update_Graph_Nodes(gold, gnew)
 	__Update_Graph_Edges(gold, gnew)
 	print("graph updated")
