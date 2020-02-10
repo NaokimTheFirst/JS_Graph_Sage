@@ -26,37 +26,32 @@ rect {
     display: none;
 }
 
-#Overlay{
+#graphFrame{
+    display: inline-flex;
     width: 100%;
+}
+
+#Overlay{
+    width: 20%;
     height: 100%;
-    position: absolute;
     background: none;
-    z-index: 10;
-    margin : none;
+    margin : 0.5%;
     pointer-events:none;
 }
 
-#topBar{
-    width:100%;
-    display: inline-flex;
-}
-
 .Panel{
-    width: fit-content;
+    width: 100%;
     height: fit-content;
     pointer-events:auto;
     color : white;
     background: rgba(184, 184, 184, 0.473);
     padding: 0.5%;
-    margin: 0.5%;
+    margin-bottom: 2%;
 }
 
 #scrollPanel{
     display: none;
-    width:fit-content;
     height: 5%;
-    position: absolute; 
-    bottom: 0;
 }
 
 .PanelHeader{
@@ -65,9 +60,7 @@ rect {
     text-align: center;
 }
 
-.PanelContent{
-    margin-bottom: 5%;
-}
+
 .PanelContent th {
     padding : 3%;
 }
@@ -84,9 +77,13 @@ rect {
     text-align: right;
 }
 
+
+#AlgorithmPanelContent{
+    width: 100%;
+}
+
 #AlgorithmPanelContent button{
     width: 100%;
-    text-align: left;
 }
 
 p {
