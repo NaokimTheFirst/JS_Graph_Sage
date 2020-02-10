@@ -1,61 +1,112 @@
 //Structure that allow to search DOM element only once
 var overlayElements = {
-    groupListElement : null,
+    _groupListElement : null,
     get groupList() {
-        if(!this.groupListElement)
+        if(!this._groupListElement)
         {
-            this.groupListElement = document.getElementById("groupList");
+            this._groupListElement = document.getElementById("groupList");
         }
-        return this.groupListElement;
+        return this._groupListElement;
     },
 
-    commandListElement : null,
-    get commandList(){
-        if(!this.commandListElement)
+    _keyPanelContent : null,
+    get keyPanelContent(){
+        if(!this._keyPanelContent)
         {
-            this.commandListElement = document.getElementById("commandTable");
+            this._keyPanelContent = document.getElementById("KeyPanelContent");
         }
-        return this.commandListElement;
+        return this._keyPanelContent;
     },
 
-    promptResultElement : null,
+    _propertyPanelContent : null,
+    get propertyPanelContent(){
+        if(!this._propertyPanelContent)
+        {
+            this._propertyPanelContent = document.getElementById("PropertyPanelContent");
+        }
+        return this._propertyPanelContent;
+    },
+
+    _toolPanelContent : null,
+    get toolPanelContent(){
+        if(!this._toolPanelContent)
+        {
+            this._toolPanelContent = document.getElementById("ToolPanelContent");
+        }
+        return this._toolPanelContent;
+    },
+
+    _algorithmPanelContent : null,
+    get algorithmPanelContent(){
+        if(!this._algorithmPanelContent)
+        {
+            this._algorithmPanelContent = document.getElementById("AlgorithmPanelContent");
+        }
+        return this._algorithmPanelContent;
+    },
+
+    _promptResultElement : null,
     get promptResult(){
-        if(!this.promptResultElement){
-            this.promptResultElement = document.getElementById("PromptResult");
+        if(!this._promptResultElement){
+            this._promptResultElement = document.getElementById("PromptResult");
         }
-        return this.promptResultElement;
+        return this._promptResultElement;
     },
 
-    directedRelatedElements : null,
+    _directedRelatedElements : null,
     get directedRelated(){
-        if(!this.directedRelatedElements){
-            this.directedRelatedElements = document.getElementsByClassName("DirectedRelated");
+        if(!this._directedRelatedElements){
+            this._directedRelatedElements = document.getElementsByClassName("DirectedRelated");
         }
-        return this.directedRelatedElements;
+        return this._directedRelatedElements;
     },
 
-    scrollTextElement : null,
+    _scrollTextElement : null,
     get scrollText(){
-        if(!this.scrollTextElement){
-            this.scrollTextElement = document.getElementsByClassName("scroll")[0];
+        if(!this._scrollTextElement){
+            this._scrollTextElement = document.getElementsByClassName("scroll")[0];
         }
-        return this.scrollTextElement;
+        return this._scrollTextElement;
     },
 
-    radiusLabelElement : null,
+    _radiusLabelElement : null,
     get radiusLabel(){
-        if(!this.radiusLabelElement){
-            this.radiusLabelElement = document.getElementById("radiusLabel");
+        if(!this._radiusLabelElement){
+            this._radiusLabelElement = document.getElementById("radiusLabel");
         }
-        return this.radiusLabelElement;
+        return this._radiusLabelElement;
     },
 
-    diameterLabelElement : null,
+    _diameterLabelElement : null,
     get diameterLabel(){
-        if(!this.diameterLabelElement){
-            this.diameterLabelElement = document.getElementById("diameterLabel");
+        if(!this._diameterLabelElement){
+            this._diameterLabelElement = document.getElementById("diameterLabel");
         }
-        return this.diameterLabelElement;
+        return this._diameterLabelElement;
+    },
+
+    _regularLabelElement : null,
+    get regularLabel(){
+        if(!this._regularLabelElement){
+            this._regularLabelElement = document.getElementById("regularLabel");
+        }
+        return this._regularLabelElement;
+    },
+
+    _planarLabelElement : null,
+    get planarLabel(){
+        if(!this._planarLabelElement){
+            this._planarLabelElement = document.getElementById("planarLabel");
+        }
+        return this._planarLabelElement;
+    },
+
+    _bipartiteLabelElement : null,
+    get bipartiteLabel(){
+        if(!this._bipartiteLabelElement){
+            this._bipartiteLabelElement = document.getElementById("bipartiteLabel");
+        }
+        return this._bipartiteLabelElement;
     },
 }
 
@@ -82,34 +133,55 @@ function CustomWarn(string, display = true){
     }
 }
 
-function SetRadius(radius){
+function SetProperties(radius,diameter,regular,planar,bipartite){
     overlayElements.radiusLabel.innerHTML = radius;
-}
-
-function SetDiameter(diameter){
     overlayElements.diameterLabel.innerHTML = diameter;
+    overlayElements.regularLabel.innerHTML = regular;
+    overlayElements.planarLabel.innerHTML = planar;
+    overlayElements.bipartiteLabel.innerHTML = bipartite;
 }
 
 function InitInterface(){
-    InitKeyHelper()
+    InitPanels();
+    UpdateDirectedRelatedElements();
     KeyboardEventInit();
 }
 
-function InitKeyHelper(){
+function InitPanels()
+{
+    DisplayElement(overlayElements.keyPanelContent,false);
+    DisplayElement(overlayElements.propertyPanelContent,false);
+    DisplayElement(overlayElements.algorithmPanelContent,false);
+}
+
+function DisplayElement(element, show){
+    element.style.display = (show)? "":"none";
+}
+
+function UpdateDirectedRelatedElements(){
     for (let index = 0; index < overlayElements.directedRelated.length; index++) {
-        overlayElements.directedRelated[index].style.display = (isDirected)? "":"none";
+        DisplayElement(overlayElements.directedRelated[index],isDirected);
     }
 }
-//Hide or show key helper
-function ShowKeys(button){
-    let show = (overlayElements.commandList.style.display == "" 
-    || overlayElements.commandList.style.display == "none");
+
+//Hide or show panel content
+function ShowPanelContent(button){
+    let panelContent = button.previousElementSibling;
+    let show = (panelContent.style.display == "none");
     
-    overlayElements.commandList.style.display = (show)? "inherit":"none";
-    button.value =(show)?"Hide Key Helper": "Show Key Helper";
+    DisplayElement(panelContent,show);
+    button.value =(show)? "Hide": "Show";
+}
+
+
+function EmptyGroupList(){
+    for (let index = overlayElements.groupList.childElementCount - 2; index >= 0 ; index--) {
+        overlayElements.groupList.removeChild(overlayElements.groupList.childNodes[index]);
+    }   
 }
 
 function PopulateGroupList(){
+    EmptyGroupList();
     for(var i = 0; i < groupList.length; i++) {
         CreateGroupElement(groupList[i]);
     }
@@ -132,7 +204,7 @@ function ChangeSelectedGroup(){
 
 function SetCurrentGroup(){
     currentGroupIndex = overlayElements.groupList.selectedIndex;
-    overlayElements.groupList.style.backgroundColor = color(currentGroupIndex); 
+    overlayElements.groupList.style.backgroundColor = customColorScale(currentGroupIndex); 
 }
 
 function CreateGroupElement(name){
@@ -142,7 +214,7 @@ function CreateGroupElement(name){
     
     let list = overlayElements.groupList;
     let lastIndex = list.childElementCount - 1;
-    newElem.style.backgroundColor = color(lastIndex);
+    newElem.style.backgroundColor = customColorScale(lastIndex);
     list.insertBefore(newElem,list.childNodes[lastIndex]);
 
     overlayElements.groupList.selectedIndex = lastIndex;
@@ -166,28 +238,29 @@ function TryAddNewGroup(){
 }
 
 function KeyboardEventInit() {
+    
     //Keyboard Event
     document.onkeyup = function (key) {
+        var action = null;
         switch (key.keyCode) {
             case 46:
-                RemoveSelection();
+                action = RemoveSelection();
                 break;
             case 65:
                 //A for Add
-                var newNode = CreateNode();
-                MyManager.execute(new AddNodeCommand(newNode));
+                action = AddNewNode();
                 break;
             case 67 :
                 //C for color
-                SetGroupOfSelection();
+                action = SetGroupOfSelection();
                 break;
             case 68:
                 //V for Divide nodes on selection
-                SubdivideEdgeOnSelection();
+                action = SubdivideEdgeOnSelection();
                 break;
             case 69:
                 //E for Edges
-                AddEdgesOnSelection();
+                action = AddEdgesOnSelection();
                 break;
             case 70:
                 //F for Freeze
@@ -195,15 +268,15 @@ function KeyboardEventInit() {
                 break;
             case 73 :
                 //I for invert
-                TryInvertEdge();
+                action = TryInvertEdge();
                 break;
             case 76 :
                 //L for Loops
-                AddLoopOnSelection();
+                action = AddLoopOnSelection();
                 break;
             case 78 : 
                 //N for Rename
-                TryRenameElement();
+                action = TryRenameElement();
                 break;
             case 82:
                 //R to reset selection
@@ -220,18 +293,32 @@ function KeyboardEventInit() {
             case 89:
                 //Y to redo
                 MyManager.redo();
+                action = true;
                 break;
             case 90:
                 //Z to undo
                 MyManager.undo();
+                action = true;
                 break;
             default:
                 //Affiche le code de la touche pressée
                 console.log("Keycode : " + key.keyCode);
                 break;
         }
+        if(action){
+            TryUserAction(action);
+        }
     }
 }
+
+function TryUserAction(action){
+    if(action == true)
+    {
+        UpdateGraphProperties();
+    }
+}
+
+
 
 function TryRenameElement(){
     if(currentObject)
@@ -243,6 +330,7 @@ function TryRenameElement(){
         {
             let vr = new ValueRegisterer(currentObject.data.name, newName, currentObject);
             MyManager.execute(new ChangeNameCommand(vr));
+            return true;
         }
         else 
         {
@@ -253,6 +341,7 @@ function TryRenameElement(){
     {
         CustomWarn("Nothing to rename");
     }
+    return false;
 }
 
 function AskForNewName(){
@@ -281,11 +370,12 @@ function CheckNewName(name, type){
 
 function TryInvertEdge() {
     if (isDirected) {
-        InvertEdgesOnSelection();
+        return InvertEdgesOnSelection();
     }
     else {
         CustomWarn("The graph is not directed");
     }
+    return false;
 }
 
 

@@ -36,7 +36,14 @@ rect {
     pointer-events:none;
 }
 
-#commandList, #PropertiesPanel, #scrollPanel{
+#topBar{
+    width:100%;
+    display: inline-flex;
+}
+
+.Panel{
+    width: fit-content;
+    height: fit-content;
     pointer-events:auto;
     color : white;
     background: rgba(184, 184, 184, 0.473);
@@ -52,29 +59,34 @@ rect {
     bottom: 0;
 }
 
-#commandList{
-    float: right;
+.PanelHeader{
+    font-size: large;
+    font-weight: bold;
+    text-align: center;
 }
 
-#commandTable{
+.PanelContent{
     margin-bottom: 5%;
-    display:none;
-
 }
-#commandTable th {
+.PanelContent th {
     padding : 3%;
 }
 
-#commandTable th:nth-child(1) {
+.PanelContent th:nth-child(1) {
     text-align: left;
 }
 
-#commandTable th:nth-child(2) {
+.PanelContent th:nth-child(2) {
     text-align: right;
 }
 
-#commandTable td:nth-child(2) {
+.PanelContent td:nth-child(2) {
     text-align: right;
+}
+
+#AlgorithmPanelContent button{
+    width: 100%;
+    text-align: left;
 }
 
 p {

@@ -1,7 +1,7 @@
 //The graph properties
 var graphJSON;
 var force;
-var color;
+var customColorScale;
 var width;
 var height;
 var drag_in_progress = false;
@@ -9,7 +9,7 @@ var is_frozen = false;
 var isDirected = false;
 
 //DOM Elements / D3JS Elements
-var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush;
+var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
 var IDCounter = 0;
 var groupList = [];
 var currentGroupIndex = 0;
@@ -20,11 +20,6 @@ const MyManager = new Manager();
 const cursorPosition = {
     x: 0,
     y: 0
-};
-const graphTranslation = {
-    x: 0,
-    y: 0,
-    zoom:0,
 };
 
 const LoopType = "loop";
@@ -54,8 +49,18 @@ class GraphSelection {
     }
 }
 
+function SetIsDirected(bool){
+    isDirected = bool;
+    graphJSON.directed = bool;
+
+    DisplayArrows();
+    UpdateDirectedRelatedElements();
+}
+
 
 window.onload = function () {
+    initCon();
+
     document.body.onmousemove = handleMouseMove;
 
     LoadGraphData();
@@ -76,7 +81,6 @@ function handleMouseMove(event) {
     cursorPosition.y = event.pageY;
 }
 
-//
 function GetGraphFromHTML() {
     var mydiv = document.getElementById("mygraphdata")
     var graph_as_string = mydiv.innerHTML
@@ -94,13 +98,11 @@ function LoadGraphData() {
     height = document.documentElement.clientHeight - 5;
 
     // List of colors
-    color = d3.scale.category10();
+    customColorScale = d3.scale.category20();
 
     //Init group
     FillGroupFromGraph(graphJSON);
     PopulateGroupList();
-
-
 }
 
 function FillGroupFromGraph(graph) {
@@ -365,23 +367,29 @@ function IsNodeInsideExtent(extent, node){
 
 function ManageArrows(){
     // Arrows, for directed graphs
-    if (isDirected) {
-        svg.append("svg:defs").selectAll("marker")
-            .data(["directed"])
-            .enter().append("svg:marker")
-            .attr("id", String)
-            // viewbox is a rectangle with bottom-left corder (0,-2), width 4 and height 4
-            .attr("viewBox", "0 -2 4 4")
-            // This formula took some time ... :-P
-            .attr("refX", Math.ceil(2 * Math.sqrt(graphJSON.vertex_size)))
-            .attr("refY", 0)
-            .attr("markerWidth", 4)
-            .attr("markerHeight", 4)
-            .attr("orient", "auto")
-            .append("svg:path")
-            // triangles with endpoints (0,-2), (4,0), (0,2)
-            .attr("d", "M0,-2L4,0L0,2");
-    }
+    arrows = svg.append("svg:defs").selectAll("marker")
+    .data(["directed"])
+    .enter().append("svg:marker")
+    .attr("id", String)
+    // viewbox is a rectangle with bottom-left corder (0,-2), width 4 and height 4
+    .attr("viewBox", "0 -2 4 4")
+    // This formula took some time ... :-P
+    .attr("refX", Math.ceil(2 * Math.sqrt(graphJSON.vertex_size)))
+    .attr("refY", 0)
+    .attr("markerWidth", 4)
+    .attr("markerHeight", 4)
+    .attr("orient", "auto")
+    .append("svg:path")
+    // triangles with endpoints (0,-2), (4,0), (0,2)
+    .attr("d", "M0,-2L4,0L0,2");
+    
+    DisplayArrows();
+}
+
+function DisplayArrows() {
+    arrows.style("fill", function () {
+        return (isDirected) ? "" : "#ffffff00";
+    });
 }
 
 //Enable or disable the forces
@@ -483,7 +491,7 @@ function ManageEdges() {
 
 function RefreshEdge() {
     links.style("stroke", function (d) {
-        return (d.isSelected == true) ? "red" : d.color;
+        return (d.isSelected == true) ? "red" : customColorScale(d.group);
     });
 }
 
@@ -571,6 +579,7 @@ function ManageNodes() {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
                     MyManager.execute(new MoveNodeCommand(positions));
+                    UpdateGraphProperties();
                 }
 
             }));
@@ -602,7 +611,7 @@ function RefreshNodes() {
             return d.name;
         })
         .attr("fill", function (d) {
-            return color(groupList.indexOf(d.group));
+            return customColorScale(groupList.indexOf(d.group));
         });
 
     RefreshNodeOutline();
@@ -676,6 +685,8 @@ function AddNode(newNode) {
 
     //Restart the force layout with the new elements
     force.start();
+    
+    return true;
 }
 
 function CreateNode(pos = null) {
@@ -685,9 +696,8 @@ function CreateNode(pos = null) {
         newX = pos[0];
         newY = pos[1];
     } else {
-        pos = cursorPosition;
-        newX = pos[0];
-        newY = pos[1];
+        newX = cursorPosition.x;
+        newY = cursorPosition.y;
     }
 
     IDCounter++
@@ -718,10 +728,12 @@ function AddLoopOnSelection() {
                 AddLoopOnNode(selectedNodes[i].data,isFirst);
                 isFirst = false;
             }
+            return true;
         } else {
             CustomWarn("No nodes to add loop at on the selection");
         }
     }
+    return false;
 }
 
 
@@ -740,9 +752,11 @@ function SetGroupOfSelection() {
                     isFirst = false;
                 }
             }
+            return true;
         } else {
             CustomWarn("No nodes selected");
         }
+        return false;
     }
 }
 
@@ -762,9 +776,12 @@ function AddEdgesOnSelection() {
                     isFirst = false;
                 }
             }
+            return true;
         } else {
             CustomWarn("No nodes to add loop at on the selection");
         }
+
+        return false;
     }
 }
 
@@ -845,6 +862,12 @@ function RemoveElementFromGraph(element, _isFirst = true) {
     }
 }
 
+function AddNewNode() {
+    var newNode = CreateNode();
+    MyManager.execute(new AddNodeCommand(newNode));
+    return true; 
+}
+
 function RemoveSelection() {
     let currentSelection = GetCurrentSelection();
     let isFirst = true;
@@ -862,10 +885,13 @@ function RemoveSelection() {
         ManageLoops();
         ManageEdges();
         ManageNodes();
+
+        return true;
     }
     else {
         CustomWarn("Nothing to delete");
     }
+    return false;
 }
 
 function RemoveEdge(edgeData) {
@@ -932,9 +958,11 @@ function SubdivideEdgeOnSelection() {
                 SubdivideEdge(edge.data, isFirst);
                 isFirst = false;
             });
+            return true;
         } else {
             CustomWarn("No edges to subdivide");
         }
+        return false;
     }
 }
 
@@ -947,9 +975,11 @@ function InvertEdgesOnSelection() {
                 InvertEdge(edge, isFirst);
                 isFirst = false;
             });
+            return true;
         } else {
             CustomWarn("No edges to invert");
         }
+        return false;
     }
 }
 
@@ -965,15 +995,15 @@ function WaitGraphLoadToFreeze(waitingTime) {
     }, waitingTime);
 }
 
-function PrettyfyJSON() {
+function PrettifyJSON() {
     var prettyJSON = JSON.parse(JSON.stringify(graphJSON));
     prettyJSON.links.forEach(element => {
         element.source = element.source.name;
         element.target = element.target.name;
     });
+
     prettyJSON.loops.forEach(element => {
-        element.source = element.source.name;
-        element.target = element.target.name;
+        element.source = element.target = element.source.name;
     });
 
     //Return the Y to correspond with Sage Plan
@@ -981,13 +1011,17 @@ function PrettyfyJSON() {
         element.y = -element.y;
     });
 
+    prettyJSON.nodes.forEach(function (node, i) {
+        node.x = node.x/100;
+        node.y = node.y/100;
+    });
+
     return prettyJSON;
 }
 
-//Change the group of a node
-function SetGroupNode(valueRegisterer) {
-    let node = FindElementInGraph(valueRegisterer.element);
-    node.group = (node.group == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
+function SetGroupElement(valueRegisterer) {
+    let element = FindElementInGraph(valueRegisterer.element);
+    element.group = (element.group == valueRegisterer.newValue) ? valueRegisterer.oldValue : valueRegisterer.newValue;
     RefreshNodes();
 }
 
@@ -1036,7 +1070,41 @@ function FindElementInGraph(element) {
     return list[list.indexOf(element.data)];
 }
 
-function UpdateGraphAttributes(){
-    graphJSON.parameter = "Radius";
-    SubmitMessage();
+
+function UpdateGraphProperties(){
+    SubmitMessage(propertiesRequestParameter);
+}
+
+function SetNodesColoration(colorationList){
+    var id = 0;
+    colorationList.forEach(coloration => {
+        coloration.forEach(name => {
+            node = graphJSON.nodes.find(function(node){
+                return node.name == name;
+            });
+            SetGroupElement(new ValueRegisterer(id,id,new Element(node,NodeType)));
+        });
+        id ++;
+    });
+
+    groupList = [];
+    FillGroupFromGraph(graphJSON);
+    PopulateGroupList();
+    ManageNodes();
+}
+
+
+function SetLinksColoration(colorationList){
+    var id = 0;
+    colorationList.forEach(coloration => {
+        coloration.forEach(tuple => {
+            link = graphJSON.links.find(function(link){
+                return link.source.name == tuple[0] && link.target.name == tuple[1];
+            });
+            SetGroupElement(new ValueRegisterer(id,id,new Element(link,EdgeType)));
+        });
+        id ++;
+    });
+
+    ManageEdges();
 }

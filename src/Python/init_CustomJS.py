@@ -1,13 +1,9 @@
-
-_last_client = 0
-graph_client_dict = {}
-server_open = False
-
 #Your path to the repository JS_Graph_Sage
 path_To_Project_Repo = 'Mes Documents/Git'
 def _update_JS_Repo(path) :
 	global path_To_Project_Repo
-	path_To_Project_Repo = str(path)
+	if path != "1" :
+		path_To_Project_Repo = str(path)
 
 
 # #Your path to the repository where you'll save the JSON version of the graphs (for example JS_Graph_Sage/obj)
@@ -23,7 +19,7 @@ def _update_JS_Repo(path) :
 
 
 
-_update_JS_Repo(raw_input('Please enter the path to the repository containing the project : '))
+_update_JS_Repo(input('Please enter the path to the repository containing the project : '))
 
 # _update_JSON_Repo(path_To_Project_Repo+'/JS_Graph_Sage/obj/')
 

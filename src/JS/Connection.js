@@ -1,43 +1,72 @@
-var ws;
+var webSocket;
 
-initCon()
+const propertiesRequestParameter = "Properties";
+const strongOrientationRequestParameter = "strongOrientation";
+const randomOrientationRequestParameter = "randomOrientation";
+const vertexColoringRequestParameter = "vertexColoring";
+const edgeColoringRequestParameter = "edgeColoring";
 
 function initCon() {
   // Connect to Web Socket
-  ws = new WebSocket("ws://localhost:9001/");
+  webSocket = new WebSocket("ws://localhost:9001/");
   // Set event handlers.
-  ws.onopen = function() {
-    output("onopen");
+  webSocket.onopen = function() {
+    UpdateGraphProperties();
   };
   
-  ws.onmessage = function(e) {
+  webSocket.onmessage = function(e) {
     let object = eval('(' + e.data + ')');
-    SetRadius(object.result[0]);
-    SetDiameter(object.result[1]);
+    TreatResponse(object);
   };
   
-  ws.onclose = function() {
-    output("onclose");
+  webSocket.onclose = function() {
   };
-  ws.onerror = function(e) {
-    output("onerror");
+
+  webSocket.onerror = function(e) {
     console.log(e)
   };
 }
 
-function SubmitMessage() {
-  if(!graphJSON.parameter){
-    graphJSON.parameter = null;
+function TreatResponse(response){
+  switch (response.request) {
+    case propertiesRequestParameter:
+      SetProperties(response.result[0],response.result[1],response.result[2],response.result[3],response.result[4]);
+      break;
+    case vertexColoringRequestParameter :
+      SetNodesColoration(response.result);
+      break;
+    case edgeColoringRequestParameter :
+      SetLinksColoration(response.result)
+      break;
+    default:
+      CustomWarn("Undefined response behavior for parameter :" + response.request);
+      break;
   }
-  var prettyJSON = PrettyfyJSON();
-  ws.send(JSON.stringify(prettyJSON))
+}
+
+function RequestVertexColoring(){
+  SubmitMessage(vertexColoringRequestParameter);
+}
+
+function RequestEdgeColoring(){
+  SubmitMessage(edgeColoringRequestParameter);
+}
+
+function RequestStrongOrientation(){
+  SubmitMessage(strongOrientationRequestParameter);
+}
+
+function RequestRandomOrientation(){
+  SubmitMessage(randomOrientationRequestParameter);
+}
+
+function SubmitMessage(parameter) {
+  graphJSON.parameter = parameter;
+  var prettyJSON = PrettifyJSON();
+  webSocket.send(JSON.stringify(prettyJSON))
 }
 
 function onCloseClick() {
-  ws.close();
-}
-
-function output(str) {
-  console.log(str)
+  webSocket.close();
 }
 

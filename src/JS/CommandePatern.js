@@ -30,7 +30,7 @@ var AddLoopCommand = function (value, firstAction = true)  {
 };
 
 var ChangeGroupCommand = function(value, firstAction = true)  {
-    return new Command(SetGroupNode, SetGroupNode, value, firstAction);
+    return new Command(SetGroupElement, SetGroupElement, value, firstAction);
 };
 
 var ChangeNameCommand = function(value, firstAction = true)  {
@@ -58,8 +58,6 @@ var Manager = function () {
             revertedCommandStack = [];
             this.do(command);
             log.add(action(command) + ": " + command.value);
-
-            UpdateGraphAttributes();
         },
 
         undo: function () {
@@ -75,7 +73,7 @@ var Manager = function () {
                 var command = commandsStack.pop();
                 current = command.undo(command.value);
                 log.add("Undo " + action(command) + ": " + command.value);
-                revertedCommandStack.push(command);
+                revertedCommandStack.push(command)
 
             } else {
                 CustomWarn("Nothing to revert");

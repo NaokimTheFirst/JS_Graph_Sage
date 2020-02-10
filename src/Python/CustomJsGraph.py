@@ -1,199 +1,53 @@
-r"""
-Graph plotting in Javascript with d3.js
 
-This module implements everything that can be used to draw graphs with `d3.js
-<http://d3js.org/>`_ in Sage.
-
-On Python's side, this is mainly done by wrapping a graph's edges and vertices
-in a structure that can then be used in the javascript code. This javascript
-code is then inserted into a .html file to be opened by a browser.
-
-What Sage feeds javascript with is a "graph" object with the following content:
-
-- ``vertices`` -- each vertex is a dictionary defining :
-
-    - ``name``  -- The vertex's label
-
-    - ``group`` -- the vertex' color (integer)
-
-The ID of a vertex is its index in the vertex list.
-
-- ``edges`` -- each edge is a dictionary defining :
-
-    - ``source`` -- the ID (int) of the edge's source
-
-    - ``target`` -- the ID (int) of the edge's destination
-
-    - ``color``  -- the edge's color (integer)
-
-    - ``value`` -- thickness of the edge
-
-    - ``strength`` -- the edge's strength in the automatic layout
-
-    - ``color`` -- color (hexadecimal code)
-
-    - ``curve`` -- distance from the barycenter of the two endpoints and the
-      center of the edge. It defines the curve of the edge, which can be useful
-      for multigraphs.
-
-- ``pos`` -- a list whose `i` th element is a dictionary defining the position
-  of the `i` th vertex
-
-It also contains the definition of some numerical/boolean variables whose
-definition can be found in the documentation of
-:meth:`~sage.graphs.generic_graph.GenericGraph.show` : ``directed``, ``charge``,
-``link_distance``, ``link_strength``, ``gravity``, ``vertex_size``,
-``edge_thickness``.
-
-.. WARNING::
-
-    Since the d3js package is not standard yet, the javascript is fetched from
-    d3js.org website by the browser. If you want to avoid that (e.g.  to protect
-    your privacy or by lack of internet connection), you can install the d3js
-    package for offline use by running ``sage -i d3js`` from the command line.
-
-.. TODO::
-
-    - Add tooltip like in `<http://bl.ocks.org/bentwonk/2514276>`_.
-
-    - Add a zoom through scrolling (`<http://bl.ocks.org/mbostock/3681006>`_).
-
-Authors:
-
-- Nathann Cohen, Brice Onfroy -- July 2013 --
-  Initial version of the Sage code,
-  Javascript code, using examples from `d3.js <http://d3js.org/>`_.
-
-- Thierry Monteil (June 2014): allow offline use of d3.js provided by d3js spkg.
-
-Functions
----------
-"""
 from sage.misc.temporary_file import tmp_filename
 from sage.plot.colors import rainbow
 import os
 
-#*****************************************************************************
-#       Copyright (C) 2013 Nathann Cohen <nathann.cohen@gmail.com>
-#                          Brice Onfroy  <onfroy.brice@gmail.com>
-#
-#  Distributed under the terms of the GNU General Public License (GPL)
-#  as published by the Free Software Foundation; either version 2 of
-#  the License, or (at your option) any later version.
-#                  http://www.gnu.org/licenses/
-#*****************************************************************************
+def gen_html_code(JSONgraph):
 
-def gen_html_code(G,
-                  vertex_partition=[],
-                  vertex_colors=None,
-                  edge_partition=[],
-                  layout=None,
-                  charge=-120,
-                  link_distance=100,
-                  link_strength=2,
-                  gravity=.04,
-                  vertex_size=12,
-                  edge_thickness=4):
-    r"""
-    Creates a .html file showing the graph using `d3.js <http://d3js.org/>`_.
+    try :
+      js_code_file = open(path_To_Project_Repo+"/JS_Graph_Sage/src/HTML/base_html.html", 'r')
+    except :
+      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
+      sys.exit(1)
+    js_code = js_code_file.read().replace("// GRAPH_DATA_HEREEEEEEEEEEE", JSONgraph)
+    js_code_file.close()
 
-    This function returns the name of the .html file. If you want to visualize
-    the actual graph use :meth:`~sage.graphs.generic_graph.GenericGraph.show`.
+    # Add d3.js script depending on whether d3js package is installed.
+    #d3js_filepath = os.path.join(SAGE_SHARE, 'd3js', 'd3.min.js')
+    #if os.path.exists(d3js_filepath):
+    #    with open(d3js_filepath, 'r') as d3js_code_file:
+    #        d3js_script = '<script>' + d3js_code_file.read() + '</script>'
+    #else:
+        
+    d3js_script = '<script src="http://d3js.org/d3.v3.min.js"></script>'
+    js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
-    INPUT:
+    # Writes the temporary .html file
+    try :
+      filename = path_To_Project_Repo+'/JS_Graph_Sage/obj/result.html'
+    except :
+      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
+      sys.exit(1)
+    f = open(filename, 'w')
+    f.write(js_code)
+    f.close()
 
-    - ``G`` -- the graph
+    return filename
 
-    - ``vertex_partition`` -- list (default: ``[]``); a list of lists
-      representing a partition of the vertex set. Vertices are then colored in
-      the graph according to the partition
 
-    - ``vertex_colors`` -- dict (default: ``None``); a dictionary representing a
-      partition of the vertex set. Keys are colors (ignored) and values are
-      lists of vertices. Vertices are then colored in the graph according to the
-      partition
+def graph_to_JSON(G,
+              vertex_partition=[],
+              vertex_colors=None,
+              edge_partition=[],
+              layout=None,
+              charge=-120,
+              link_distance=100,
+              link_strength=2,
+              gravity=.04,
+              vertex_size=12,
+              edge_thickness=4):
 
-    - ``edge_partition`` -- list (default: ``[]``); same as
-      ``vertex_partition``, with edges instead
-
-    - ``force_spring_layout`` -- boolean (default: ``False``); whether to take
-      previously computed position of nodes into account if there is one, or to
-      compute a spring layout
-
-    - ``vertex_size`` -- integer (default: ``7``); the size of a vertex' circle
-
-    - ``edge_thickness`` -- integer (default: ``4``); thickness of an edge
-
-    - ``charge`` -- integer (default: ``-120``); the vertices' charge. Defines
-      how they repulse each other. See
-      `<https://github.com/mbostock/d3/wiki/Force-Layout>`_ for more
-      information
-
-    - ``link_distance`` -- integer (default: ``30``); see
-      `<https://github.com/mbostock/d3/wiki/Force-Layout>`_ for more
-      information
-
-    - ``link_strength`` -- integer (default: ``2``); see
-      `<https://github.com/mbostock/d3/wiki/Force-Layout>`_ for more
-      information
-
-    - ``gravity`` -- float (default: ``0.04``); see
-      `<https://github.com/mbostock/d3/wiki/Force-Layout>`_ for more
-      information
-
-    .. WARNING::
-
-        Since the d3js package is not standard yet, the javascript is fetched
-        from d3js.org website by the browser. If you want to avoid that (e.g.
-        to protect your privacy or by lack of internet connection), you can
-        install the d3js package for offline use by running ``sage -i d3js``
-        from the command line.
-
-    EXAMPLES::
-
-        sage: graphs.RandomTree(50).show(method="js") # optional -- internet
-
-        sage: g = graphs.PetersenGraph()
-        sage: g.show(method="js", vertex_partition=g.coloring()) # optional -- internet
-
-        sage: graphs.DodecahedralGraph().show(method="js", force_spring_layout=True) # optional -- internet
-
-        sage: graphs.DodecahedralGraph().show(method="js") # optional -- internet
-
-        sage: g = digraphs.DeBruijn(2, 2)
-        sage: g.allow_multiple_edges(True)
-        sage: g.add_edge("10", "10", "a")
-        sage: g.add_edge("10", "10", "b")
-        sage: g.add_edge("10", "10", "c")
-        sage: g.add_edge("10", "10", "d")
-        sage: g.add_edge("01", "11", "1")
-        sage: g.show(method="js"
-        ....:        link_distance=200, gravity=.05, charge=-500,
-        ....:        edge_partition=[[("11", "12", "2"), ("21", "21", "a")]],
-        ....:        edge_thickness=4) # optional -- internet
-
-    TESTS::
-
-        sage: from sage.graphs.graph_plot_js import gen_html_code
-        sage: filename = gen_html_code(graphs.PetersenGraph())
-
-    :trac:`17370`::
-
-        sage: filename = gen_html_code(graphs.CompleteBipartiteGraph(4, 5))
-
-    In the generated html code, the source (resp. target) of a link is the index
-    of the node in the list defining the names of the nodes. We check that the
-    order is correct (:trac:`27460`)::
-
-        sage: filename = gen_html_code(DiGraph({1: [10]}))
-        sage: with open(filename, 'r') as f:
-        ....:     data = f.read()
-        sage: nodes = data.partition('"nodes":')[2]; nodes
-        ...[{..."name": "10"...}, {..."name": "1"...}]...
-        sage: links = data.partition('"links":')[2]
-        sage: '"source": 1' in links and '"target": 0' in links
-        True
-    """
     directed = G.is_directed()
     multiple_edges = G.has_multiple_edges()
 
@@ -287,7 +141,7 @@ def gen_html_code(G,
         for v in G:
             x, y = Gpos[v]
             pos.append([float(x), float(-y)])
-
+            
     # Encodes the data as a JSON string
     from json import JSONEncoder
     string = JSONEncoder().encode({"nodes": nodes,
@@ -301,89 +155,30 @@ def gen_html_code(G,
                                    "gravity": float(gravity),
                                    "vertex_size": int(vertex_size),
                                    "edge_thickness": int(edge_thickness)})
+    return string
 
 
 
-
-
-    # from sage.env import SAGE_EXTCODE, SAGE_SHARE
-    try :
-      js_code_file = open(path_To_Project_Repo+"/JS_Graph_Sage/src/HTML/base_html.html", 'r')
-    except :
-      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
-      sys.exit(1)
-    js_code = js_code_file.read().replace("// GRAPH_DATA_HEREEEEEEEEEEE", string)
-    js_code_file.close()
-
-
-    # Add d3.js script depending on whether d3js package is installed.
-    #d3js_filepath = os.path.join(SAGE_SHARE, 'd3js', 'd3.min.js')
-    #if os.path.exists(d3js_filepath):
-    #    with open(d3js_filepath, 'r') as d3js_code_file:
-    #        d3js_script = '<script>' + d3js_code_file.read() + '</script>'
-    #else:
-        
-    d3js_script = '<script src="http://d3js.org/d3.v3.min.js"></script>'
-    js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
-
-    # Writes the temporary .html file
-    try :
-      filename = path_To_Project_Repo+'/JS_Graph_Sage/obj/result.html'
-    except :
-      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
-      sys.exit(1)
-    f = open(filename, 'w')
-    f.write(js_code)
-    f.close()
-
-    return filename
-
-
-
-
-import re
-import webbrowser
-
-
+import re, webbrowser, time
 def show_CustomJS(G, layout=None):
-  webbrowser.open('file://'+os.path.realpath(gen_html_code(G,layout=layout)))
+  global current_server
 
-  global _last_client
-  client = _last_client
-
-  global server_open
-  if not server_open:
+  if not current_server:
     launch_connection()
+    WaitServer()
 
-  while _last_client==client :
-    pass
+  graph_client_dict[current_server.id_counter + 1] = G
 
-  global graph_client_dict
-  graph_client_dict[_last_client] = G
+  JSONgraph = graph_to_JSON(G, layout=layout)
+  webbrowser.open('file://'+os.path.realpath(gen_html_code(JSONgraph)))
 
-  print graph_client_dict
+def WaitServer():
+  global current_server
 
-  _last_client=0
-
-
-
-# def GetBackJSON(pathRepo=path_To_JSON_Repo,
-#                 nameJSON=JSON_name):
-
-#   filename = pathRepo+nameJSON
+  while current_server is None :
+    time.sleep(1)
   
-#   try :
-#     f = open(filename, 'r')
-#   except :
-#     print ('File '+pathRepo+nameJSON+' does not exist')
-#     print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
-#     print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
-#     sys.exit(1)
 
-#   if f.mode == 'r':
-#     lines = f.readlines()
-
-#   return lines[0]
 
 
 class DataGraph(object):
@@ -396,7 +191,13 @@ from sage.graphs import graph
 
 def ConstructGraphFromJSONObject(JSONObject):
   posdict={}
-  G = graphs.EmptyGraph()
+
+  G = None
+
+  if JSONObject.directed :
+    G = DiGraph()
+  else :
+    G = Graph()
 
   #Add nodes
   for n in JSONObject.nodes:
@@ -414,7 +215,7 @@ def ConstructGraphFromJSONObject(JSONObject):
 
   #Add loops
   if len(JSONObject.loops)>0:
-    G.allow_loops(true)
+    G.allow_loops(True)
   for l in JSONObject.loops:
     G.add_edge(l.get("source"),l.get("target"))
 
@@ -426,3 +227,24 @@ def ConstructGraphFromJSONObject(JSONObject):
 #   string = GetBackJSON(nameJSON=nameJSON)
 
 #   return ConstructGraphFromJSONString(string)
+
+
+
+# def GetBackJSON(pathRepo=path_To_JSON_Repo,
+#                 nameJSON=JSON_name):
+
+#   filename = pathRepo+nameJSON
+
+#   try :
+#     f = open(filename, 'r')
+#   except :
+#     print ('File '+pathRepo+nameJSON+' does not exist')
+#     print ('default : path = \'Mes Documents/Git/JS_Graph_Sage/obj/\' -> _update_JSON_Repo(path) to update')
+#     print ('          name JSON = \'Graph_JSON\' -> _update_JSON_name(name) to update')
+#     sys.exit(1)
+
+#   if f.mode == 'r':
+#     lines = f.readlines()
+
+#   return lines[0]
+
