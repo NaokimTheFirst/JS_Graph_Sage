@@ -158,7 +158,6 @@ def graph_to_JSON(G,
     return string
 
 
-
 import re, webbrowser, time
 def show_CustomJS(G, layout=None):
   global current_server

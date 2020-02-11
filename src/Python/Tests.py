@@ -39,6 +39,7 @@ def _Test_ConstuctGraphFromJson():
 	__Pass_Test('edges (non-loops) (Failed)', __TestConstructEdges(g, JSONObject), False)
 	__Pass_Test('loops (Failed)', __TestConstructLoops(g, JSONObject), False)
 
+
 def __TestConstructNodes(g, JSON):
 	
 	test=True

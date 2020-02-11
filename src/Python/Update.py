@@ -2,6 +2,7 @@ def update_graph(gold, gnew):
 	__Update_Graph_Nodes(gold, gnew)
 	__Update_Graph_Edges(gold, gnew)
 	print("graph updated")
+	
 
 
 def __Update_Graph_Nodes(gold, gnew):
