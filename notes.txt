@@ -1,5 +1,4 @@
 préservation des objets pour les noeuds
-retirer strong et random orientation et vertex coloring et edge coloring pour DiGraph
-coloration du graphe non dirigé sous-jascent (?)
+strong et random orientation et coloration du graphe non dirigé sous-jacent
 retirer le tmpJS.obj
 retirer dans le dict graph-client si le graph est déjà ouvert (vérif avec hashcode)

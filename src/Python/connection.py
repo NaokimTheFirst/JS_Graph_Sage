@@ -61,7 +61,22 @@ def message_received(client, server, message):
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
 			server.send_message(client,returnMessage)
+	else :
+		end_connection(client, server)
 
 def end_connection(client, server):
 	returnMessage = JSONEncoder().encode({"request":'closeConnection', "result": ''})
 	server.send_message(client,returnMessage)
+
+
+def client_dictionnary_verification(G):
+	global current_server, graph_client_dict
+
+	if G in graph_client_dict.values() :
+		idGraph = id(G)
+		for key in graph_client_dict.keys() :
+			if id(graph_client_dict[key]) == idGraph :
+				client_to_remove = None
+				for client in current_server.clients:
+					if client['id'] == key :
+						end_connection(client, current_server)

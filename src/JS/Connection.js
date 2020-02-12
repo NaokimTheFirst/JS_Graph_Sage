@@ -42,6 +42,8 @@ function TreatResponse(response){
       SetLinksColoration(response.result)
       break;
     case strongOrientationRequestParameter :
+      InitNewGraph(StringToObject(response.result));
+      break;
     case randomOrientationRequestParameter :
       InitNewGraph(StringToObject(response.result));
       break;
@@ -50,6 +52,7 @@ function TreatResponse(response){
       break;
     case closeConnectionParameter :
       webSocket.close();
+      break;
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;

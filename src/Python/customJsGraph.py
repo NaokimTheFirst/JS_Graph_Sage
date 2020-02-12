@@ -161,13 +161,14 @@ def graph_to_JSON(G,
 
 import re, webbrowser, time
 def show_CustomJS(G, layout=None):
-  global current_server
+  global current_server, graph_client_dict
 
   if not current_server:
     graph_client_dict[1] = G
     launch_connection()
     WaitServer()
   else :
+    client_dictionnary_verification(G)
     graph_client_dict[current_server.id_counter + 1] = G
 
   JSONgraph = graph_to_JSON(G, layout=layout)
