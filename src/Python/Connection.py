@@ -6,6 +6,7 @@ def new_client(client, server):
 	print("New client connected and was given id %d" % client['id'])
 	
 
+
 # Called for every client disconnecting
 def client_left(client, server):
 	global graph_client_dict,current_server

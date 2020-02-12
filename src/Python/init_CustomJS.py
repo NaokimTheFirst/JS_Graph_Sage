@@ -32,4 +32,3 @@ try:
 	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/message_handler.py')
 except:
 	print('Files not found')
-
