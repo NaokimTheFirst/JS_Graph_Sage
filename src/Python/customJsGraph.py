@@ -164,10 +164,11 @@ def show_CustomJS(G, layout=None):
   global current_server
 
   if not current_server:
+    graph_client_dict[1] = G
     launch_connection()
     WaitServer()
-
-  graph_client_dict[current_server.id_counter + 1] = G
+  else :
+    graph_client_dict[current_server.id_counter + 1] = G
 
   JSONgraph = graph_to_JSON(G, layout=layout)
   webbrowser.open('file://'+os.path.realpath(gen_html_code(JSONgraph)))

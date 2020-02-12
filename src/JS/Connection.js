@@ -6,6 +6,7 @@ const randomOrientationRequestParameter = "randomOrientation";
 const vertexColoringRequestParameter = "vertexColoring";
 const edgeColoringRequestParameter = "edgeColoring";
 const convertGraphParameter = "convert";
+const closeConnectionParameter = "closeConnection"
 
 function InitWebSocketConnection() {
   // Connect to Web Socket
@@ -47,6 +48,8 @@ function TreatResponse(response){
     case convertGraphParameter :
       CustomWarn("Graph : "+ response.result +" open in new Window");
       break;
+    case closeConnectionParameter :
+      webSocket.close();
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;

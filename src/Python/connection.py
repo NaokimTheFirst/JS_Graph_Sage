@@ -3,7 +3,11 @@ current_server = None
 
 # Called for every client connecting
 def new_client(client, server):
-	print("New client connected and was given id %d" % client['id'])
+	if client['id'] not in graph_client_dict :
+		end_connection(client, server)
+		print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
+	else :
+		print("New client connected and was given id %d" % client['id'])
 	
 
 
@@ -11,8 +15,9 @@ def new_client(client, server):
 def client_left(client, server):
 	global graph_client_dict,current_server
 
-	print("Client(%d) disconnected" % client['id'])
-	graph_client_dict.pop(client['id'])
+	if client['id'] in graph_client_dict :
+		print("Client(%d) disconnected" % client['id'])
+		graph_client_dict.pop(client['id'])
 
 	if not graph_client_dict :
 		server.server_close()
@@ -43,15 +48,20 @@ from json import JSONEncoder
 # Called when a client sends a message
 def message_received(client, server, message):
 	global graph_client_dict
-	targetGraph = graph_client_dict[client['id']]
-	JSONmessage = DataGraph(message)
+	if client['id'] in graph_client_dict :
+		targetGraph = graph_client_dict[client['id']]
+		JSONmessage = DataGraph(message)
 
-	newGraph = ConstructGraphFromJSONObject(JSONmessage)
-	response = handle_message(JSONmessage.parameter,newGraph)
-	
-	update_graph(targetGraph, newGraph)
+		newGraph = ConstructGraphFromJSONObject(JSONmessage)
+		response = handle_message(JSONmessage.parameter,newGraph)
+		
+		update_graph(targetGraph, newGraph)
 
 
-	if response[1] != None :
-		returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
-		server.send_message(client,returnMessage)
+		if response[1] != None :
+			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
+			server.send_message(client,returnMessage)
+
+def end_connection(client, server):
+	returnMessage = JSONEncoder().encode({"request":'closeConnection', "result": ''})
+	server.send_message(client,returnMessage)
