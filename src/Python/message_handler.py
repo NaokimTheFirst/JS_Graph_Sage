@@ -1,27 +1,39 @@
+propertiesParameter = 'Properties'
+strongOrientationParameter = 'strongOrientation'
+randomOrientationParameter = 'randomOrientation'
+vertexColoringParameter = 'vertexColoring'
+edgeColoringParameter = 'edgeColoring'
+convertGraphParameter = 'convert'
+errorParameter = "errorWhileTreatingRequest"
+
+
 
 def handle_message(parameter,graph):
-	result = None
+	response = None
 	if parameter is not None:
-		result = JS_functions_dict[parameter](graph)
-	return result
+		response = JS_functions_dict[parameter](graph)
+	return response
 
-def get_graph_properties(graph):
-	result = []
+def _get_graph_properties(graph):
+	response = [propertiesParameter,[]]
 
-	if len(graph.vertices()) == 1 :
-		radius = 1
+	if len(graph.vertices()) <= 1  :
+		radius = len(graph.vertices())
 	else :
 		radius = convert_sage_types(graph.radius())
 	
-	diameter = convert_sage_types(graph.diameter())
+	if len(graph.vertices()) == 0  :
+		diameter = 0
+	else :
+		diameter = convert_sage_types(graph.diameter())
 
-	result.append(radius)
-	result.append(diameter)
-	result.append(graph.is_regular())
-	result.append(graph.is_planar())
-	result.append(graph.is_bipartite())
+	response[1].append(radius)
+	response[1].append(diameter)
+	response[1].append(graph.is_regular())
+	response[1].append(graph.is_planar())
+	response[1].append(graph.is_bipartite())
 
-	return result
+	return response
 
 def convert_sage_types(target) :
 	if isinstance(target, sage.rings.integer.Integer) :
@@ -32,39 +44,71 @@ def convert_sage_types(target) :
 	return target
 
 
-def strong_orientation(graph):
+def _strong_orientation_for_JS(graph):
 	newGraph = None
-	try :
-		newGraph = list(graph.strong_orientations_iterator())[0]
-		if graph.is_directed() :
-			return graph_to_JSON(newGraph)
-		else :
-			show_CustomJS(create_global_tmp_graph(newGraph))
+	response = []
 
-	except :
+	try :
+		if graph.is_directed() :
+			newGraph = graph.to_undirected()
+			newGraph = newGraph.strong_orientation()
+			__update_graph_positions(newGraph, graph)
+			response.append(strongOrientationParameter)
+			response.append(graph_to_JSON(newGraph))
+		else :
+			newGraph = graph.strong_orientation()
+			response.append(convertGraphParameter)
+			response.append("tmpJS")
+			show_CustomJS(create_global_tmp_graph(newGraph))
+	except Exception as exception :
+		print("ERROR : "+ str(exception))
+		response.append(errorParameter)
+		response.append(str(exception))
+		pass
+	return response
+
+
+def _random_orientation_for_JS(graph):
+	newGraph = None
+	response = []
+
+	try :
+		if graph.is_directed() :
+			newGraph = graph.to_undirected()
+			newGraph = newGraph.random_orientation()
+			__update_graph_positions(newGraph, graph)
+			response.append(randomOrientationParameter)
+			response.append(graph_to_JSON(newGraph))
+		else :
+			newGraph = graph.random_orientation()
+			response.append(convertGraphParameter)
+			response.append("tmpJS")
+			show_CustomJS(create_global_tmp_graph(newGraph))
+	except Exception as exception :
+		print("ERROR : "+ str(exception))
+		response.append(errorParameter)
+		response.append(str(exception))
 		pass
 
+	return response
 
-def random_orientation(graph):
-	newGraph = DiGraph([(a, b, c) if randint(0, 1) else (b, a, c) for a, b, c in graph.edge_iterator()])
 
-	if graph.is_directed() :
-		return graph_to_JSON(newGraph)
+def _generate_vertex_coloring_for_JS(graph):
+	if not graph.is_directed():
+		color = graph.coloring()
 	else :
+		newGraph = Graph()
 		update_graph(newGraph, graph)
-		show_CustomJS(create_global_tmp_graph(newGraph))
-
-
-def generate_vertex_coloring(graph):
-	return graph.coloring()
+		color = newGraph.coloring()
+	return [vertexColoringParameter,color]
 
 
 import sage.graphs.graph_coloring
-def generate_edge_coloring(graph):
-	return graph_coloring.edge_coloring(graph)
+def _generate_edge_coloring_for_JS(graph):
+	return [edgeColoringParameter,graph_coloring.edge_coloring(graph)]
 
 
-def convert_graph_digraph_bidirectionnal(graph):
+def _convert_graph_digraph_bidirectionnal_for_JS(graph):
 	newGraph = None
 	if graph.is_directed():
 		newGraph = convert_DtoG(graph)
@@ -72,8 +116,10 @@ def convert_graph_digraph_bidirectionnal(graph):
 		newGraph = convert_GtoD(graph)
 	show_CustomJS(create_global_tmp_graph(newGraph))
 
+	return [convertGraphParameter,"tmpJS"]
+
 def convert_GtoD(graph):
-	newGraph = Digraph()
+	newGraph = DiGraph()
 	update_graph(newGraph, graph)
 	return newGraph
 
@@ -84,15 +130,17 @@ def convert_DtoG(graph):
 
 
 def create_global_tmp_graph(graph):
-	graph.save('tmpJS')
-	global tmpJS
-	tmpJS = load('tmpJS')
-	print('New graph created in variable \"tmpJS\"')
-	return tmpJS
+	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'
+	graph.save(path_to_tmp_graph)
+	global tmpJSgraph
+	tmpJSgraph = load(path_to_tmp_graph)
+	print('New graph created in variable \"tmpJSgraph\"')
+	return tmpJSgraph
 
-JS_functions_dict = {'Properties' : get_graph_properties,
-					 'strongOrientation' : strong_orientation,
-					 'randomOrientation' : random_orientation,
-					 'vertexColoring' : generate_vertex_coloring,
-					 'edgeColoring' : generate_edge_coloring,
-					 'convert' : convert_graph_digraph_bidirectionnal}
+JS_functions_dict = {propertiesParameter : _get_graph_properties,
+					strongOrientationParameter : _strong_orientation_for_JS,
+					randomOrientationParameter : _random_orientation_for_JS,
+					vertexColoringParameter : _generate_vertex_coloring_for_JS,
+					edgeColoringParameter : _generate_edge_coloring_for_JS,
+					convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS}
+

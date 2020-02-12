@@ -1,0 +1,2 @@
+préservation des objets pour les noeuds
+retirer le tmpJS.obj

@@ -5,6 +5,8 @@ const strongOrientationRequestParameter = "strongOrientation";
 const randomOrientationRequestParameter = "randomOrientation";
 const vertexColoringRequestParameter = "vertexColoring";
 const edgeColoringRequestParameter = "edgeColoring";
+const convertGraphParameter = "convert";
+const closeConnectionParameter = "closeConnection"
 
 function InitWebSocketConnection() {
   // Connect to Web Socket
@@ -40,8 +42,16 @@ function TreatResponse(response){
       SetLinksColoration(response.result)
       break;
     case strongOrientationRequestParameter :
+      InitNewGraph(StringToObject(response.result));
+      break;
     case randomOrientationRequestParameter :
       InitNewGraph(StringToObject(response.result));
+      break;
+    case convertGraphParameter :
+      CustomWarn("Graph : "+ response.result +" open in new Window");
+      break;
+    case closeConnectionParameter :
+      webSocket.close();
       break;
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
@@ -65,6 +75,12 @@ function RequestStrongOrientation()
 function RequestRandomOrientation(){
   SubmitMessage(randomOrientationRequestParameter);
 }
+
+
+function RequestConvertGraph(){
+  SubmitMessage(convertGraphParameter);
+}
+
 
 function SubmitMessage(parameter) {
   graphJSON.parameter = parameter;
