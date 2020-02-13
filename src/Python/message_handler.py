@@ -116,7 +116,6 @@ def _convert_graph_digraph_bidirectionnal_for_JS(graph):
 		newGraph = convert_DtoG(graph)
 	else :
 		newGraph = convert_GtoD(graph)
-	print("oui")
 	show_CustomJS(__create_temporary_JS_graph(newGraph))
 
 	return [convertGraphParameter,"tmpJS"], graph
