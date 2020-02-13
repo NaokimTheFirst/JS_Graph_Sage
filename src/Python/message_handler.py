@@ -11,8 +11,8 @@ errorParameter = "errorWhileTreatingRequest"
 def handle_message(parameter,graph):
 	response = None
 	if parameter is not None:
-		response = JS_functions_dict[parameter](graph)
-	return response
+		response, graph = JS_functions_dict[parameter](graph)
+	return response, graph
 
 def _get_graph_properties(graph):
 	response = [propertiesParameter,[]]
@@ -33,7 +33,7 @@ def _get_graph_properties(graph):
 	response[1].append(graph.is_planar())
 	response[1].append(graph.is_bipartite())
 
-	return response
+	return response, graph
 
 def convert_sage_types(target) :
 	if isinstance(target, sage.rings.integer.Integer) :
@@ -57,15 +57,16 @@ def _strong_orientation_for_JS(graph):
 			response.append(graph_to_JSON(newGraph))
 		else :
 			newGraph = graph.strong_orientation()
+			__update_graph_positions(newGraph, graph)
 			response.append(convertGraphParameter)
 			response.append("tmpJS")
-			show_CustomJS(create_global_tmp_graph(newGraph))
+			show_CustomJS(__create_temporary_JS_graph(newGraph))
 	except Exception as exception :
 		print("ERROR : "+ str(exception))
 		response.append(errorParameter)
 		response.append(str(exception))
 		pass
-	return response
+	return response, newGraph
 
 
 def _random_orientation_for_JS(graph):
@@ -81,16 +82,17 @@ def _random_orientation_for_JS(graph):
 			response.append(graph_to_JSON(newGraph))
 		else :
 			newGraph = graph.random_orientation()
+			__update_graph_positions(newGraph, graph)
 			response.append(convertGraphParameter)
 			response.append("tmpJS")
-			show_CustomJS(create_global_tmp_graph(newGraph))
+			show_CustomJS(__create_temporary_JS_graph(newGraph))
 	except Exception as exception :
 		print("ERROR : "+ str(exception))
 		response.append(errorParameter)
 		response.append(str(exception))
 		pass
 
-	return response
+	return response, newGraph
 
 
 def _generate_vertex_coloring_for_JS(graph):
@@ -100,12 +102,12 @@ def _generate_vertex_coloring_for_JS(graph):
 		newGraph = Graph()
 		update_graph(newGraph, graph)
 		color = newGraph.coloring()
-	return [vertexColoringParameter,color]
+	return [vertexColoringParameter,color], graph
 
 
 import sage.graphs.graph_coloring
 def _generate_edge_coloring_for_JS(graph):
-	return [edgeColoringParameter,graph_coloring.edge_coloring(graph)]
+	return [edgeColoringParameter,graph_coloring.edge_coloring(graph)], graph
 
 
 def _convert_graph_digraph_bidirectionnal_for_JS(graph):
@@ -114,9 +116,10 @@ def _convert_graph_digraph_bidirectionnal_for_JS(graph):
 		newGraph = convert_DtoG(graph)
 	else :
 		newGraph = convert_GtoD(graph)
-	show_CustomJS(create_global_tmp_graph(newGraph))
+	print("oui")
+	show_CustomJS(__create_temporary_JS_graph(newGraph))
 
-	return [convertGraphParameter,"tmpJS"]
+	return [convertGraphParameter,"tmpJS"], graph
 
 def convert_GtoD(graph):
 	newGraph = DiGraph()
@@ -129,13 +132,17 @@ def convert_DtoG(graph):
 	return newGraph
 
 
-def create_global_tmp_graph(graph):
-	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'
-	graph.save(path_to_tmp_graph)
-	global tmpJSgraph
-	tmpJSgraph = load(path_to_tmp_graph)
-	print('New graph created in variable \"tmpJSgraph\"')
-	return tmpJSgraph
+tmpJSgraphs = []
+def __create_temporary_JS_graph(graph):
+	global tmpJSgraphs
+
+	path_to_last_tmp_graph = SAGE_TMP+'/tmpJSgraph'
+	graph.save(path_to_last_tmp_graph)
+	tmpJSgraphs.append(load(path_to_last_tmp_graph))
+	print('New graph created in \"tmpJSgraphs[%d]\"' % (len(tmpJSgraphs)-1))
+	return tmpJSgraphs[len(tmpJSgraphs)-1]
+
+
 
 JS_functions_dict = {propertiesParameter : _get_graph_properties,
 					strongOrientationParameter : _strong_orientation_for_JS,
@@ -144,3 +151,14 @@ JS_functions_dict = {propertiesParameter : _get_graph_properties,
 					edgeColoringParameter : _generate_edge_coloring_for_JS,
 					convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS}
 
+
+
+# def create_show_global_tmp_graph(graph):
+# 	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'
+# 	graph.save(path_to_tmp_graph)
+# 	global tmpJSgraph
+# 	print(id(tmpJSgraph))
+# 	tmpJSgraph = load(path_to_tmp_graph)
+# 	print('New graph created in variable \"tmpJSgraph\"')
+# 	show_CustomJS(tmpJSgraph)
+# 	return tmpJSgraph
