@@ -200,8 +200,8 @@ def ConstructGraphFromJSONObject(JSONObject):
     G = Graph()
 
   #Add nodes
-  for n in JSONObject.nodes:
-    G.add_vertex(n.get("name"))
+  for node in JSONObject.nodes:
+    G.add_vertex(node.get("name"))
 
   #Fill the dictionary of node coordinates
   for n in JSONObject.nodes:

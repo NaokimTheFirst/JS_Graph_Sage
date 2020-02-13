@@ -85,7 +85,7 @@ function RequestConvertGraph(){
 function SubmitMessage(parameter) {
   graphJSON.parameter = parameter;
   var prettyJSON = PrettifyJSON();
-  webSocket.send(JSON.stringify(prettyJSON));
+  webSocket.send(prettyJSON);
 }
 
 function onCloseClick() {

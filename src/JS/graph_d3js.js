@@ -11,7 +11,6 @@ var isDirected = false;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
-var IDCounter = 0;
 var groupList = [];
 var currentGroupIndex = 0;
 var currentObject = null;
@@ -108,13 +107,6 @@ function FillGroupFromGraph(graph) {
 
 function InitGraph() {
     isDirected = graphJSON.directed;
-
-    //Find the highest  ID in the graph
-    graphJSON.nodes.forEach(element => {
-        if (element.name > IDCounter) {
-            IDCounter = element.name;
-        }
-    });
 
     graphJSON.loops.forEach(element => {
         element.source = graphJSON.nodes[element.source];
@@ -699,16 +691,32 @@ function CreateNode(pos = null) {
         newY = cursorPosition.y;
     }
 
-    IDCounter++
     var newNode = {
         group: "0",
-        name: IDCounter.toString(),
+        name: FindLowestIDAvailable(),
         x: newX,
         y: newY,
         fixed: is_frozen
     };
 
     return newNode;
+}
+
+function FindLowestIDAvailable(){
+    let lowestID = Infinity;
+    let i = 0;
+    while (lowestID == Infinity)
+    {
+        if(graphJSON.nodes.find(node => node.name == i) != undefined)
+        {
+            i++;
+        }
+        else
+        {
+            lowestID = i;
+        }
+    }
+    return lowestID.toString(10);
 }
 
 //Add loop on a node
@@ -996,26 +1004,28 @@ function WaitGraphLoadToFreeze(waitingTime) {
 
 function PrettifyJSON() {
     var prettyJSON = JSON.parse(JSON.stringify(graphJSON));
-    prettyJSON.links.forEach(element => {
-        element.source = element.source.name;
-        element.target = element.target.name;
+
+    prettyJSON.links.forEach(link => {
+        link.source = link.source.name;
+        link.target = link.target.name;
     });
 
-    prettyJSON.loops.forEach(element => {
-        element.source = element.target = element.source.name;
+    prettyJSON.loops.forEach(loop => {
+        loop.source = loop.target = loop.source.name;
     });
-
+    
     //Return the Y to correspond with Sage Plan
-    prettyJSON.nodes.forEach(element => {
-        element.y = -element.y;
+    prettyJSON.nodes.forEach(node => {
+        node.y = -node.y;
     });
 
-    prettyJSON.nodes.forEach(function (node, i) {
+    //Shrink graph to adapt to the scale of SageMath Show() method
+    prettyJSON.nodes.forEach(function (node) {
         node.x = node.x/100;
         node.y = node.y/100;
     });
 
-    return prettyJSON;
+    return JSON.stringify(prettyJSON);
 }
 
 function SetGroupElement(valueRegisterer) {
