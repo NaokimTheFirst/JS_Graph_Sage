@@ -53,10 +53,9 @@ def message_received(client, server, message):
 		JSONmessage = DataGraph(message)
 
 		newGraph = ConstructGraphFromJSONObject(JSONmessage)
-		response = handle_message(JSONmessage.parameter,newGraph)
+		response, newGraph = handle_message(JSONmessage.parameter,newGraph)
 		
 		update_graph(targetGraph, newGraph)
-
 
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
