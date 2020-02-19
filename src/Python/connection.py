@@ -20,7 +20,7 @@ def client_left(client, server):
 		graph_client_dict.pop(client['id'])
 
 	if not graph_client_dict :
-		server.server_close()
+		server.shutdown()
 		print("server closed")
 		current_server = None
 
@@ -79,3 +79,4 @@ def client_dictionnary_verification(G):
 				for client in current_server.clients:
 					if client['id'] == key :
 						end_connection(client, current_server)
+						
