@@ -50,18 +50,18 @@ from time import gmtime, strftime
 def message_received(client, server, message):
 	global graph_client_dict
 	if client['id'] in graph_client_dict :
-		print(strftime('[%H:%M:%S] : action detected', gmtime()))
+		print(strftime('[%H:%M:%S]', gmtime()))
 
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
 
 		newGraph = ConstructGraphFromJSONObject(JSONmessage)
 		response, newGraph = handle_message(JSONmessage.parameter,newGraph)
-		
-		update_graph(targetGraph, newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
+		
+		update_graph(targetGraph, newGraph)
 
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})

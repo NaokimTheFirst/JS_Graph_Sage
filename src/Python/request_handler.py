@@ -9,7 +9,7 @@ __errorParameter = "errorWhileTreatingRequest"
 
 
 def _get_graph_properties(graph):
-	response = [propertiesParameter,[]]
+	response = [__propertiesParameter,[]]
 
 	if len(graph.vertices()) <= 1  :
 		radius = len(graph.vertices())
@@ -47,18 +47,18 @@ def _strong_orientation_for_JS(graph):
 			newGraph = graph.to_undirected()
 			newGraph = newGraph.strong_orientation()
 			__update_graph_positions(newGraph, graph)
-			response.append(strongOrientationParameter)
+			response.append(__strongOrientationParameter)
 			response.append(graph_to_JSON(newGraph))
 			print("Generated strong orientation")
 		else :
 			newGraph = graph.strong_orientation()
 			__update_graph_positions(newGraph, graph)
-			response.append(convertGraphParameter)
+			response.append(__convertGraphParameter)
 			response.append("tmpJS")
 			show_CustomJS(__create_temporary_JS_graph(newGraph))
 	except Exception as exception :
 		print("ERROR : "+ str(exception))
-		response.append(errorParameter)
+		response.append(__errorParameter)
 		response.append(str(exception))
 		pass
 	return response, newGraph
@@ -73,18 +73,18 @@ def _random_orientation_for_JS(graph):
 			newGraph = graph.to_undirected()
 			newGraph = newGraph.random_orientation()
 			__update_graph_positions(newGraph, graph)
-			response.append(randomOrientationParameter)
+			response.append(__randomOrientationParameter)
 			response.append(graph_to_JSON(newGraph))
 			print("Generated random orientation")
 		else :
 			newGraph = graph.random_orientation()
 			__update_graph_positions(newGraph, graph)
-			response.append(convertGraphParameter)
+			response.append(__convertGraphParameter)
 			response.append("tmpJS")
 			show_CustomJS(__create_temporary_JS_graph(newGraph))
 	except Exception as exception :
 		print("ERROR : "+ str(exception))
-		response.append(errorParameter)
+		response.append(__errorParameter)
 		response.append(str(exception))
 		pass
 
@@ -99,13 +99,13 @@ def _generate_vertex_coloring_for_JS(graph):
 		newGraph = Graph()
 		update_graph(newGraph, graph)
 		color = newGraph.coloring()
-	return [vertexColoringParameter,color], graph
+	return [__vertexColoringParameter,color], graph
 
 
 import sage.graphs.graph_coloring
 def _generate_edge_coloring_for_JS(graph):
 	print("Generated edge coloration")
-	return [edgeColoringParameter,graph_coloring.edge_coloring(graph)], graph
+	return [__edgeColoringParameter,graph_coloring.edge_coloring(graph)], graph
 
 
 def _convert_graph_digraph_bidirectionnal_for_JS(graph):
