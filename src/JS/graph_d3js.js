@@ -1,7 +1,5 @@
 //The graph properties
-var graphJSON;
-var force;
-var customColorScale;
+var graphJSON, force, customColorScale;
 var width = function() {return document.documentElement.clientWidth * 0.8};
 var height = function() {return document.documentElement.clientHeight};
 var xshift = function() {return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;};
@@ -14,17 +12,16 @@ var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
 var groupList = [];
 var currentGroupIndex = 0;
 var currentObject = null;
-const MyManager = new Manager();
-
+const MyManager = new CommandManager();
 
 const cursorPosition = {
     x: 0,
     y: 0
 };
 
-const LoopType = "loop";
+const LoopType = "Loop";
 const NodeType = "Node";
-const EdgeType = "link directed";
+const EdgeType = "Edge";
 
 class Point {
     constructor(x, y) {
@@ -39,7 +36,6 @@ class Segment {
         this.end = end;
     }
 }
-
 
 class ValueRegisterer {
     constructor(oldValue, newValue, element) {
@@ -692,8 +688,8 @@ function ManageNodes() {
                 {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
-                    MyManager.execute(new MoveNodeCommand(positions));
-                    UpdateGraphProperties();
+                    MyManager.Execute(new MoveNodeCommand(positions));
+                    UpdateGraphProperties("Node's positions changed");
                 }
 
             }));
@@ -845,7 +841,7 @@ function FindLowestIDAvailable(){
 //Add loop on a node
 function AddLoopOnNode(node, isFirst = true) {
     var newLoop = CreateLoop(node);
-    MyManager.execute(new AddLoopCommand(newLoop, isFirst));
+    MyManager.Execute(new AddLoopCommand(newLoop, isFirst));
 }
 
 //Add loop on all selected nodes
@@ -878,7 +874,7 @@ function SetGroupOfSelection() {
                 if(selectedNodes[i].data.group != groupList[currentGroupIndex])
                 {
                     let vr = new ValueRegisterer(selectedNodes[i].data.group, groupList[currentGroupIndex], selectedNodes[i]);
-                    MyManager.execute(new ChangeGroupCommand(vr, isFirst));
+                    MyManager.Execute(new ChangeGroupCommand(vr, isFirst));
                     isFirst = false;
                 }
             }
@@ -902,7 +898,7 @@ function AddEdgesOnSelection() {
                 j = i + 1;
                 for (; j < selectedNodes.length; j++) {
                     var newLink = CreateEdge(selectedNodes[i].data, selectedNodes[j].data);
-                    MyManager.execute(new AddEdgeCommand(newLink, isFirst));
+                    MyManager.Execute(new AddEdgeCommand(newLink, isFirst));
                     isFirst = false;
                 }
             }
@@ -973,28 +969,28 @@ function RemoveElementFromGraph(element, _isFirst = true) {
         case NodeType:
             let isFirst = _isFirst;
             GetEdgesByVertex(element.data).forEach(edge => {
-                MyManager.execute(new SupprEdgeCommand(edge, isFirst));
+                MyManager.Execute(new SupprEdgeCommand(edge, isFirst));
                 isFirst = false;
             });
 
             GetLoopsByVertex(element.data).forEach(loop => {
-                MyManager.execute(new SupprLoopCommand(loop, false));
+                MyManager.Execute(new SupprLoopCommand(loop, false));
             });
 
-            MyManager.execute(new SupprNodeCommand(element.data, false));
+            MyManager.Execute(new SupprNodeCommand(element.data, false));
             break;
         case EdgeType:
-            MyManager.execute(new SupprEdgeCommand(element.data, _isFirst));
+            MyManager.Execute(new SupprEdgeCommand(element.data, _isFirst));
             break;
         case LoopType:
-            MyManager.execute(new SupprLoopCommand(element.data, _isFirst));
+            MyManager.Execute(new SupprLoopCommand(element.data, _isFirst));
             break;
     }
 }
 
 function AddNewNode() {
     var newNode = CreateNode();
-    MyManager.execute(new AddNodeCommand(newNode));
+    MyManager.Execute(new AddNodeCommand(newNode));
     return true; 
 }
 
@@ -1073,10 +1069,10 @@ function SubdivideEdge(edge, isFirst = true) {
     let pos = third_point_of_curved_edge(edge.source, edge.target, 0);
     let newNode = CreateNode(pos);
 
-    MyManager.execute(new AddNodeCommand(newNode, isFirst));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.source), false));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.target), false));
-    MyManager.execute(new SupprEdgeCommand(edge, false));
+    MyManager.Execute(new AddNodeCommand(newNode, isFirst));
+    MyManager.Execute(new AddEdgeCommand(CreateEdge(newNode, edge.source), false));
+    MyManager.Execute(new AddEdgeCommand(CreateEdge(newNode, edge.target), false));
+    MyManager.Execute(new SupprEdgeCommand(edge, false));
 }
 
 function SubdivideEdgeOnSelection() {
@@ -1115,7 +1111,7 @@ function InvertEdgesOnSelection() {
 
 function InvertEdge(edge, isFirst = true){
     let vr = new ValueRegisterer([edge.data.source, edge.data.target], [edge.data.target, edge.data.source], edge);
-    MyManager.execute(new InvertDirectionCommand(vr, isFirst));
+    MyManager.Execute(new InvertDirectionCommand(vr, isFirst));
 }
 
 
@@ -1203,8 +1199,8 @@ function FindElementInGraph(element) {
 }
 
 
-function UpdateGraphProperties(){
-    SubmitMessage(propertiesRequestParameter);
+function UpdateGraphProperties(message = ""){
+    SubmitMessage(propertiesRequestParameter,message = message);
 }
 
 function SetNodesColoration(colorationList){

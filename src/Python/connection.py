@@ -57,6 +57,9 @@ def message_received(client, server, message):
 		
 		update_graph(targetGraph, newGraph)
 
+		if(JSONmessage.message != ""):
+			print(JSONmessage.message)
+
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
 			server.send_message(client,returnMessage)

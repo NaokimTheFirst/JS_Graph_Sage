@@ -222,26 +222,26 @@ function TryAddNewGroup(){
 function KeyboardEventInit() {
     //Keyboard Event
     document.onkeyup = function (key) {
-        var action = null;
+        var result = null;
         switch (key.keyCode) {
             case 46:
-                action = RemoveSelection();
+                result = [RemoveSelection(), "Delete selected Elements"];
                 break;
             case 65:
                 //A for Add
-                action = AddNewNode();
+                result = [AddNewNode(), "Add new node"];
                 break;
             case 67 :
                 //C for color
-                action = SetGroupOfSelection();
+                SetGroupOfSelection();
                 break;
             case 68:
                 //V for Divide nodes on selection
-                action = SubdivideEdgeOnSelection();
+                result = [SubdivideEdgeOnSelection(), "Subdivide selected edges"];
                 break;
             case 69:
                 //E for Edges
-                action = AddEdgesOnSelection();
+                result = [AddEdgesOnSelection(), "Add edge between selected nodes"];
                 break;
             case 70:
                 //F for Freeze
@@ -249,15 +249,15 @@ function KeyboardEventInit() {
                 break;
             case 73 :
                 //I for invert
-                action = TryInvertEdge();
+                result = [TryInvertEdge(), "Invert selected edges orientation"];
                 break;
             case 76 :
                 //L for Loops
-                action = AddLoopOnSelection();
+                result = [AddLoopOnSelection(), "Add loop on selected nodes"];
                 break;
             case 78 : 
                 //N for Rename
-                action = TryRenameElement();
+                result = [TryRenameElement(), "Relabel hovered element"];
                 break;
             case 82:
                 //R to reset selection
@@ -273,27 +273,27 @@ function KeyboardEventInit() {
                 break;
             case 89:
                 //Y to redo
-                action = MyManager.redo();
+                result = [MyManager.Redo(), "Redo previous reverted action"];
                 break;
             case 90:
                 //Z to undo
-                action = MyManager.undo();
+                result = [MyManager.Undo(), "Undo previous action"];
                 break;
             default:
                 //Affiche le code de la touche pressée
                 console.log("Keycode : " + key.keyCode);
                 break;
         }
-        if(action){
-            TryUserAction(action);
+        if(result){
+            CheckUserAction(result);
         }
     }
 }
 
-function TryUserAction(action){
-    if(action == true)
+function CheckUserAction(result){
+    if(result[0] == true)
     {
-        UpdateGraphProperties();
+        UpdateGraphProperties(result[1]);
     }
 }
 
@@ -308,7 +308,7 @@ function TryRenameElement(){
         if(result)
         {
             let vr = new ValueRegisterer(currentObject.data.name, newName, currentObject);
-            MyManager.execute(new ChangeNameCommand(vr));
+            MyManager.Execute(new ChangeNameCommand(vr));
             return true;
         }
         else 
