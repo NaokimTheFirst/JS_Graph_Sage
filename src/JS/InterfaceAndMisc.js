@@ -273,13 +273,11 @@ function KeyboardEventInit() {
                 break;
             case 89:
                 //Y to redo
-                MyManager.redo();
-                action = true;
+                action = MyManager.redo();
                 break;
             case 90:
                 //Z to undo
-                MyManager.undo();
-                action = true;
+                action = MyManager.undo();
                 break;
             default:
                 //Affiche le code de la touche pressée

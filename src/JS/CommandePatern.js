@@ -73,10 +73,12 @@ var Manager = function () {
                 var command = commandsStack.pop();
                 current = command.undo(command.value);
                 log.add("Undo " + action(command) + ": " + command.value);
-                revertedCommandStack.push(command)
+                revertedCommandStack.push(command);
+                return true;
 
             } else {
                 CustomWarn("Nothing to revert");
+                return false;
             }
         },
 
@@ -93,8 +95,10 @@ var Manager = function () {
                     this.do(command);
                 } 
                 while(revertedCommandStack.length > 0 && revertedCommandStack[revertedCommandStack.length - 1].firstAction == false)
+                return true;
             } else {
                 CustomWarn("Nothing to redo");
+                return false;
             }
         },
 
