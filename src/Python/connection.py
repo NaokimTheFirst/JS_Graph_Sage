@@ -20,7 +20,7 @@ def client_left(client, server):
 		graph_client_dict.pop(client['id'])
 
 	if not graph_client_dict :
-		server.server_close()
+		server.shutdown()
 		print("server closed")
 		current_server = None
 
@@ -45,28 +45,39 @@ def connect():
 
 
 from json import JSONEncoder
+from time import gmtime, strftime
 # Called when a client sends a message
 def message_received(client, server, message):
 	global graph_client_dict
 	if client['id'] in graph_client_dict :
+		print(strftime('[%H:%M:%S]', gmtime()))
+
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
 
 		newGraph = ConstructGraphFromJSONObject(JSONmessage)
 		response, newGraph = handle_message(JSONmessage.parameter,newGraph)
-		
-		update_graph(targetGraph, newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
+		
+		update_graph(targetGraph, newGraph)
 
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
 			server.send_message(client,returnMessage)
 	else :
-		end_connection(client, server)
+		end_connection_client(client, server)
 
-def end_connection(client, server):
+
+def handle_message(parameter,graph):
+	response = None
+	if parameter is not None:
+		response, graph = JS_functions_dict[parameter](graph)
+	return response, graph
+
+
+def end_connection_client(client, server):
 	returnMessage = JSONEncoder().encode({"request":'closeConnection', "result": ''})
 	server.send_message(client,returnMessage)
 
