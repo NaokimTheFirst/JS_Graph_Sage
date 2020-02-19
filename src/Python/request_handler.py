@@ -1,18 +1,12 @@
-propertiesParameter = 'Properties'
-strongOrientationParameter = 'strongOrientation'
-randomOrientationParameter = 'randomOrientation'
-vertexColoringParameter = 'vertexColoring'
-edgeColoringParameter = 'edgeColoring'
-convertGraphParameter = 'convert'
-errorParameter = "errorWhileTreatingRequest"
+__propertiesParameter = 'Properties'
+__strongOrientationParameter = 'strongOrientation'
+__randomOrientationParameter = 'randomOrientation'
+__vertexColoringParameter = 'vertexColoring'
+__edgeColoringParameter = 'edgeColoring'
+__convertGraphParameter = 'convert'
+__errorParameter = "errorWhileTreatingRequest"
 
 
-
-def handle_message(parameter,graph):
-	response = None
-	if parameter is not None:
-		response, graph = JS_functions_dict[parameter](graph)
-	return response, graph
 
 def _get_graph_properties(graph):
 	response = [propertiesParameter,[]]
@@ -55,6 +49,7 @@ def _strong_orientation_for_JS(graph):
 			__update_graph_positions(newGraph, graph)
 			response.append(strongOrientationParameter)
 			response.append(graph_to_JSON(newGraph))
+			print("Generated strong orientation")
 		else :
 			newGraph = graph.strong_orientation()
 			__update_graph_positions(newGraph, graph)
@@ -80,6 +75,7 @@ def _random_orientation_for_JS(graph):
 			__update_graph_positions(newGraph, graph)
 			response.append(randomOrientationParameter)
 			response.append(graph_to_JSON(newGraph))
+			print("Generated random orientation")
 		else :
 			newGraph = graph.random_orientation()
 			__update_graph_positions(newGraph, graph)
@@ -96,6 +92,7 @@ def _random_orientation_for_JS(graph):
 
 
 def _generate_vertex_coloring_for_JS(graph):
+	print("Generated vertex coloration")
 	if not graph.is_directed():
 		color = graph.coloring()
 	else :
@@ -107,25 +104,26 @@ def _generate_vertex_coloring_for_JS(graph):
 
 import sage.graphs.graph_coloring
 def _generate_edge_coloring_for_JS(graph):
+	print("Generated edge coloration")
 	return [edgeColoringParameter,graph_coloring.edge_coloring(graph)], graph
 
 
 def _convert_graph_digraph_bidirectionnal_for_JS(graph):
 	newGraph = None
 	if graph.is_directed():
-		newGraph = convert_DtoG(graph)
+		newGraph = __convert_DtoG(graph)
 	else :
-		newGraph = convert_GtoD(graph)
+		newGraph = __convert_GtoD(graph)
 	show_CustomJS(__create_temporary_JS_graph(newGraph))
 
 	return [convertGraphParameter,"tmpJS"], graph
 
-def convert_GtoD(graph):
+def __convert_GtoD(graph):
 	newGraph = DiGraph()
 	update_graph(newGraph, graph)
 	return newGraph
 
-def convert_DtoG(graph):
+def __convert_DtoG(graph):
 	newGraph = Graph()
 	update_graph(newGraph, graph)
 	return newGraph
@@ -143,12 +141,12 @@ def __create_temporary_JS_graph(graph):
 
 
 
-JS_functions_dict = {propertiesParameter : _get_graph_properties,
-					strongOrientationParameter : _strong_orientation_for_JS,
-					randomOrientationParameter : _random_orientation_for_JS,
-					vertexColoringParameter : _generate_vertex_coloring_for_JS,
-					edgeColoringParameter : _generate_edge_coloring_for_JS,
-					convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS}
+JS_functions_dict = {__propertiesParameter : _get_graph_properties,
+					 __strongOrientationParameter : _strong_orientation_for_JS,
+					 __randomOrientationParameter : _random_orientation_for_JS,
+					 __vertexColoringParameter : _generate_vertex_coloring_for_JS,
+					 __edgeColoringParameter : _generate_edge_coloring_for_JS,
+					 __convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS}
 
 
 

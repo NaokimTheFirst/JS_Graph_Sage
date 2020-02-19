@@ -45,10 +45,13 @@ def connect():
 
 
 from json import JSONEncoder
+from time import gmtime, strftime
 # Called when a client sends a message
 def message_received(client, server, message):
 	global graph_client_dict
 	if client['id'] in graph_client_dict :
+		print(strftime('[%H:%M:%S] : action detected', gmtime()))
+
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
 
@@ -61,9 +64,17 @@ def message_received(client, server, message):
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
 			server.send_message(client,returnMessage)
 	else :
-		end_connection(client, server)
+		end_connection_client(client, server)
 
-def end_connection(client, server):
+
+def handle_message(parameter,graph):
+	response = None
+	if parameter is not None:
+		response, graph = JS_functions_dict[parameter](graph)
+	return response, graph
+
+
+def end_connection_client(client, server):
 	returnMessage = JSONEncoder().encode({"request":'closeConnection', "result": ''})
 	server.send_message(client,returnMessage)
 
@@ -79,4 +90,3 @@ def client_dictionnary_verification(G):
 				for client in current_server.clients:
 					if client['id'] == key :
 						end_connection(client, current_server)
-						
