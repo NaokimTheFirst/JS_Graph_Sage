@@ -5,116 +5,92 @@ var Command = function (execute, undo, value, firstAction) {
     this.firstAction = firstAction;
 }
 
-var SupprNodeCommand = function (value, firstAction = true)  {
+var SupprNodeCommand = function (value, firstAction = true) {
     return new Command(RemoveNode, AddNode, value, firstAction);
 };
 
-var SupprEdgeCommand = function (value, firstAction = true)  {
+var SupprEdgeCommand = function (value, firstAction = true) {
     return new Command(RemoveEdge, AddEdge, value, firstAction);
 };
 
-var SupprLoopCommand = function (value, firstAction = true)  {
+var SupprLoopCommand = function (value, firstAction = true) {
     return new Command(RemoveLoop, AddLoop, value, firstAction);
 };
 
-var AddNodeCommand = function (value, firstAction = true)  {
+var AddNodeCommand = function (value, firstAction = true) {
     return new Command(AddNode, RemoveNode, value, firstAction);
 };
 
-var AddEdgeCommand = function (value, firstAction = true)  {
+var AddEdgeCommand = function (value, firstAction = true) {
     return new Command(AddEdge, RemoveEdge, value, firstAction);
 };
 
-var AddLoopCommand = function (value, firstAction = true)  {
+var AddLoopCommand = function (value, firstAction = true) {
     return new Command(AddLoop, RemoveLoop, value, firstAction);
 };
 
-var ChangeGroupCommand = function(value, firstAction = true)  {
+var ChangeGroupCommand = function (value, firstAction = true) {
     return new Command(SetGroupElement, SetGroupElement, value, firstAction);
 };
 
-var ChangeNameCommand = function(value, firstAction = true)  {
+var ChangeNameCommand = function (value, firstAction = true) {
     return new Command(SetElementName, SetElementName, value, firstAction);
 };
 
-var InvertDirectionCommand = function(value, firstAction = true)  {
+var InvertDirectionCommand = function (value, firstAction = true) {
     return new Command(SetLinkDirection, SetLinkDirection, value, firstAction);
 };
-var MoveNodeCommand = function(value, firstAction = true)  {
+var MoveNodeCommand = function (value, firstAction = true) {
     return new Command(SetNewPosition, SetOldPosition, value, firstAction);
 };
 
-var commandsStack = [];
-var Manager = function () {
-    var revertedCommandStack = [];
-
-    function action(command) {
-        var name = command.execute.toString().substr(9, 3);
-        return name.charAt(0).toUpperCase() + name.slice(1);
+class CommandManager {
+    constructor() {
+        this.commandStack = [];
+        this.revertedCommandStack = [];
     }
 
-    return {
-        execute: function (command) {
-            revertedCommandStack = [];
-            this.do(command);
-            log.add(action(command) + ": " + command.value);
-        },
+    Execute(command) {
+        this.revertedCommandStack = [];
+        this.Do(command);
+    }
 
-        undo: function () {
-            if (commandsStack.length > 0) {
-                while(commandsStack.length > 0 && commandsStack[commandsStack.length - 1].firstAction == false){
-                    var command = commandsStack.pop();
-                    current = command.undo(command.value);
-                    log.add("Undo " + action(command) + ": " + command.value);
-                    revertedCommandStack.push(command);
-                }
-
-                //Redo the first action of the user
-                var command = commandsStack.pop();
-                current = command.undo(command.value);
-                log.add("Undo " + action(command) + ": " + command.value);
-                revertedCommandStack.push(command)
-
-            } else {
-                CustomWarn("Nothing to revert");
+    Undo() {
+        if (this.commandStack.length > 0) {
+            while (this.commandStack.length > 0 && this.commandStack[this.commandStack.length - 1].firstAction == false) {
+                var command = this.commandStack.pop();
+                command.undo(command.value);
+                this.revertedCommandStack.push(command);
             }
-        },
 
-        do: function (command) {
-            command.execute(command.value);
-            commandsStack.push(command);
-        },
+            //Redo the first action of the user
+            var command = this.commandStack.pop();
+            command.undo(command.value);
+            this.revertedCommandStack.push(command);
+            return true;
 
-        redo: function () {
-            if (revertedCommandStack.length > 0) {
-                do
-                {
-                    var command = revertedCommandStack.pop();
-                    this.do(command);
-                } 
-                while(revertedCommandStack.length > 0 && revertedCommandStack[revertedCommandStack.length - 1].firstAction == false)
-            } else {
-                CustomWarn("Nothing to redo");
+        } else {
+            CustomWarn("Nothing to revert");
+            return false;
+        }
+    }
+
+    Do(command) {
+        command.execute(command.value);
+        this.commandStack.push(command);
+    }
+
+    Redo() {
+        if (this.revertedCommandStack.length > 0) {
+            do {
+                var command = this.revertedCommandStack.pop();
+                MyManager.Do(command);
             }
-        },
-
-        getCurrentValue: function () {
-            return current;
+            while (this.revertedCommandStack.length > 0 && this.revertedCommandStack[this.revertedCommandStack.length - 1].firstAction == false)
+            return true;
+        } else {
+            CustomWarn("Nothing to redo");
+            return false;
         }
     }
 }
-
-// log helper
-var log = (function () {
-    var log = "";
-
-    return {
-        add: function (msg) {
-            log += msg + "\n";
-        },
-        show: function () {
-            alert(log);
-            log = "";
-        }
-    }
-})();

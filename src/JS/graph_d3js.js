@@ -1,7 +1,5 @@
 //The graph properties
-var graphJSON;
-var force;
-var customColorScale;
+var graphJSON, force, customColorScale;
 var width = function() {return document.documentElement.clientWidth * 0.8};
 var height = function() {return document.documentElement.clientHeight};
 var xshift = function() {return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;};
@@ -14,17 +12,30 @@ var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
 var groupList = [];
 var currentGroupIndex = 0;
 var currentObject = null;
-const MyManager = new Manager();
-
+const MyManager = new CommandManager();
 
 const cursorPosition = {
     x: 0,
     y: 0
 };
 
-const LoopType = "loop";
+const LoopType = "Loop";
 const NodeType = "Node";
-const EdgeType = "link directed";
+const EdgeType = "Edge";
+
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class Segment {
+    constructor(start, end) {
+        this.start = start;
+        this.end = end;
+    }
+}
 
 class ValueRegisterer {
     constructor(oldValue, newValue, element) {
@@ -345,11 +356,119 @@ function SelectElementsInsideExtent(extent) {
         }
     })
     links.each(function (d) {
-        if (IsNodeInsideExtent(extent, d.source) && IsNodeInsideExtent(extent, d.target))
-        {
+        if(IsEdgeInsideExtent(extent,d)){
             SelectElement(new Element(d,EdgeType));
         }
     })
+}
+
+function ConstructRectangleFromExtent(extent)
+{
+    topLeftCorner = new Point(extent[0][0],extent[0][1]);
+    topRightCorner = new Point(extent[1][0],extent[0][1]);
+    bottomLefttCorner = new Point(extent[0][0],extent[1][1]);
+    bottomRightCorner = new Point(extent[1][0],extent[1][1]);
+
+    topBorder = new Segment(topLeftCorner,topRightCorner);
+    leftBorder = new Segment(topLeftCorner, bottomLefttCorner);
+    rightBorder = new Segment(topRightCorner, bottomRightCorner);
+    bottomBorder = new Segment(bottomRightCorner, bottomLefttCorner);
+
+    rectangle = [topBorder,leftBorder,rightBorder,bottomBorder];
+
+    return rectangle;
+}
+
+// Given three colinear points p, q, r, the function checks if 
+// point q lies on line segment 'pr' 
+function onSegment( p,  q,  r) 
+{ 
+    if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && 
+        q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y)) 
+    return true; 
+
+    return false; 
+} 
+
+// To find orientation of ordered triplet (p, q, r). 
+// The function returns following values 
+// 0 --> p, q and r are colinear 
+// 1 --> Clockwise 
+// 2 --> Counterclockwise 
+function orientation(p,  q,  r) 
+{ 
+    // See https://www.geeksforgeeks.org/orientation-3-ordered-points/ 
+    // for details of below formula. 
+        val = (q.y - p.y) * (r.x - q.x) - 
+            (q.x - p.x) * (r.y - q.y); 
+
+    if (val == 0) return 0; // colinear 
+
+    return (val > 0)? 1: 2; // clock or counterclock wise 
+} 
+
+function doSegmentIntersect(firstSegment, secondSegment) 
+{
+    return doIntersect(firstSegment.start,firstSegment.end,secondSegment.start,secondSegment.end);
+}
+
+// The main function that returns true if line segment 'p1q1' 
+// and 'p2q2' intersect. 
+function doIntersect( p1,  q1,  p2,  q2) 
+{ 
+    // Find the four orientations needed for general and 
+    // special cases 
+        o1 = orientation(p1, q1, p2); 
+        o2 = orientation(p1, q1, q2); 
+        o3 = orientation(p2, q2, p1); 
+        o4 = orientation(p2, q2, q1); 
+
+    // General case 
+    if (o1 != o2 && o3 != o4) 
+        return true; 
+
+    // Special Cases 
+    // p1, q1 and p2 are colinear and p2 lies on segment p1q1 
+    if (o1 == 0 && onSegment(p1, p2, q1)) return true; 
+
+    // p1, q1 and q2 are colinear and q2 lies on segment p1q1 
+    if (o2 == 0 && onSegment(p1, q2, q1)) return true; 
+
+    // p2, q2 and p1 are colinear and p1 lies on segment p2q2 
+    if (o3 == 0 && onSegment(p2, p1, q2)) return true; 
+
+    // p2, q2 and q1 are colinear and q1 lies on segment p2q2 
+    if (o4 == 0 && onSegment(p2, q1, q2)) return true; 
+
+    return false; // Doesn't fall in any of the above cases 
+} 
+
+function IsEdgeInsideExtent(extent,edge)
+{
+    if (IsNodeInsideExtent(extent, edge.source) || IsNodeInsideExtent(extent, edge.target))
+    {
+        return true;
+    }
+    else 
+    {
+        return DoesEdgeIntersectExtent(extent,edge);
+    }
+}
+
+function DoesEdgeIntersectExtent(extent,edge)
+{
+    rectangle = ConstructRectangleFromExtent(extent);
+    edgeSegment = new Segment(edge.source, edge.target);
+    doesIntersect = false;
+    count = 0;
+
+    while(doesIntersect == false && count < rectangle.length)
+    {
+        doesIntersect = doSegmentIntersect(rectangle[count],edgeSegment);
+        count += 1;
+    }
+
+    return doesIntersect;
 }
 
 function IsNodeInsideExtent(extent, node){
@@ -569,8 +688,8 @@ function ManageNodes() {
                 {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
-                    MyManager.execute(new MoveNodeCommand(positions));
-                    UpdateGraphProperties();
+                    MyManager.Execute(new MoveNodeCommand(positions));
+                    UpdateGraphProperties("Node's positions changed");
                 }
 
             }));
@@ -722,7 +841,7 @@ function FindLowestIDAvailable(){
 //Add loop on a node
 function AddLoopOnNode(node, isFirst = true) {
     var newLoop = CreateLoop(node);
-    MyManager.execute(new AddLoopCommand(newLoop, isFirst));
+    MyManager.Execute(new AddLoopCommand(newLoop, isFirst));
 }
 
 //Add loop on all selected nodes
@@ -755,7 +874,7 @@ function SetGroupOfSelection() {
                 if(selectedNodes[i].data.group != groupList[currentGroupIndex])
                 {
                     let vr = new ValueRegisterer(selectedNodes[i].data.group, groupList[currentGroupIndex], selectedNodes[i]);
-                    MyManager.execute(new ChangeGroupCommand(vr, isFirst));
+                    MyManager.Execute(new ChangeGroupCommand(vr, isFirst));
                     isFirst = false;
                 }
             }
@@ -779,7 +898,7 @@ function AddEdgesOnSelection() {
                 j = i + 1;
                 for (; j < selectedNodes.length; j++) {
                     var newLink = CreateEdge(selectedNodes[i].data, selectedNodes[j].data);
-                    MyManager.execute(new AddEdgeCommand(newLink, isFirst));
+                    MyManager.Execute(new AddEdgeCommand(newLink, isFirst));
                     isFirst = false;
                 }
             }
@@ -850,28 +969,28 @@ function RemoveElementFromGraph(element, _isFirst = true) {
         case NodeType:
             let isFirst = _isFirst;
             GetEdgesByVertex(element.data).forEach(edge => {
-                MyManager.execute(new SupprEdgeCommand(edge, isFirst));
+                MyManager.Execute(new SupprEdgeCommand(edge, isFirst));
                 isFirst = false;
             });
 
             GetLoopsByVertex(element.data).forEach(loop => {
-                MyManager.execute(new SupprLoopCommand(loop, false));
+                MyManager.Execute(new SupprLoopCommand(loop, false));
             });
 
-            MyManager.execute(new SupprNodeCommand(element.data, false));
+            MyManager.Execute(new SupprNodeCommand(element.data, false));
             break;
         case EdgeType:
-            MyManager.execute(new SupprEdgeCommand(element.data, _isFirst));
+            MyManager.Execute(new SupprEdgeCommand(element.data, _isFirst));
             break;
         case LoopType:
-            MyManager.execute(new SupprLoopCommand(element.data, _isFirst));
+            MyManager.Execute(new SupprLoopCommand(element.data, _isFirst));
             break;
     }
 }
 
 function AddNewNode() {
     var newNode = CreateNode();
-    MyManager.execute(new AddNodeCommand(newNode));
+    MyManager.Execute(new AddNodeCommand(newNode));
     return true; 
 }
 
@@ -950,10 +1069,10 @@ function SubdivideEdge(edge, isFirst = true) {
     let pos = third_point_of_curved_edge(edge.source, edge.target, 0);
     let newNode = CreateNode(pos);
 
-    MyManager.execute(new AddNodeCommand(newNode, isFirst));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.source), false));
-    MyManager.execute(new AddEdgeCommand(CreateEdge(newNode, edge.target), false));
-    MyManager.execute(new SupprEdgeCommand(edge, false));
+    MyManager.Execute(new AddNodeCommand(newNode, isFirst));
+    MyManager.Execute(new AddEdgeCommand(CreateEdge(newNode, edge.source), false));
+    MyManager.Execute(new AddEdgeCommand(CreateEdge(newNode, edge.target), false));
+    MyManager.Execute(new SupprEdgeCommand(edge, false));
 }
 
 function SubdivideEdgeOnSelection() {
@@ -992,7 +1111,7 @@ function InvertEdgesOnSelection() {
 
 function InvertEdge(edge, isFirst = true){
     let vr = new ValueRegisterer([edge.data.source, edge.data.target], [edge.data.target, edge.data.source], edge);
-    MyManager.execute(new InvertDirectionCommand(vr, isFirst));
+    MyManager.Execute(new InvertDirectionCommand(vr, isFirst));
 }
 
 
@@ -1080,8 +1199,8 @@ function FindElementInGraph(element) {
 }
 
 
-function UpdateGraphProperties(){
-    SubmitMessage(propertiesRequestParameter);
+function UpdateGraphProperties(message = ""){
+    SubmitMessage(propertiesRequestParameter,message = message);
 }
 
 function SetNodesColoration(colorationList){
