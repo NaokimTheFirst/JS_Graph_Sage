@@ -263,10 +263,6 @@ function KeyboardEventInit() {
                 //R to reset selection
                 ResetSelection();
                 break;
-            case 83:
-                //S to save
-                SubmitMessage();
-                break;
             case 84:
                 //T for Test, to remove before build
                 LaunchAllTest();

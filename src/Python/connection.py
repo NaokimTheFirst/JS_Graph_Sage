@@ -4,7 +4,7 @@ current_server = None
 # Called for every client connecting
 def new_client(client, server):
 	if client['id'] not in graph_client_dict :
-		end_connection(client, server)
+		end_connection_client(client, server)
 		print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
 	else :
 		print("New client connected and was given id %d" % client['id'])

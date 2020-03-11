@@ -59,6 +59,10 @@ def __update_graph_edges(gold, gnew, print_update = True):
 	if did_smth is not None and print_update:
 		print(did_smth)
 
+
+
+#to delete when edgelist comparison fixed in Sage
+
 def __compareGraphEdges(firstGraph, secondGraph):
 	if len(firstGraph.edges()) != len(secondGraph.edges()):
 		return False
