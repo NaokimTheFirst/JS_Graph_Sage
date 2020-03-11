@@ -986,7 +986,7 @@ function RemoveElementFromGraph(element, _isFirst = true) {
             }
             break;
         case LoopType:
-            if(graphJSON.loops.indexOf(element.data) = -1)
+            if(graphJSON.loops.indexOf(element.data) != -1)
             {
                 MyManager.Execute(new SupprLoopCommand(element.data, _isFirst));
                 break;
