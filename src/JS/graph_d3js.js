@@ -980,11 +980,19 @@ function RemoveElementFromGraph(element, _isFirst = true) {
             MyManager.Execute(new SupprNodeCommand(element.data, false));
             break;
         case EdgeType:
-            MyManager.Execute(new SupprEdgeCommand(element.data, _isFirst));
+            if(graphJSON.links.indexOf(element.data) != -1)
+            {
+                MyManager.Execute(new SupprEdgeCommand(element.data, _isFirst));
+            }
             break;
         case LoopType:
-            MyManager.Execute(new SupprLoopCommand(element.data, _isFirst));
-            break;
+            if(graphJSON.loops.indexOf(element.data) = -1)
+            {
+                MyManager.Execute(new SupprLoopCommand(element.data, _isFirst));
+                break;
+            }
+
+            
     }
 }
 
@@ -1007,10 +1015,12 @@ function RemoveSelection() {
                 isFirst = false;
             });
         });
+        
 
         ManageLoops();
         ManageEdges();
         ManageNodes();
+     
 
         return true;
     }
