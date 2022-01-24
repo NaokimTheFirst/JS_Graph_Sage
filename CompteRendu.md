@@ -8,3 +8,4 @@ Le but du projet est de terminer le travail en enrichissant cette solution. Il s
 #### 24/01/2022 - 2e rdv avec tuteur
 - Creation d'un fork : https://github.com/Dalwaj/JS_Graph_Sage
 - Pull des modifications pour 'attach' par Jawad
+- A faire : Diagramme de classes (+ sequences), ajouter les fonctionnalités à l'interface graphique (afficher nombre de sommets, déplacer la partie du graph sélectionnée...)
