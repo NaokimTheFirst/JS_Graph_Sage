@@ -3,12 +3,13 @@ from sage.misc.temporary_file import tmp_filename
 from sage.plot.colors import rainbow
 import os
 
+#Setup the html page for d3js and for hosting the graph
 def gen_html_code(JSONgraph):
 
     try :
-      js_code_file = open(path_To_Project_Repo+"/JS_Graph_Sage/src/HTML/base_html.html", 'r')
+      js_code_file = open(pathRepo+"/JS_Graph_Sage/src/HTML/base_html.html", 'r') #Open the html page which will host the graph
     except :
-      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
+      print("Repository "+pathRepo+" not found, update it with _update_JS_Repo(path)")
       sys.exit(1)
     js_code = js_code_file.read().replace("// GRAPH_DATA_HEREEEEEEEEEEE", JSONgraph)
     js_code_file.close()
@@ -25,9 +26,9 @@ def gen_html_code(JSONgraph):
 
     # Writes the temporary .html file
     try :
-      filename = path_To_Project_Repo+'/JS_Graph_Sage/obj/result.html'
+      filename = pathRepo + '/JS_Graph_Sage/obj/result.html'
     except :
-      print("Repository "+path_To_Project_Repo+" not found, update it with _update_JS_Repo(path)")
+      print("Repository " + pathRepo + " not found, update it with _update_JS_Repo(path)")
       sys.exit(1)
     f = open(filename, 'w')
     f.write(js_code)
@@ -228,7 +229,7 @@ def ConstructGraphFromJSONObject(JSONObject):
 
 #   return ConstructGraphFromJSONString(string)
 
-
+ 	
 
 # def GetBackJSON(pathRepo=path_To_JSON_Repo,
 #                 nameJSON=JSON_name):
