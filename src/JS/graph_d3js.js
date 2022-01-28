@@ -8,7 +8,7 @@ var is_frozen = false;
 var isDirected = false;
 
 //DOM Elements / D3JS Elements
-var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
+var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush, arrows;
 var groupList = [];
 var currentGroupIndex = 0;
 var currentObject = null;
