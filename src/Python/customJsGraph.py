@@ -1,9 +1,14 @@
+import sys
 
 from sage.misc.temporary_file import tmp_filename
 from sage.plot.colors import rainbow
 import os
 
 #Setup the html page for d3js and for hosting the graph
+from JS_Graph_Sage.src.Python.connection import launch_connection, client_dictionnary_verification
+from JS_Graph_Sage.src.Python.init_CustomJS import pathRepo
+
+
 def gen_html_code(JSONgraph):
 
     try :

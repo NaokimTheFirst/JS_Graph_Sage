@@ -1263,3 +1263,11 @@ function NumberOfNodes() {
 
 }
 
+function NumberOfEdges(){
+        var edgesNumberFunction = document.querySelectorAll('path').length
+
+      document.getElementById("numberOfEdges").innerHTML = edgesNumberFunction-1;
+
+
+}
+

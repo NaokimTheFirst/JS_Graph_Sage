@@ -1,3 +1,6 @@
+from JS_Graph_Sage.src.Python.customJsGraph import graph_to_JSON, show_CustomJS
+from JS_Graph_Sage.src.Python.update import __update_graph_positions, update_graph
+
 __propertiesParameter = 'Properties'
 __strongOrientationParameter = 'strongOrientation'
 __randomOrientationParameter = 'randomOrientation'
