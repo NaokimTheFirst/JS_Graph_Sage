@@ -1,7 +1,10 @@
 /* graph_style.css */
 body {
-    background-color: rgb(15, 15, 73);
-    margin : 0%;
+    display: flex;
+    flex-direction: row;
+    font-family: Arial, serif;
+    background-color: #18191A;
+    margin : 0;
 }
 
 .extent{
@@ -9,7 +12,7 @@ body {
 }
 
 rect {
-    fill: rgb(15, 15, 73);
+    fill: #18191A;
 }
 
 .scroll{
@@ -25,18 +28,24 @@ rect {
 .scroll::-webkit-scrollbar {
     display: none;
 }
-
 #graphFrame{
     display: inline-flex;
-    width: 100%;
 }
-
+#graphFrame > svg {
+    overflow: scroll;
+}
 #Overlay{
-    width: 20%;
-    height: 100%;
+    position: fixed;
+    flex-grow: 2;
+    height: 700px;
+    overflow: auto;
     background: none;
     margin : 0.5%;
     pointer-events:none;
+}
+#graphFrame > svg{
+    margin-left: 20%;
+    flex-grow: 8;
 }
 
 .Panel{
@@ -120,7 +129,13 @@ text {
 marker {
     fill: #bbb;
 }
-#nombreNode{
 
-
+button{
+    padding: 3px;
+    color: whitesmoke;
+    background-color: #3A3B3C;
+    border : #3A3B3C;
+}
+button:hover{
+    background-color: #2A2B2C;
 }
