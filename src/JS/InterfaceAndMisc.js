@@ -6,6 +6,7 @@ var overlayElements = {
         {
             this._groupListElement = document.getElementById("groupList");
         }
+
         return this._groupListElement;
     },
 
