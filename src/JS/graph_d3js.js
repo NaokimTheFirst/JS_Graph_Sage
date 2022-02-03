@@ -793,8 +793,8 @@ function AddNode(newNode) {
 
     //Restart the force layout with the new elements
     force.start();
-    var number =graphJSON.nodes.length;
-    number++;
+    NumberOfNodes();
+    NumberOfEdges();
 
     return true;
 }
@@ -1073,6 +1073,8 @@ function RemoveNode(nodeData) {
     ManageNodes();
     ManageNodeLabels();
     force.start();
+    NumberOfEdges();
+    NumberOfNodes();
 
 
 }
@@ -1256,18 +1258,15 @@ function NumberOfNodes() {
 
     var nodeNumberFonction = graphJSON.nodes.length
 
-     document.getElementById("numberOfNode").innerHTML = nodeNumberFonction
-
-    return nodeNumberFonction
+    document.getElementById("numberOfNode").innerHTML = nodeNumberFonction
 
 
 }
 
-function NumberOfEdges(){
-        var edgesNumberFunction = document.querySelectorAll('path').length
+function NumberOfEdges() {
+    var edgesNumberFunction = document.querySelectorAll('path').length
 
-      document.getElementById("numberOfEdges").innerHTML = edgesNumberFunction-1;
-
+    document.getElementById("numberOfEdges").innerHTML = edgesNumberFunction - 1;
 
 }
 
