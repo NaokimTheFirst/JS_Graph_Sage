@@ -707,7 +707,14 @@ function ManageNodes() {
 
 function manageSelection(){
     selectedNodes = svg.selectAll('.isSelected');
+    graphSelectedNodes = [];
     let mousePreviousPos, nodePreviousPos;
+
+    for (let node of graphJSON.nodes){
+        if (node.isSelected){
+            graphSelectedNodes.push(node);
+        }
+    }
 
     selectedNodes.call(force.drag()
         .on('dragstart', function (d) {
@@ -717,35 +724,24 @@ function manageSelection(){
             drag_in_progress = true;
         })
         .on('dragend', function (d) {
-            let tabNodes = [], find = false;
             drag_in_progress = false;
+            let tabNodes = [];
 
-            for (let circle of selectedNodes[0]){
-                find = false;
-                for (let i = 0; i < graphJSON.nodes.length && !find; i++){
-                    if (circle.getAttribute('name') == graphJSON.nodes[i].name){
-                        node = graphJSON.nodes[i];
-                        console.log(node);
-                        previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
+            for (let node of graphSelectedNodes) {
+                let previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
+                let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
 
-                        if(previousPos[0] != previousPos[0] - mousePreviousPos[0] + window.event.clientX
-                            && previousPos[1] != previousPos[1] - mousePreviousPos[1] + window.event.clientY){
-                            let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
-                            var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
-                            tabNodes.push(positions);
-                        }
-                        find = true;
-                    }
+                if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
+                    var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
+                    tabNodes.push(positions);
                 }
-
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
             UpdateGraphProperties("Node's positions changed");
-
         }));
 
-        RefreshNodes();
+    RefreshNodes();
 }
 
 function SetNewPosition(registeredPos) {
