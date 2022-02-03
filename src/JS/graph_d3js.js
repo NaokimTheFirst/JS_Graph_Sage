@@ -717,20 +717,27 @@ function manageSelection(){
             drag_in_progress = true;
         })
         .on('dragend', function (d) {
-            let tabNodes = [];
+            let tabNodes = [], find = false;
             drag_in_progress = false;
 
             for (let circle of selectedNodes[0]){
-                node = graphJSON.nodes[circle.getAttribute('name')];
+                find = false;
+                for (let i = 0; i < graphJSON.nodes.length && !find; i++){
+                    if (circle.getAttribute('name') == graphJSON.nodes[i].name){
+                        node = graphJSON.nodes[i];
+                        console.log(node);
+                        previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
 
-                previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
-
-                if(previousPos[0] != previousPos[0] - mousePreviousPos[0] + window.event.clientX
-                    && previousPos[1] != previousPos[1] - mousePreviousPos[1] + window.event.clientY){
-                    let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
-                    var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
-                    tabNodes.push(positions);
+                        if(previousPos[0] != previousPos[0] - mousePreviousPos[0] + window.event.clientX
+                            && previousPos[1] != previousPos[1] - mousePreviousPos[1] + window.event.clientY){
+                            let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+                            var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
+                            tabNodes.push(positions);
+                        }
+                        find = true;
+                    }
                 }
+
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
@@ -794,7 +801,13 @@ function SelectElement(element) {
     switch (element.type) {
         case NodeType:
             RefreshNodes();
-            document.querySelectorAll('.node')[element.data.name].setAttribute('class', 'node isSelected');
+            console.log(element);
+            let nodes = document.querySelectorAll('.node');
+            for (let circle of nodes){
+                if (circle.getAttribute('name') == element.data.name){
+                    circle.setAttribute('class', 'node isSelected');
+                }
+            }
             manageSelection();
             break;
         case EdgeType:
