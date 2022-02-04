@@ -1,11 +1,13 @@
 //The graph properties
 var graphJSON, force, customColorScale;
-var width = function() {return document.documentElement.clientWidth * 0.8};
+var width = function() {return document.documentElement.clientWidth};
 var height = function() {return document.documentElement.clientHeight};
 var xshift = function() {return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;};
 var drag_in_progress = false;
 var is_frozen = false;
 var isDirected = false;
+var oldWidth, oldHeight;
+var oldWindowSize = [oldWidth, oldHeight];
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
@@ -61,6 +63,7 @@ class GraphSelection {
 }
 
 window.onload = function () {
+    oldWindowSize = [document.documentElement.clientWidth, document.documentElement.clientHeight];
     InitWebSocketConnection();
 
     document.body.onmousemove = handleMouseMove;
@@ -69,6 +72,32 @@ window.onload = function () {
     KeyboardEventInit();
 
     InitNewGraph();
+}
+
+window.onresize = function() {
+    //console.log(oldWindowSize);
+    //console.log(width() + ", " +height());
+    let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
+
+    oldWindowSize[0] = width();
+    oldWindowSize[1] = height();
+
+    console.log(resizeRate);
+    svg = d3.select("svg")
+        .attr("width", width())
+        .attr("height", height());
+
+    graph = graphJSON;
+    console.log(graph);
+    for (let node of graphJSON.nodes){
+        node.x *= resizeRate[0];
+        node.y *= resizeRate[1];
+        let nodePositions = new ValueRegisterer([node.px,node.py], [node.x, node.y], new Element(node, NodeType));
+        node.px *= resizeRate[0];
+        node.py *= resizeRate[1];
+        SetNewPosition(nodePositions);
+    }
+
 }
 
 function InitNewGraph(graph = null)
@@ -317,6 +346,7 @@ function ManageAllGraphicsElements()
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000);
 
+    //Resize
 
     InitBrush();
 
