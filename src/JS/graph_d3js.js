@@ -75,20 +75,16 @@ window.onload = function () {
 }
 
 window.onresize = function() {
-    //console.log(oldWindowSize);
-    //console.log(width() + ", " +height());
     let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
 
     oldWindowSize[0] = width();
     oldWindowSize[1] = height();
 
-    console.log(resizeRate);
     svg = d3.select("svg")
         .attr("width", width())
         .attr("height", height());
 
     graph = graphJSON;
-    console.log(graph);
     for (let node of graphJSON.nodes){
         node.x *= resizeRate[0];
         node.y *= resizeRate[1];
@@ -827,7 +823,6 @@ function SelectElement(element) {
     switch (element.type) {
         case NodeType:
             RefreshNodes();
-            console.log(element);
             let nodes = document.querySelectorAll('.node');
             for (let circle of nodes){
                 if (circle.getAttribute('name') == element.data.name){
