@@ -142,7 +142,11 @@ def graph_to_JSON(G,
         charge = 0
         link_strength = 0
         gravity = 0
-
+        
+        nodesNumber = len(G.get_vertices())
+        if nodesNumber > len(Gpos):
+          Gpos[G.vertices()[nodesNumber-1]] = (0, 0)
+          
         for v in G:
             x, y = Gpos[v]
             pos.append([float(x), float(-y)])

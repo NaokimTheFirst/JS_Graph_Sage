@@ -141,6 +141,10 @@ function SetProperties(radius,diameter,regular,planar,bipartite){
     overlayElements.bipartiteLabel.innerHTML = bipartite;
 }
 
+// function RenewGraph(newgraph) {
+//     document.getElementById("mygraphdata").innerHTML = newgraph;
+// }
+
 function InitInterface(){
     UpdateDirectedRelatedElements();
 }
