@@ -1,7 +1,7 @@
 
 from sage.misc.temporary_file import tmp_filename
 from sage.plot.colors import rainbow
-import os
+import os, sys
 
 #Setup the html page for d3js and for hosting the graph
 def gen_html_code(JSONgraph):
