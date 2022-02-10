@@ -18,3 +18,13 @@ Le but du projet est de terminer le travail en enrichissant cette solution. Il s
 - les types des sommets sont transformés en string lors de la connexion.
 
 *Solution proposée pour le problème des strings :* créer un dictionnaire (une map) qui associe à chaque sommet v du graphe initial une chaîne de caractères cv qui est sa représentation textuelle que vous allez utiliser dans le format JSON. Toutes les opération que vous allez effectuer dans d3js sur cv seront transposé sur v à travers ce dictionnaire.
+
+#### 10/02/2022 - 4e rdv
+*Nouvelles choses à faire :* 
+- voir les fichiers _things-to-add.md_ et _ToDo.md_.
+- enovoyer le graph en JSON de Python à JavaScript pour remplacer le graphe precedent avec innerHTML (mission déjà accomplie :) ).
+- pouvoir relancer la page sans perdre la connexion.
+
+*Travail fait :*
+- Mapping des sommets dans un dict pour preserver les types d'origin.
+- Possibilite de modifier le graphe dans ls terminal et importer les changements dans l'interface graphique avec le bouton "Renew Graph".
