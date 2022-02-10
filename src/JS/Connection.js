@@ -7,6 +7,7 @@ const vertexColoringRequestParameter = "vertexColoring";
 const edgeColoringRequestParameter = "edgeColoring";
 const convertGraphParameter = "convert";
 const closeConnectionParameter = "closeConnection"
+const renewGraphParameter = "renewGraph";
 
 function InitWebSocketConnection() {
   // Connect to Web Socket
@@ -53,6 +54,8 @@ function TreatResponse(response){
     case closeConnectionParameter :
       webSocket.close();
       break;
+    case renewGraphParameter :
+      RenewGraph(response.result);
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;
@@ -79,6 +82,10 @@ function RequestRandomOrientation(){
 
 function RequestConvertGraph(){
   SubmitMessage(convertGraphParameter);
+}
+
+function RequestRenewGraph() {
+  SubmitMessage(renewGraphParameter);
 }
 
 

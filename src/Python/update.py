@@ -15,10 +15,12 @@ def __update_graph_nodes(gold, gnew, print_update = True):
 		for n in vert_old:
 			if n not in vert_new:
 				gold.delete_vertex(n)
+				print("Vertex " + str(n) + " deleted")
 
 		for n in vert_new:
 			if n not in vert_old:
 				gold.add_vertex(n)
+				print("Vertex " + str(n) + " added")
 
 	if did_smth is not None and print_update :
 		print(did_smth)
@@ -48,6 +50,7 @@ def __update_graph_edges(gold, gnew, print_update = True):
 		for currentEdge in edges_old:
 			if currentEdge not in edges_new:
 				gold.delete_edge(currentEdge[0], currentEdge[1])
+				print("Edge (" + str(currentEdge[0]) + ", " + str(currentEdge[1]) + ") deleted")
 
 		if gnew.allows_loops():
 			gold.allow_loops(True)
@@ -55,6 +58,7 @@ def __update_graph_edges(gold, gnew, print_update = True):
 		for currentEdge in edges_new :
 			if currentEdge not in edges_old :
 				gold.add_edge(currentEdge[0], currentEdge[1])
+				print("Edge (" + str(currentEdge[0]) + ", " + str(currentEdge[1]) + ") added")
 
 	if did_smth is not None and print_update:
 		print(did_smth)

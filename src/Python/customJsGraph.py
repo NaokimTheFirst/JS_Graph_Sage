@@ -1,7 +1,7 @@
 
 from sage.misc.temporary_file import tmp_filename
 from sage.plot.colors import rainbow
-import os
+import os, sys
 
 #Setup the html page for d3js and for hosting the graph
 def gen_html_code(JSONgraph):
@@ -67,6 +67,10 @@ def graph_to_JSON(G,
     # Vertex list
     # Data for vertex v must be at position v_to_id[v] in list nodes
     nodes = [{"name": str(v), "group": str(color[v_to_id[v]])} for v in G]
+    global original_nodes 
+    original_nodes = {}
+    for v in G:
+      original_nodes[str(v)] = v
 
     # Edge colors.
     edge_color_default = "#aaa"
@@ -138,7 +142,11 @@ def graph_to_JSON(G,
         charge = 0
         link_strength = 0
         gravity = 0
-
+        
+        nodesNumber = len(G.get_vertices())
+        if nodesNumber > len(Gpos):
+          Gpos[G.vertices()[nodesNumber-1]] = (0, 0)
+          
         for v in G:
             x, y = Gpos[v]
             pos.append([float(x), float(-y)])
@@ -202,23 +210,25 @@ def ConstructGraphFromJSONObject(JSONObject):
 
   #Add nodes
   for node in JSONObject.nodes:
-    G.add_vertex(node.get("name"))
+    if not node.get("name") in original_nodes:
+      original_nodes[node.get("name")] = int(node.get("name"))
+    G.add_vertex(original_nodes[node.get("name")])
 
   #Fill the dictionary of node coordinates
   for n in JSONObject.nodes:
-    posdict[n.get("name")] = (n.get("x"),n.get("y"))
+    posdict[original_nodes[n.get("name")]] = (n.get("x"),n.get("y"))
 
   G.set_pos(posdict)
 
-  #Add edges
+  #Add edgesS
   for l in JSONObject.links:
-    G.add_edge(l.get("source"),l.get("target"))
+    G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
 
   #Add loops
   if len(JSONObject.loops)>0:
     G.allow_loops(True)
   for l in JSONObject.loops:
-    G.add_edge(l.get("source"),l.get("target"))
+    G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
 
   return G
 
