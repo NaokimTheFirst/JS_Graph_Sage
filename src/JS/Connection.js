@@ -56,6 +56,7 @@ function TreatResponse(response){
       break;
     case renewGraphParameter :
       RenewGraph(response.result);
+      break;
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;
