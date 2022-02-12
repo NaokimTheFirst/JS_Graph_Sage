@@ -23,7 +23,9 @@ function InitWebSocketConnection() {
     TreatResponse(StringToObject(message.data));
   };
   
-  webSocket.onclose = function() {};
+  webSocket.onclose = function() {
+    InitWebSocketConnection();
+  };
 
   webSocket.onerror = function(error) 
   {
@@ -88,7 +90,6 @@ function RequestConvertGraph(){
 function RequestRenewGraph() {
   SubmitMessage(renewGraphParameter);
 }
-
 
 function SubmitMessage(parameter,message = "") {
   graphJSON.parameter = parameter;
