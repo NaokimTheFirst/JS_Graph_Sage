@@ -372,3 +372,20 @@ function StringToObject(string)
 {
     return eval('(' + string + ')');
 }
+
+function develop(button){
+    let content = button.parentNode.nextElementSibling;
+    let style = window.getComputedStyle(content).display;
+    if (style == "block"){
+        content.style.display = "none";
+        button.innerHTML = ">";
+    } else {
+        content.style.display = "block";
+        button.innerHTML = "v";
+    }
+
+    return true;
+}
+
+
+

@@ -42,6 +42,7 @@ rect {
     background: none;
     margin : 0.5%;
     pointer-events:none;
+    width: 300px;
 }
 
 .Panel{
@@ -134,4 +135,9 @@ button{
 }
 button:hover{
     background-color: #2A2B2C;
+}
+.Panel>div:first-child{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }

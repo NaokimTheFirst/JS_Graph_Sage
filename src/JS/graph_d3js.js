@@ -85,11 +85,6 @@ window.onresize = function() {
         .attr("width", width())
         .attr("height", height());
 
-
-
-    var bBox= svg1.getBBox();
-    console.log('XxY', bBox.x + 'x' + bBox.y);
-
     graph = graphJSON;
     for (let node of graphJSON.nodes){
         node.x *= resizeRate[0];
