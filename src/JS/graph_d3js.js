@@ -8,6 +8,7 @@ var is_frozen = false;
 var isDirected = false;
 var oldWidth, oldHeight;
 var oldWindowSize = [oldWidth, oldHeight];
+var g6;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
@@ -83,6 +84,11 @@ window.onresize = function() {
     svg = d3.select("svg")
         .attr("width", width())
         .attr("height", height());
+
+
+
+    var bBox= svg1.getBBox();
+    console.log('XxY', bBox.x + 'x' + bBox.y);
 
     graph = graphJSON;
     for (let node of graphJSON.nodes){
@@ -1333,4 +1339,13 @@ function SetLinksColoration(colorationList){
     });
 
     ManageEdges();
+}
+
+function UpdateG6Form(newg6){
+    g6 = newg6;
+}
+
+function getG6Form(){
+    alert(g6);
+    console.log(g6);
 }
