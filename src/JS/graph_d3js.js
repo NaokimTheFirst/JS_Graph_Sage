@@ -73,6 +73,7 @@ window.onload = function () {
     KeyboardEventInit();
 
     InitNewGraph();
+    dragElement(document.getElementById("Overlay"));
 }
 
 window.onresize = function() {
@@ -1343,4 +1344,46 @@ function UpdateG6Form(newg6){
 function getG6Form(){
     alert(g6);
     console.log(g6);
+}
+
+function dragElement(elmnt) {
+    let mouseX = 0, mouseY = 0, offsetX, offsetY;
+    if (document.getElementById(elmnt.id + "header")) {
+        /* if present, the header is where you move the DIV from:*/
+        document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    } else {
+        /* otherwise, move the DIV from anywhere inside the DIV:*/
+        elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+
+        offsetX = e.clientX - elmnt.style.left;
+        offsetY = e.clientY - elmnt.style.top;
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        document.onmouseup = closeDragElement;
+
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        elmnt.style.top = -offsetY + mouseY + "px";
+        elmnt.style.left = -offsetX + mouseX + "px";
+    }
+
+    function closeDragElement() {
+
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
 }

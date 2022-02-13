@@ -36,7 +36,9 @@ rect {
     overflow: scroll;
 }
 #Overlay{
-    position: fixed;
+    position: absolute;
+    top: 0px;
+    left: 0px;
     height: 100%;
     overflow: auto;
     background: none;
