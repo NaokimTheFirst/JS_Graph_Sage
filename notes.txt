@@ -1,2 +1,31 @@
 préservation des objets pour les noeuds
 retirer le tmpJS.obj
+
+Notes about how the connection to server works:
+launch_connection() : creates a thread and connects to server with connect() function. The reference to the server is stored in current_server global variable.
+
+Notice : methods new_client, client_left and message_received presented below are called and passed arguments by other methods in websocket_server.py which was probably just downloaded and not written by the IUT students, so we won't try to analyze how it works.
+
+new_client(client, server) : checks graph_client_dict variable for the id of client (function's argument) and calls end_connection_client(client, server) if the id is not there (i.e. if the id is not in graph_client_dict client will be disconnected).
+
+client_left(client, server) : checks graph_client_dict variable for the id of client (function's argument) and if so, removes the corresponding key-value pair from the dict. If the graph_client_dict appears to be empty after that, it calls server.shutdown() and disconnects from the server completely.
+
+message_received(client, server, message) : if the client is not in the graph_client_dict it just calls end_connection_client(client, server). Otherwise, it gets corresponding graph from graph_client_dict and converts message to JSON object that seeminly has two attributes : parameter and message. After that, it gets some response from handle_message(JSONmessage.parameter,newGraph) function which returns the parameter that was requested in the message (as a list of size 2) + graph (useful if needed to convert graph to something new, for example to directed graph). The graph is either renewed in JavaScript (new functionality added by yours truly) or updated in SageMath. The handle_message response is a list of size 2 containing the string indicating which parameter it is and the parameter itself (graph, color, string message...). This response is encoded as JSON and sent to JavaScript with server.send_message(client,returnMessage) method.
+
+WaitServer() : just waits until current_server variable is not None, i.e. the connection with server is established.
+
+client_dictionnary_verification(G) : apparently is needed to avoid displaying the same graph in two windows. I.e. if the graph you pass to show_CustomJS is the same as the one you have already opened in browser, the connection for the old graph will be closed (Note: possible bug - no such function as end_connection(), probably meant end_connection_client()).
+
+graph_client_dict : a dict that has server clients' id as its keys and Sage graphs as values. Every new show_CustomJS() adds a new line in this dict with the next smallest int as id/key unless previous windows were closed.
+
+graph_to_JSON(G, layout=layout) : converts SageMath graph to JSON object setting nodes' according to a certain layout if it was provided.
+
+gen_html_code(JSONgraph) : takes text from base_html.html, changes it adding JSON graph and d3js script and then writes this text into result.html file (base_html.html remains unchanged).
+
+show_CustomJS(G, layout=None) : checks if the variable current_server is not None (i.e. the connection with server already exists), if not, adds the first key-value pair to graph_client_dict (id = 1; value = graph) and calls launch_connection() + WaitServer(). If connection is already there, it calls client_dictionnary_verification(G) and adds new pair to the dict with id/key = current_server.id_counter + 1. Finally it converts graph to JSON with graph_to_JSON method and opens modified result.html in browser by calling webbrowser.open('file://'+os.path.realpath(gen_html_code(JSONgraph))).
+
+Note: both JavaScript and Python use the same 9001 port to create linked WebSocket objects.
+
+Si le Sage affiche une erreur OSError: [Errno 112] Address already in use:
+    netstat -ano | findstr :9001 - affiche a la fin le PID du processus
+    taskkill (/F) /PID numeroDePIDTrouve - pour kill le processus sur Windows

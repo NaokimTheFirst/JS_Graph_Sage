@@ -7,7 +7,7 @@ const vertexColoringRequestParameter = "vertexColoring";
 const edgeColoringRequestParameter = "edgeColoring";
 const convertGraphParameter = "convert";
 const closeConnectionParameter = "closeConnection";
-const getSequenceParamater="getSequence";
+const renewGraphParameter = "renewGraph";
 
 function InitWebSocketConnection() {
   // Connect to Web Socket
@@ -15,7 +15,9 @@ function InitWebSocketConnection() {
   // Set event handlers.
   webSocket.onopen = function() 
   {
-    UpdateGraphProperties();
+    PageOpenOrReload();
+    // Display the body hidden in window.onload
+    document.body.style.display = "inline";
   };
   
   webSocket.onmessage = function(message) 
@@ -23,7 +25,15 @@ function InitWebSocketConnection() {
     TreatResponse(StringToObject(message.data));
   };
   
-  webSocket.onclose = function() {};
+  webSocket.onclose = function() {
+    // Launch new connection if it was closed due to page reload, otherwise close the tab
+    if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+      InitWebSocketConnection();
+    }
+    else {
+      window.close();
+    }
+  };
 
   webSocket.onerror = function(error) 
   {
@@ -62,6 +72,10 @@ function TreatResponse(response){
     case closeConnectionParameter :
       webSocket.close();
       break;
+    case renewGraphParameter :
+      InitNewGraph(StringToObject(response.result));
+      UpdateGraphProperties();
+      break;
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;
@@ -90,15 +104,13 @@ function RequestRandomOrientation(){
   SubmitMessage(randomOrientationRequestParameter);
 }
 
-
 function RequestConvertGraph(){
   SubmitMessage(convertGraphParameter);
 }
 
-function RequestGetSequence(){
-  SubmitMessage(getSequenceParamater)
+function RequestRenewGraph() {
+  SubmitMessage(renewGraphParameter);
 }
-
 
 function SubmitMessage(parameter,message = "") {
   graphJSON.parameter = parameter;
