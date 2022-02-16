@@ -1,14 +1,15 @@
 graph_client_dict = {}
 current_server = None
 reloaded_graph = None
-#reload_in_process = False
 
 # Called for every client connecting
 def new_client(client, server):
 	global reloaded_graph
 	if client['id'] not in graph_client_dict :
+		# If some other client has left (cf. client_left())
 		if reloaded_graph :
 			graph_client_dict[client['id']] = reloaded_graph
+			print("Page reloaded. New client id is %d" % client['id'])
 		else :
 			end_connection_client(client, server)
 			print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
@@ -25,12 +26,9 @@ def client_left(client, server):
 	if client['id'] in graph_client_dict :
 		print("Client(%d) disconnected" % client['id'])
 		reloaded_graph = graph_client_dict.pop(client['id'])
-		#if reload_in_process:
-			#graph_client_dict[server.id_counter + 1] = graph
-			#reload_in_process = False
-			#print("Reloading page")
+	# Waiting for half sec in case a new client will appear in empty graph_client_dict (for page reload)
 	import time
-	time.sleep(5)
+	time.sleep(0.5)
 	if not graph_client_dict :
 		server.shutdown()
 		print("server closed")
@@ -67,11 +65,9 @@ def message_received(client, server, message):
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
 
-		# First and clumsy attempt to reverse connection between Sage and JS
+		# Reverse connection between Sage and JS
 		if JSONmessage.parameter == "renewGraph":
 			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)
-		elif JSONmessage.parameter == "reloadPage":
-			reload_in_process = True
 		else:
 			newGraph = ConstructGraphFromJSONObject(JSONmessage)
 			response, newGraph = handle_message(JSONmessage.parameter,newGraph)

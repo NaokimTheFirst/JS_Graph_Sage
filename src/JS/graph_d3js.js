@@ -70,14 +70,28 @@ class GraphSelection {
 }
 
 window.onload = function () {
+    // Hide the body to avoid showing html template before the data is fully loaded
+    document.body.style.display = "none";
     InitWebSocketConnection();
 
     document.body.onmousemove = handleMouseMove;
     // List of colors
     customColorScale = d3.scale.category20();
     KeyboardEventInit();
+}
 
-    InitNewGraph();
+// Called in webSocket.onopen, reloads page opening a new connection or opens a new page
+function PageOpenOrReload() {
+    if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+        console.info( "The page is reloaded" );
+        graphJSON = JSON.parse(sessionStorage.getItem('graph'));
+        RequestRenewGraph();
+    }
+    else {
+        console.info("The page is opened");
+        InitNewGraph();
+        UpdateGraphProperties();
+    }
 }
 
 function InitNewGraph(graph = null) {
@@ -112,6 +126,7 @@ function GetGraphFromHTML() {
 // Loads the graph data
 function LoadGraphData(newGraph) {
     graphJSON = (newGraph) ? newGraph : GetGraphFromHTML();
+    sessionStorage.setItem('graph', JSON.stringify(graphJSON));
 
     //Init group
     FillGroupFromGraph(graphJSON);

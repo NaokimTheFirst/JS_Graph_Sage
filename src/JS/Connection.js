@@ -15,7 +15,9 @@ function InitWebSocketConnection() {
   // Set event handlers.
   webSocket.onopen = function() 
   {
-    UpdateGraphProperties();
+    PageOpenOrReload();
+    // Display the body hidden in window.onload
+    document.body.style.display = "inline";
   };
   
   webSocket.onmessage = function(message) 
@@ -24,7 +26,13 @@ function InitWebSocketConnection() {
   };
   
   webSocket.onclose = function() {
-    InitWebSocketConnection();
+    // Launch new connection if it was closed due to page reload, otherwise close the tab
+    if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+      InitWebSocketConnection();
+    }
+    else {
+      window.close();
+    }
   };
 
   webSocket.onerror = function(error) 
@@ -57,7 +65,8 @@ function TreatResponse(response){
       webSocket.close();
       break;
     case renewGraphParameter :
-      RenewGraph(response.result);
+      InitNewGraph(StringToObject(response.result));
+      UpdateGraphProperties();
       break;
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
@@ -81,7 +90,6 @@ function RequestStrongOrientation()
 function RequestRandomOrientation(){
   SubmitMessage(randomOrientationRequestParameter);
 }
-
 
 function RequestConvertGraph(){
   SubmitMessage(convertGraphParameter);
