@@ -141,8 +141,13 @@ def __create_temporary_JS_graph(graph):
 	return tmpJSgraphs[len(tmpJSgraphs)-1]
 
 def _generate_graph6_formula(graph):
-	print(graph.graph6_string())
-	return [__graph6Parameter, graph.graph6_string()], graph
+	response = [__graph6Parameter]
+	if (graph.is_directed()):
+		response.append(graph.dig6_string())
+	else :
+		response.append(graph.graph6_string())
+
+	return response, graph;
 
 JS_functions_dict = {__propertiesParameter : _get_graph_properties,
 					 __strongOrientationParameter : _strong_orientation_for_JS,
