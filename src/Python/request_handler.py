@@ -1,5 +1,4 @@
-from JS_Graph_Sage.src.Python.customJsGraph import graph_to_JSON, show_CustomJS
-from JS_Graph_Sage.src.Python.update import __update_graph_positions, update_graph
+
 
 __propertiesParameter = 'Properties'
 __strongOrientationParameter = 'strongOrientation'
@@ -8,6 +7,7 @@ __vertexColoringParameter = 'vertexColoring'
 __edgeColoringParameter = 'edgeColoring'
 __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
+
 
 
 
@@ -29,6 +29,13 @@ def _get_graph_properties(graph):
 	response[1].append(graph.is_regular())
 	response[1].append(graph.is_planar())
 	response[1].append(graph.is_bipartite())
+	response[1].append(len(graph.vertices()))
+	ds = graph.degree_sequence()
+	response[1].append(ds[0]) #get max degree of the graph
+	response[1].append(ds[len(ds)-1])  #get minimum degree of the graph
+
+
+
 
 	return response, graph
 

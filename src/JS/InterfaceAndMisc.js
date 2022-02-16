@@ -109,6 +109,31 @@ var overlayElements = {
         }
         return this._bipartiteLabelElement;
     },
+
+     _numberNodes : null,
+    get nombreNodes(){
+        if(!this._numberNodes){
+            this._numberNodes = document.getElementById("numberOfNode");
+        }
+        return this._numberNodes;
+    },
+    _maximalDegree : null,
+    get maxDegree(){
+        if(!this._maximalDegree){
+            this._maximalDegree = document.getElementById("maximaldegre");
+        }
+        return this._maximalDegree;
+    },
+
+    _minimumDegree : null,
+    get minDegree(){
+        if(!this._minimumDegree){
+            this._minimumDegree = document.getElementById("minimaldegre");
+        }
+        return this._minimumDegree;
+    },
+
+
 }
 
 //Return string with time on format "HH:MM""
@@ -134,12 +159,15 @@ function CustomWarn(string, display = true){
     }
 }
 
-function SetProperties(radius,diameter,regular,planar,bipartite){
+function SetProperties(radius,diameter,regular,planar,bipartite,nbnodes,maximalDegree,minimalDegree){
     overlayElements.radiusLabel.innerHTML = radius;
     overlayElements.diameterLabel.innerHTML = diameter;
     overlayElements.regularLabel.innerHTML = regular;
     overlayElements.planarLabel.innerHTML = planar;
     overlayElements.bipartiteLabel.innerHTML = bipartite;
+    overlayElements.nombreNodes.innerHTML=nbnodes;
+    overlayElements.maxDegree.innerHTML=maximalDegree;
+    overlayElements.minDegree.innerHTML=minimalDegree;
 }
 
 function InitInterface(){

@@ -5,8 +5,6 @@ from sage.plot.colors import rainbow
 import os
 
 #Setup the html page for d3js and for hosting the graph
-from JS_Graph_Sage.src.Python.connection import launch_connection, client_dictionnary_verification
-from JS_Graph_Sage.src.Python.init_CustomJS import pathRepo
 
 
 def gen_html_code(JSONgraph):
@@ -226,6 +224,9 @@ def ConstructGraphFromJSONObject(JSONObject):
     G.add_edge(l.get("source"),l.get("target"))
 
   return G
+
+
+
 
 
 # def ConstructGraphFromJSON(pathRepo=path_To_JSON_Repo,

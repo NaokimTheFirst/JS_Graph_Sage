@@ -1,6 +1,8 @@
 //The graph properties
 
 
+
+
 var graphJSON, force, customColorScale;
 var width = function () {
     return document.documentElement.clientWidth * 0.8
@@ -793,7 +795,7 @@ function AddNode(newNode) {
 
     //Restart the force layout with the new elements
     force.start();
-    NumberOfNodes();
+
     NumberOfEdges();
 
     return true;
@@ -897,11 +899,12 @@ function AddEdgesOnSelection() {
                     isFirst = false;
                 }
             }
-
+            NumberOfEdges();
             return true;
         } else {
             CustomWarn("No nodes to add loop at on the selection");
         }
+        NumberOfEdges();
 
         return false;
     }
@@ -1037,6 +1040,8 @@ function RemoveEdge(edgeData) {
         graphJSON.links.splice(index, 1);
         ManageEdges();
         force.start();
+        NumberOfEdges();
+
     }
 }
 
@@ -1047,6 +1052,8 @@ function RemoveLoop(loopData) {
         graphJSON.loops.splice(graphJSON.loops.indexOf(loopData), 1);
         ManageLoops();
         force.start();
+        NumberOfEdges();
+
     }
 }
 
@@ -1074,7 +1081,7 @@ function RemoveNode(nodeData) {
     ManageNodeLabels();
     force.start();
     NumberOfEdges();
-    NumberOfNodes();
+
 
 
 }
@@ -1253,20 +1260,31 @@ function SetLinksColoration(colorationList) {
 }
 
 
-function NumberOfNodes() {
 
-
-    var nodeNumberFonction = graphJSON.nodes.length
-
-    document.getElementById("numberOfNode").innerHTML = nodeNumberFonction
-
-
-}
 
 function NumberOfEdges() {
     var edgesNumberFunction = document.querySelectorAll('path').length
 
     document.getElementById("numberOfEdges").innerHTML = edgesNumberFunction - 1;
 
+
+
 }
 
+function getSequence(){
+
+   sequence=[]
+    sequence=getSequenceParamater(graphJSON)
+    
+
+    console.log("getsequence")
+
+
+
+    /*  list = graphJSON.links;
+
+    alert(list)
+       link.source = link.source.name;
+       links = svg.selectAll(".link")*/
+
+}

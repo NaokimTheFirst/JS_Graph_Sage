@@ -6,7 +6,8 @@ const randomOrientationRequestParameter = "randomOrientation";
 const vertexColoringRequestParameter = "vertexColoring";
 const edgeColoringRequestParameter = "edgeColoring";
 const convertGraphParameter = "convert";
-const closeConnectionParameter = "closeConnection"
+const closeConnectionParameter = "closeConnection";
+const getSequenceParamater="getSequence";
 
 function InitWebSocketConnection() {
   // Connect to Web Socket
@@ -33,7 +34,15 @@ function InitWebSocketConnection() {
 function TreatResponse(response){
   switch (response.request) {
     case propertiesRequestParameter:
-      SetProperties(response.result[0],response.result[1],response.result[2],response.result[3],response.result[4]);
+      SetProperties(response.result[0],
+          response.result[1],
+          response.result[2],
+          response.result[3],
+          response.result[4],
+          response.result[5],
+          response.result[6],
+          response.result[7],
+          response.result[8]);
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
@@ -56,6 +65,11 @@ function TreatResponse(response){
     default:
       CustomWarn("Undefined response behavior for parameter :" + response.request);
       break;
+
+      case getSequenceParamater :
+     getSequenceParamater(response.result);
+      break;
+
   }
 }
 
@@ -81,6 +95,10 @@ function RequestConvertGraph(){
   SubmitMessage(convertGraphParameter);
 }
 
+function RequestGetSequence(){
+  SubmitMessage(getSequenceParamater)
+}
+
 
 function SubmitMessage(parameter,message = "") {
   graphJSON.parameter = parameter;
@@ -92,4 +110,6 @@ function SubmitMessage(parameter,message = "") {
 function onCloseClick() {
   webSocket.close();
 }
+
+
 

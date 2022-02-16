@@ -1,7 +1,4 @@
-from JS_Graph_Sage.src.Python.customJsGraph import ConstructGraphFromJSONObject, DataGraph
-from JS_Graph_Sage.src.Python.request_handler import JS_functions_dict
-from JS_Graph_Sage.src.Python.update import update_graph
-from JS_Graph_Sage.src.Python.websocket_server import WebsocketServer
+
 
 graph_client_dict = {}
 current_server = None
@@ -13,7 +10,7 @@ def new_client(client, server):
 		print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
 	else :
 		print("New client connected and was given id %d" % client['id'])
-	
+
 
 
 # Called for every client disconnecting
@@ -60,12 +57,14 @@ def message_received(client, server, message):
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
 
+
+
 		newGraph = ConstructGraphFromJSONObject(JSONmessage)
 		response, newGraph = handle_message(JSONmessage.parameter,newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
-		
+
 		update_graph(targetGraph, newGraph)
 
 		if response[1] != None :
