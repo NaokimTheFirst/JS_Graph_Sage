@@ -21,7 +21,7 @@ def new_client(client, server):
 
 # Called for every client disconnecting
 def client_left(client, server):
-	global graph_client_dict,current_server, reload_in_process, reloaded_graph
+	global graph_client_dict,current_server, reloaded_graph
 
 	if client['id'] in graph_client_dict :
 		print("Client(%d) disconnected" % client['id'])
