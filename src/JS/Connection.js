@@ -52,7 +52,11 @@ function TreatResponse(response){
           response.result[5],
           response.result[6],
           response.result[7],
-          response.result[8]);
+          response.result[8],
+          response.result[9],
+          response.result[10],
+          response.result[11],
+          );
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);

@@ -34,8 +34,9 @@ def _get_graph_properties(graph):
 	ds = graph.degree_sequence()
 	response[1].append(ds[0]) #get max degree of the graph
 	response[1].append(ds[len(ds)-1])  #get minimum degree of the graph
-
-
+	response[1].append(graph.size())
+	response[1].append(graph.is_hamiltonian())
+	response[1].append(graph.is_eulerian())
 
 
 	return response, graph
