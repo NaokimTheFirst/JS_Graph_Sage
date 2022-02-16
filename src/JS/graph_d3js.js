@@ -1339,11 +1339,7 @@ function SetLinksColoration(colorationList){
 
 function UpdateG6Form(newg6){
     g6 = newg6;
-}
-
-function getG6Form(){
     alert(g6);
-    console.log(g6);
 }
 
 function dragElement(elmnt) {

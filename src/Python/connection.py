@@ -50,11 +50,7 @@ from time import gmtime, strftime
 def message_received(client, server, message):
 	global graph_client_dict
 
-	if (message == "Graph6") :
-		print("New g6 : %", g.graph6_string())
-		returnMessage = JSONEncoder().encode({"request":"Graph6", "result":g.graph6_string()})
-		server.send_message(client, returnMessage)
-	elif client['id'] in graph_client_dict :
+	if client['id'] in graph_client_dict :
 		print(strftime('[%H:%M:%S]', gmtime()))
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)

@@ -5,6 +5,7 @@ __vertexColoringParameter = 'vertexColoring'
 __edgeColoringParameter = 'edgeColoring'
 __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
+__graph6Parameter = "Graph6"
 
 
 
@@ -139,14 +140,17 @@ def __create_temporary_JS_graph(graph):
 	print('New graph created in \"tmpJSgraphs[%d]\"' % (len(tmpJSgraphs)-1))
 	return tmpJSgraphs[len(tmpJSgraphs)-1]
 
-
+def _generate_graph6_formula(graph):
+	print(graph.graph6_string())
+	return [__graph6Parameter, graph.graph6_string()], graph
 
 JS_functions_dict = {__propertiesParameter : _get_graph_properties,
 					 __strongOrientationParameter : _strong_orientation_for_JS,
 					 __randomOrientationParameter : _random_orientation_for_JS,
 					 __vertexColoringParameter : _generate_vertex_coloring_for_JS,
 					 __edgeColoringParameter : _generate_edge_coloring_for_JS,
-					 __convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS}
+					 __convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS,
+					 __graph6Parameter : _generate_graph6_formula}
 
 
 

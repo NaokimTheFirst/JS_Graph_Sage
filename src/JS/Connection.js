@@ -80,9 +80,12 @@ function RequestRandomOrientation(){
   SubmitMessage(randomOrientationRequestParameter);
 }
 
-
 function RequestConvertGraph(){
   SubmitMessage(convertGraphParameter);
+}
+
+function RequestG6(){
+  SubmitMessage(getG6RequestParameter);
 }
 
 
@@ -91,7 +94,6 @@ function SubmitMessage(parameter,message = "") {
   graphJSON.message = message;
   var prettyJSON = PrettifyJSON();
   webSocket.send(prettyJSON);
-  webSocket.send(getG6RequestParameter);
 }
 
 function onCloseClick() {
