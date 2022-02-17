@@ -48,7 +48,8 @@ def port_in_use(port: int) -> bool:
         return s.connect_ex(('localhost', port)) == 0
 def connect():
 	PORT=9001
-	if (port_in_use(PORT) == 0) :
+	#version avec un if
+	'''if (port_in_use(PORT) == 0) :
 		server = None
 		server = WebsocketServer(PORT)
 		server.set_fn_new_client(new_client)
@@ -59,7 +60,19 @@ def connect():
 		server.run_forever()
 	else :
 		print("Veuillez fermer ma page avant de lancer un nouveua graph")
-
+'''
+	#version avec un raise exception
+	if (port_in_use(PORT) == 1 ) :
+		raise Exception('Le port est occupé veuillez fermer la page \n avant de lance un nouveau Graph')
+	else :
+		server = None
+		server = WebsocketServer(PORT)
+		server.set_fn_new_client(new_client)
+		server.set_fn_client_left(client_left)
+		server.set_fn_message_received(message_received)
+		global current_server
+		current_server = server
+		server.run_forever()
 
 from json import JSONEncoder
 from time import gmtime, strftime
