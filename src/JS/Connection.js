@@ -56,6 +56,8 @@ function TreatResponse(response){
           response.result[9],
           response.result[10],
           response.result[11],
+          response.result[12],
+          response.result[13]
           );
       break;
     case vertexColoringRequestParameter :

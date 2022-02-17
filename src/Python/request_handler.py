@@ -37,6 +37,7 @@ def _get_graph_properties(graph):
 	response[1].append(graph.size())
 	response[1].append(graph.is_hamiltonian())
 	response[1].append(graph.is_eulerian())
+	response[1].append(graph.girth())
 
 
 	return response, graph

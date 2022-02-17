@@ -148,6 +148,13 @@ var overlayElements = {
         }
         return this._iseulerian;
     },
+    _isGirth: null,
+    get isGirth() {
+        if (!this._isGirth) {
+            this._isGirth = document.getElementById("isGirth");
+        }
+        return this._isGirth;
+    }
 }
 
 //Return string with time on format "HH:MM""
@@ -183,7 +190,8 @@ function SetProperties(radius,
                        minimalDegree,
                        edges,
                        halmitonian,
-                       eulerian
+                       eulerian,
+                       girth
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
     overlayElements.diameterLabel.innerHTML = diameter;
@@ -195,7 +203,8 @@ function SetProperties(radius,
     overlayElements.minDegree.innerHTML = minimalDegree;
     overlayElements.edgesNumber.innerHTML = edges;
     overlayElements.isHamiltonian.innerHTML = halmitonian;
-    overlayElements.isEulerian.innerHTML=eulerian;
+    overlayElements.isEulerian.innerHTML = eulerian;
+    overlayElements.isGirth.innerHTML=girth;
 }
 
 function InitInterface() {
