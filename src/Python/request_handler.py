@@ -1,3 +1,5 @@
+
+
 __propertiesParameter = 'Properties'
 __strongOrientationParameter = 'strongOrientation'
 __randomOrientationParameter = 'randomOrientation'
@@ -5,6 +7,8 @@ __vertexColoringParameter = 'vertexColoring'
 __edgeColoringParameter = 'edgeColoring'
 __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
+__renewGraphParameter = 'renewGraph'
+
 
 
 
@@ -26,6 +30,15 @@ def _get_graph_properties(graph):
 	response[1].append(graph.is_regular())
 	response[1].append(graph.is_planar())
 	response[1].append(graph.is_bipartite())
+	response[1].append(len(graph.vertices()))
+	ds = graph.degree_sequence()
+	response[1].append(ds[0]) #get max degree of the graph
+	response[1].append(ds[len(ds)-1])  #get minimum degree of the graph
+	response[1].append(graph.size())
+	response[1].append(graph.is_hamiltonian())
+	response[1].append(graph.is_eulerian())
+	response[1].append(graph.girth())
+
 
 	return response, graph
 
@@ -139,6 +152,9 @@ def __create_temporary_JS_graph(graph):
 	print('New graph created in \"tmpJSgraphs[%d]\"' % (len(tmpJSgraphs)-1))
 	return tmpJSgraphs[len(tmpJSgraphs)-1]
 
+def _get_new_graph_in_JSON_for_JS(graph):
+	return [__renewGraphParameter, graph_to_JSON(graph, layout=None)], graph
+
 
 
 JS_functions_dict = {__propertiesParameter : _get_graph_properties,
@@ -146,7 +162,8 @@ JS_functions_dict = {__propertiesParameter : _get_graph_properties,
 					 __randomOrientationParameter : _random_orientation_for_JS,
 					 __vertexColoringParameter : _generate_vertex_coloring_for_JS,
 					 __edgeColoringParameter : _generate_edge_coloring_for_JS,
-					 __convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS}
+					 __convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS,
+					 __renewGraphParameter : _get_new_graph_in_JSON_for_JS}
 
 
 

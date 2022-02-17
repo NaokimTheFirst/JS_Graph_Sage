@@ -1,24 +1,35 @@
+
+
 graph_client_dict = {}
 current_server = None
+reloaded_graph = None
 
 # Called for every client connecting
 def new_client(client, server):
+	global reloaded_graph
 	if client['id'] not in graph_client_dict :
-		end_connection_client(client, server)
-		print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
+		# If some other client has left (cf. client_left())
+		if reloaded_graph :
+			graph_client_dict[client['id']] = reloaded_graph
+			print("Page reloaded. New client id is %d" % client['id'])
+		else :
+			end_connection_client(client, server)
+			print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
 	else :
 		print("New client connected and was given id %d" % client['id'])
-	
+	reloaded_graph = None
 
 
 # Called for every client disconnecting
 def client_left(client, server):
-	global graph_client_dict,current_server
+	global graph_client_dict,current_server, reloaded_graph
 
 	if client['id'] in graph_client_dict :
 		print("Client(%d) disconnected" % client['id'])
-		graph_client_dict.pop(client['id'])
-
+		reloaded_graph = graph_client_dict.pop(client['id'])
+	# Waiting for half sec in case a new client will appear in empty graph_client_dict (for page reload)
+	import time
+	time.sleep(0.5)
 	if not graph_client_dict :
 		server.shutdown()
 		print("server closed")
@@ -48,20 +59,22 @@ from json import JSONEncoder
 from time import gmtime, strftime
 # Called when a client sends a message
 def message_received(client, server, message):
-	global graph_client_dict
+	global graph_client_dict, reload_in_process
 	if client['id'] in graph_client_dict :
 		print(strftime('[%H:%M:%S]', gmtime()))
 
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
-
-		newGraph = ConstructGraphFromJSONObject(JSONmessage)
-		response, newGraph = handle_message(JSONmessage.parameter,newGraph)
+		# Reverse connection between Sage and JS
+		if JSONmessage.parameter == "renewGraph":
+			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)
+		else:
+			newGraph = ConstructGraphFromJSONObject(JSONmessage)
+			response, newGraph = handle_message(JSONmessage.parameter,newGraph)
+			update_graph(targetGraph, newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
-		
-		update_graph(targetGraph, newGraph)
 
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
@@ -92,4 +105,4 @@ def client_dictionnary_verification(G):
 				client_to_remove = None
 				for client in current_server.clients:
 					if client['id'] == key :
-						end_connection(client, current_server)
+						end_connection_client(client, current_server)
