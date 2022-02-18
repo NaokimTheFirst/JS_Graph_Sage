@@ -1,3 +1,5 @@
+
+
 graph_client_dict = {}
 current_server = None
 reloaded_graph = None
@@ -16,7 +18,6 @@ def new_client(client, server):
 	else :
 		print("New client connected and was given id %d" % client['id'])
 	reloaded_graph = None
-	
 
 
 # Called for every client disconnecting
@@ -64,7 +65,6 @@ def message_received(client, server, message):
 
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
-
 		# Reverse connection between Sage and JS
 		if JSONmessage.parameter == "renewGraph":
 			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)

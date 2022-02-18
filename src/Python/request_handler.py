@@ -1,3 +1,5 @@
+
+
 __propertiesParameter = 'Properties'
 __strongOrientationParameter = 'strongOrientation'
 __randomOrientationParameter = 'randomOrientation'
@@ -6,6 +8,7 @@ __edgeColoringParameter = 'edgeColoring'
 __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
 __renewGraphParameter = 'renewGraph'
+
 
 
 
@@ -27,6 +30,15 @@ def _get_graph_properties(graph):
 	response[1].append(graph.is_regular())
 	response[1].append(graph.is_planar())
 	response[1].append(graph.is_bipartite())
+	response[1].append(len(graph.vertices()))
+	ds = graph.degree_sequence()
+	response[1].append(ds[0]) #get max degree of the graph
+	response[1].append(ds[len(ds)-1])  #get minimum degree of the graph
+	response[1].append(graph.size())
+	response[1].append(graph.is_hamiltonian())
+	response[1].append(graph.is_eulerian())
+	response[1].append(graph.girth())
+
 
 	return response, graph
 
