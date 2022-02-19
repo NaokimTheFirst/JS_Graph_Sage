@@ -5,3 +5,5 @@ src/.vscode/.ropeproject/config.py
 .idea/
 .vs/
 .vscode/
+*.class
+*o
