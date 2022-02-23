@@ -53,6 +53,10 @@ function TreatResponse(response){
           response.result[6],
           response.result[7],
           response.result[8]);
+      if (showSpanTree && Object.keys(response.result[8]).length != 0)
+        SetLinksColoration(new Array(response.result[8]), 1);
+      else
+        links.style("stroke", customColorScale());
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
