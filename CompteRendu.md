@@ -28,3 +28,36 @@ Le but du projet est de terminer le travail en enrichissant cette solution. Il s
 *Travail fait :*
 - Mapping des sommets dans un dict pour preserver les types d'origin.
 - Possibilite de modifier le graphe dans ls terminal et importer les changements dans l'interface graphique avec le bouton "Renew Graph".
+
+#### 18/02/2022 - 5e rdv
+*Nouvelles choses à faire :*
+- Pour tout le monde : 
+    1. faire le menage sur le dépôt en effaçant les fichiers de configuration (personnels), du type : .vscode, .idea, .class, .o etc.
+    2. faire `git rm --cache obj/result.html`
+    3. ajouter à gitignore : 
+        ```
+        .idea/
+        .vs/
+        .vscode/
+        *.class
+        *o
+        ```
+    4. faire `git add .` et `git commit`
+- Comprendre comment D3.js marche dans le code et faire migrer vers une version plus récente. Voir les liens : 
+https://observablehq.com/@d3/d3v6-migration-guide
+https://blog.devgenius.io/d3-js-whats-new-in-version-6-5f45b00a85cb
+- Permettre à l'utilisateur de sortir du terminal sage avec `exit`.
+- Trouver un moyen de remplacer les getters dans InterfaceAndMisc.js par un seul getter.
+- Les propriétés "lourdes" (qui prennent le temps pour que le sage les compte), ne doivent être affichées que si l'utilisateur les demande explicitement. Voir _things-to-add.md_/Hard Stuff.
+- Chercher le moyen à copier le project board GitHub à un autre compte (organisation ou utilisateur) pour pouvoir le lier au dépot GitHub.
+- Pour l'affichage de girth : Bug avec graphs.ClawGraph(), car girth est infinie. Il faut passer une exception dans le code.
+
+*Travail fait :*
+- Possibilite de modifier le graphe dans ls terminal et importer les changements dans l'interface graphique avec le bouton "Renew Graph" (Bouton à renommer et repositionner).
+- Possibilité de refraichir la page sans perdre la connexion (permet d'importer les changements de même manière que "Renew Graph").
+- Refraichir la page ou "Renew Graph" peuvent être utilisés pour repositionner le graph au centre de l'écran et optimiser ça taille.
+- Diagramme de séquence pour le processus de connexion (mes changements dans le code original sont marqués en rouge).
+- Affichage de plusieurs nouvelles propriétés du graph dans le menu : degrés max et min, is eulerian, hamiltonicity.
+- Affichage du graph sous format G6.
+- Possibilité de questionner le site _The House Of Graphs_ si le graphe obtenu est déjà connu.
+- Project Board crée sur GitHub pour le backlog de nos user stories (à deplacer). Voir : https://github.com/users/sea-gull-diana/projects/1/
