@@ -1257,8 +1257,7 @@ function SetNodesColoration(colorationList) {
 }
 
 
-function SetLinksColoration(colorationList) {
-    var id = 0;
+function SetLinksColoration(colorationList, id = 0) {
     colorationList.forEach(coloration => {
         coloration.forEach(tuple => {
             link = graphJSON.links.find(function (link) {
@@ -1270,11 +1269,21 @@ function SetLinksColoration(colorationList) {
     });
 
     ManageEdges();
-
-
 }
 
-
+var showSpanTree = false;
+document.addEventListener('DOMContentLoaded', (e) => {
+    document.getElementById("span_tree").addEventListener('change', function() {
+        if (this.checked) {
+        showSpanTree = true;
+        UpdateGraphProperties();
+        } 
+        else {
+        showSpanTree = false;
+        links.style("stroke", customColorScale());
+        }
+    });
+});
 
 
 

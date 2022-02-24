@@ -25,6 +25,9 @@
     <div id="Overlay">
         <div id="leftSide">
             <div class="Panel">
+                <button id="redraw" onclick="RequestRenewGraph()">Redraw Graph</button>
+            </div>
+            <div class="Panel">
                 <p class="PanelHeader">Tools</p>
                 <div id="ToolPanelContent" class="PanelContent">
                     <table>
@@ -46,10 +49,11 @@
                 <p class="PanelHeader">Properties</p>
                 <div id="PropertyPanelContent" class="PanelContent">
                     <table>
+                        <tr>
                         <td>Number of nodes</td>
                         <td id="numberOfNode"></td>
                         </tr>
-
+                        <tr>
                         <td>Number of edges</td>
                         <td id="numberOfEdges"></td>
                         </tr>
@@ -76,7 +80,8 @@
                         <tr>
                             <td>Maximal degree</td>
                             <td id="maximaldegre"></td>
-                        </tr> <tr>
+                        </tr> 
+                        <tr>
                             <td>Minimal degree</td>
                             <td id="minimaldegre"></td>
                         </tr>
@@ -89,8 +94,12 @@
                             <td id="isEulerian"></td>
                         </tr>
                         <tr>
-                            <td>Is girth</td>
+                            <td>Girth</td>
                             <td id="isGirth"></td>
+                        </tr>
+                        <tr>
+                            <input type="checkbox" id="span_tree">
+                            <label for="span_tree">Show spanning tree</label>
                         </tr>
                     </table>
                 </div>
@@ -126,11 +135,6 @@
                         <tr>
                             <td>
                                 <button onclick="RequestConvertGraph()">Convert to Di/Graph</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                              <button onclick="RequestRenewGraph()">Renew Graph</button>
                             </td>
                         </tr>
                     </table>

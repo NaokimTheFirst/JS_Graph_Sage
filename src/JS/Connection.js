@@ -55,10 +55,12 @@ function TreatResponse(response){
           response.result[8],
           response.result[9],
           response.result[10],
-          response.result[11],
-          response.result[12],
-          response.result[13]
+          response.result[11]
           );
+      if (showSpanTree && Object.keys(response.result[12]).length != 0)
+        SetLinksColoration(new Array(response.result[12]), 1);
+      else
+        links.style("stroke", customColorScale());
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
