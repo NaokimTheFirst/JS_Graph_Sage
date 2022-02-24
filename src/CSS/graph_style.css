@@ -120,7 +120,9 @@ text {
 marker {
     fill: #bbb;
 }
-#nombreNode{
 
-
+#redraw {
+    width: 100%;
+    background-color: lightblue;
+    height: 30px;
 }
