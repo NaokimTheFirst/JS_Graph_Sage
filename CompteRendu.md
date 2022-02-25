@@ -61,3 +61,15 @@ https://blog.devgenius.io/d3-js-whats-new-in-version-6-5f45b00a85cb
 - Affichage du graph sous format G6.
 - Possibilité de questionner le site _The House Of Graphs_ si le graphe obtenu est déjà connu.
 - Project Board crée sur GitHub pour le backlog de nos user stories (à deplacer). Voir : https://github.com/users/sea-gull-diana/projects/1/
+
+#### 25/02/2022 - 6e rdv
+*Nouvelles choses à faire :*
+- Changer ownership du dépot vers une organisation (et copier-coller le project board vers cette organisation).
+- Comment attribuer des portes ? Coder en dur ou choisir n'importe quel porte disponible (voir si les portes sont regroupées par famille et on peut choisir une famille à utiliser).
+- Changer la méthode de coloration optimale. Utiliser la fonction du sage plus optimale (voir email).
+- La division en groupes à enlever (fonctionnalité non finie, donc le champ du groupe dans le menu sert à rien).
+- La prémière ébauche du rapport à faire et envoyer à M. Valicov pendant les vacances.
+
+*Travail fait :*
+- Connexion aux portes différentes selon la disponibilité (bugs à fixer voir au-dessus).
+- Spanning tree (coloration des arêtes d'un arbre couvrant).
