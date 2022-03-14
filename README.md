@@ -2,7 +2,7 @@
  
 New version of the Javascript visualization of Sage with D3.js
 
-This project was started by the students of Licence Pro at IUT of Montpellier 2 years ago and taken by our group (students on DUT informatique) to improve and debut.
+This project was started by the students of Licence Pro at IUT of Montpellier 2 years ago and taken by our group (students on DUT informatique) to improve and debug.
 
 # User Guide
 ### Step 1
