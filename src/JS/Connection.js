@@ -61,7 +61,7 @@ function TreatResponse(response){
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
-      document.getElementById("vertexColoring").innerHTML = "<td>Classes: " + response.result + "</td>";
+      // document.getElementById("vertexColoring").innerHTML = "<td>Classes: " + response.result + "</td>";
       break;
     case edgeColoringRequestParameter :
       //

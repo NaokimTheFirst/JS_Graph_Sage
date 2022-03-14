@@ -1,61 +1,21 @@
 # JS_Graph_Sage
  
 New version of the Javascript visualization of Sage with D3.js
-Student project
 
-Project's logbook :
-https://docs.google.com/document/d/1wu1qKDCjxPgVY6a5Im5XkJSdYcvF8YcselkqUSTHnds/edit?usp=sharing
+This project was started by the students of Licence Pro at IUT of Montpellier 2 years ago and taken by our group (students on DUT informatique) to improve and debut.
 
-Project's Trello :
-https://trello.com/b/7y723RZk/sagemathgraph
+# User Guide
+### Step 1
+Download the source code from GitHub and make sure you have SageMath installed.
 
-Sources :
-https://github.com/d3/d3/wiki (D3.js documentation)
-http://bl.ocks.org/tgk/6068367 (example we used to add nodes)
-https://developer.mozilla.org/en-US/docs/Web/SVG/Element (documentation of SVG elements)
-https://travishorn.com/updating-dynamic-data-in-d3-15ce4a9fa856 (data updating in D3.js)
-https://www.d3-graph-gallery.com/interactivity.html (interactivity with displaying)
+### Step 2
+Unzip the source code and type `attach("path_to_file_init_CustomJS.py")` in your Sage terminal.
+For example if you place the project in a folder where your `.sage/` directory is located, you should tap `attach("JS_Graph_Sage/src/Python/init_CustomJS.py")`.
 
 
---------------
-
-Methods explanation : 
-
-METHODS USED IN window.onload :
-	
-	LoadGraphData()
-		Loads the data from the graph and puts index on nodes
-
-	InitGraph()
-		Transfers all the data from the JSON to a D3.js graph object (force)
-		Adapts the graph layout to the javascript window's dimensions
-
-	KeyboardEventInit()
-		Launched at each key press, triggers an action depending on the key
-
-	ManageAllGraphicsElements()
-		Creates the D3 version of the window, nodes, edges, zooming
-
-	InitForce()
-		Determines a position for each element and adds a force layout to have a dynamic positionning of the nodes and edges
+### Step 3
+Now you can launch the interface by creating a graph in terminal (for example: `g = graphs.CompleteGraph(20)`) and typing `show_CustomJS(g)`.
 
 
-
-METHODS USED IN KeyboardEventInit() :
-
-	RemoveElement(currentObject)
-		Deletes the mouseovered element. If it's a node, deletes the connected edges
-
-	AddNode()
-		Creates a node at the position of the cursor
-
-	FreezeGraph()
-		Stops the forces simulation to easily manipulate the graph.
-		If the graph is already frozen, unfreezes it.
-
-
-
-OTHER :
-
-	AddEdge(src, dest)
-		Creates an edge between the src and the dest, wich are the names of two nodes of the graph
+### Importing changes from terminal
+If the modifications you want to add cannot be made in the interface, you can run the necessary commands in Sage terminal and click `Redraw Graph` button on top of the page to import changes. Or you can simply reload the page.
