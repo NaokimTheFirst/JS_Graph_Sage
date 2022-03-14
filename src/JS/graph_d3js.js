@@ -1274,16 +1274,23 @@ function SetLinksColoration(colorationList, id = 0) {
 var showSpanTree = false;
 document.addEventListener('DOMContentLoaded', (e) => {
     document.getElementById("span_tree").addEventListener('change', function() {
+        DeleteAllEdgeGroups();
         if (this.checked) {
         showSpanTree = true;
         UpdateGraphProperties();
         } 
         else {
         showSpanTree = false;
-        links.style("stroke", customColorScale());
+        ManageEdges();
         }
     });
 });
+
+function DeleteAllEdgeGroups() {
+    links.each(function (d) {
+        SetGroupElement(new ValueRegisterer(0, 0, new Element(d, EdgeType)));
+    });
+}
 
 
 function NumberOfEdges() {
