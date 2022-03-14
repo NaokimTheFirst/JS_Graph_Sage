@@ -101,19 +101,18 @@ def _random_orientation_for_JS(graph):
 
 	return response, newGraph
 
-
+import sage.graphs.graph_coloring
 def _generate_vertex_coloring_for_JS(graph):
 	print("Generated vertex coloration")
 	if not graph.is_directed():
-		color = graph.coloring()
+		color = graph_coloring.vertex_coloring(graph)
 	else :
 		newGraph = Graph()
 		update_graph(newGraph, graph)
-		color = newGraph.coloring()
+		color = graph_coloring.vertex_coloring(newGraph)
 	return [__vertexColoringParameter,color], graph
 
 
-import sage.graphs.graph_coloring
 def _generate_edge_coloring_for_JS(graph):
 	print("Generated edge coloration")
 	return [__edgeColoringParameter,graph_coloring.edge_coloring(graph)], graph
