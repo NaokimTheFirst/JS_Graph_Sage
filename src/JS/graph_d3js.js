@@ -811,7 +811,7 @@ function AddNode(newNode) {
     //Restart the force layout with the new elements
     force.start();
 
-    NumberOfEdges();
+
 
     return true;
 }
@@ -914,12 +914,12 @@ function AddEdgesOnSelection() {
                     isFirst = false;
                 }
             }
-            NumberOfEdges();
+
             return true;
         } else {
             CustomWarn("No nodes to add loop at on the selection");
         }
-        NumberOfEdges();
+
 
         return false;
     }
@@ -993,10 +993,10 @@ function RemoveElementFromGraph(element, _isFirst = true) {
 
             MyManager.Execute(new SupprNodeCommand(element.data, false));
 
-            var numberNode = graphJSON.nodes.length;
 
 
-            numberNode--;
+
+
 
             break;
         case EdgeType:
@@ -1055,7 +1055,7 @@ function RemoveEdge(edgeData) {
         graphJSON.links.splice(index, 1);
         ManageEdges();
         force.start();
-        NumberOfEdges();
+
 
     }
 }
@@ -1067,7 +1067,7 @@ function RemoveLoop(loopData) {
         graphJSON.loops.splice(graphJSON.loops.indexOf(loopData), 1);
         ManageLoops();
         force.start();
-        NumberOfEdges();
+
 
     }
 }
@@ -1095,7 +1095,7 @@ function RemoveNode(nodeData) {
     ManageNodes();
     ManageNodeLabels();
     force.start();
-    NumberOfEdges();
+
 
 
 
@@ -1293,29 +1293,4 @@ function DeleteAllEdgeGroups() {
 }
 
 
-function NumberOfEdges() {
-    var edgesNumberFunction = document.querySelectorAll('path').length
 
-    document.getElementById("numberOfEdges").innerHTML = edgesNumberFunction - 1;
-
-
-
-}
-
-function getSequence(){
-
-   sequence=[]
-    sequence=getSequenceParamater(graphJSON)
-    
-
-    console.log("getsequence")
-
-
-
-    /*  list = graphJSON.links;
-
-    alert(list)
-       link.source = link.source.name;
-       links = svg.selectAll(".link")*/
-
-}
