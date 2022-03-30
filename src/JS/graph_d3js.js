@@ -1258,6 +1258,7 @@ function SetNodesColoration(colorationList) {
 
 
 function SetLinksColoration(colorationList, id = 0) {
+    console.info("SpanTree: " + colorationList);
     colorationList.forEach(coloration => {
         coloration.forEach(tuple => {
             link = graphJSON.links.find(function (link) {
@@ -1288,7 +1289,7 @@ document.addEventListener('DOMContentLoaded', (e) => {
 
 function DeleteAllEdgeGroups() {
     links.each(function (d) {
-        SetGroupElement(new ValueRegisterer(0, 0, new Element(d, EdgeType)));
+        delete d.group;
     });
 }
 

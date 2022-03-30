@@ -62,13 +62,12 @@ function TreatResponse(response){
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
-      // document.getElementById("vertexColoring").innerHTML = "<td>Classes: " + response.result + "</td>";
+      DisplayColoringInText("vertexColoring", response.result);
       break;
     case edgeColoringRequestParameter :
-      //
       DeleteAllEdgeGroups();
       SetLinksColoration(response.result);
-      console.info(response.result);
+      DisplayColoringInText("edgeColoring", response.result);
       break;
     case strongOrientationRequestParameter :
       InitNewGraph(StringToObject(response.result));
