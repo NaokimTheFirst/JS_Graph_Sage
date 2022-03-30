@@ -94,6 +94,9 @@ function SubmitMessage(parameter,message = "") {
   graphJSON.message = message;
   var prettyJSON = PrettifyJSON();
   webSocket.send(prettyJSON);
+  graphJSON.parameter = getG6RequestParameter;
+  var prettyJSON = PrettifyJSON();
+  webSocket.send(prettyJSON);
 }
 
 function onCloseClick() {

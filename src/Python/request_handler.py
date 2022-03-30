@@ -131,6 +131,7 @@ def __convert_DtoG(graph):
 
 
 tmpJSgraphs = []
+
 def __create_temporary_JS_graph(graph):
 	global tmpJSgraphs
 
