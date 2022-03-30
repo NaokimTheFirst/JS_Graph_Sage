@@ -51,23 +51,19 @@ function TreatResponse(response){
           response.result[4],
           response.result[5],
           response.result[6],
-          response.result[7],
-          response.result[8]);
+          response.result[7]);
       if (showSpanTree && Object.keys(response.result[8]).length != 0) {
         SetLinksColoration(new Array(response.result[8]), 1);
       }
-      else
-        links.style("stroke", customColorScale());
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
-      // document.getElementById("vertexColoring").innerHTML = "<td>Classes: " + response.result + "</td>";
+      DisplayColoringInText("vertexColoring", response.result);
       break;
     case edgeColoringRequestParameter :
-      //
       DeleteAllEdgeGroups();
       SetLinksColoration(response.result);
-      console.info(response.result);
+      DisplayColoringInText("edgeColoring", response.result);
       break;
     case strongOrientationRequestParameter :
       InitNewGraph(StringToObject(response.result));

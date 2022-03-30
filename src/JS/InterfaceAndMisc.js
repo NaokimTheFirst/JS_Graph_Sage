@@ -401,3 +401,17 @@ function StringToObject(string)
 {
     return eval('(' + string + ')');
 }
+
+function DisplayColoringInText(idHtml, coloring) {
+    coloringString = '';
+    for (var i = 0; i < coloring.length; i++) {
+      coloringString += "<div><strong>" + (i+1) + ":</strong> ";
+      for (var j = 0; j < coloring[i].length; j++) {
+        coloringString += " (" + coloring[i][j] + ") ";
+      }
+      coloringString += "</div>";
+    }
+    document.getElementById(idHtml).innerHTML = `
+          <button class="x" onclick="this.parentElement.innerHTML = '';"></button> 
+          <span id="classes">Classes:</span>` + coloringString;
+  }

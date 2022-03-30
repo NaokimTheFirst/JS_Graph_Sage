@@ -127,7 +127,43 @@ marker {
     height: 30px;
 }
 
-/* #vertexColoring {
-    inline-size: 150px;
-    overflow-wrap: break-word;
-} */
+#vertexColoring button, #edgeColoring button {
+    width: 20px;
+    height: 20px;
+}
+
+#vertexColoring div, #edgeColoring div {
+    margin: 5px 2px;
+}
+
+/* 'x' button style, idea copied from https://impossiblue.github.io/log/141026/index.html : */
+.x {
+	position: relative;
+	border: 2px solid #eef5df;
+	background-color: #ff5248;
+	border-radius: 50%;
+    margin: 5px;
+	}
+.x::before, .x::after {
+	position: absolute;
+	top: 7px;
+	left: 3.1px;
+	width: 10px;
+	height: 2.5px;
+	content: "";
+	background-color: #eef5df;
+	visibility: hidden;
+	}
+.x::before {
+	transform: rotate(-45deg);
+	}
+.x::after {
+	transform: rotate(45deg);
+	}
+.x:hover { cursor: pointer; }
+.x:hover::before, .x:hover::after { visibility: visible; }
+
+#classes {
+    line-height: 33px;
+    vertical-align: top;
+}
