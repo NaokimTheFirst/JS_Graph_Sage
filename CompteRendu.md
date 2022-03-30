@@ -73,3 +73,15 @@ https://blog.devgenius.io/d3-js-whats-new-in-version-6-5f45b00a85cb
 *Travail fait :*
 - Connexion aux portes différentes selon la disponibilité (bugs à fixer voir au-dessus).
 - Spanning tree (coloration des arêtes d'un arbre couvrant).
+
+#### 30/03/2022 - 7e rdv
+*Nouvelles choses à faire :*
+- Faire une réunion du groupe pour merge tout ce qu'on a fait sur GitHub (LE PLUS IMPORTANT - faire avant le rdv suivant).
+- Encore quelques boutons à ajouter (voir Project Board).
+- Edge contruction
+
+*Travail fait :*
+- Affichage des classes de coloration sous la forme du texte
+- Bug fixé dans l'affichage de l'arbre recouvrant
+- Plan du rapport preparé ;
+- Redaction du rapport commencé : [voir document sur OneDrive](https://1drv.ms/w/s!Ah20cN1s-zt3h78TY4GmdzCLvJmvOQ?e=JR4fun).
