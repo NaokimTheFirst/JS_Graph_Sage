@@ -8,7 +8,7 @@ __edgeColoringParameter = 'edgeColoring'
 __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
 __renewGraphParameter = 'renewGraph'
-
+__graph6Parameter = "Graph6"
 
 
 
@@ -150,10 +150,19 @@ def __create_temporary_JS_graph(graph):
 	print('New graph created in \"tmpJSgraphs[%d]\"' % (len(tmpJSgraphs)-1))
 	return tmpJSgraphs[len(tmpJSgraphs)-1]
 
+
 def _get_new_graph_in_JSON_for_JS(graph):
 	return [__renewGraphParameter, graph_to_JSON(graph, layout=None)], graph
 
 
+def _generate_graph6_formula(graph):
+	response = [__graph6Parameter]
+	if (graph.is_directed()):
+		response.append(graph.dig6_string())
+	else :
+		response.append(graph.graph6_string())
+
+	return response, graph
 
 JS_functions_dict = {__propertiesParameter : _get_graph_properties,
 					 __strongOrientationParameter : _strong_orientation_for_JS,
@@ -161,7 +170,8 @@ JS_functions_dict = {__propertiesParameter : _get_graph_properties,
 					 __vertexColoringParameter : _generate_vertex_coloring_for_JS,
 					 __edgeColoringParameter : _generate_edge_coloring_for_JS,
 					 __convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS,
-					 __renewGraphParameter : _get_new_graph_in_JSON_for_JS}
+					 __renewGraphParameter : _get_new_graph_in_JSON_for_JS,
+					 __graph6Parameter : _generate_graph6_formula}
 
 
 

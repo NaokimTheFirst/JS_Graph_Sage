@@ -1,5 +1,6 @@
 import sys
 
+
 from sage.misc.temporary_file import tmp_filename
 from sage.plot.colors import rainbow
 import os, sys

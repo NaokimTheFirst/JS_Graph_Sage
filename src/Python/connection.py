@@ -79,9 +79,9 @@ from time import gmtime, strftime
 # Called when a client sends a message
 def message_received(client, server, message):
 	global graph_client_dict, reload_in_process
+
 	if client['id'] in graph_client_dict :
 		print(strftime('[%H:%M:%S]', gmtime()))
-
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
 		# Reverse connection between Sage and JS
