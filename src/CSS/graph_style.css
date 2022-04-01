@@ -1,13 +1,13 @@
 /* graph_style.css */
 body {
-    display: flex;
-    flex-direction: row;
+    /* display: flex;
+    flex-direction: row; */
     font-family: Arial, serif;
     background-color: #18191A;
     margin : 0;
 }
 
-.extent{
+.extent {
     fill: rgba(200, 200, 209,0.3);
 }
 
@@ -15,20 +15,20 @@ rect {
     fill: #18191A;
 }
 
-/* .scroll{
+.scroll {
     width:100%;
     height: 100%;
     overflow:auto;
-    -ms-overflow-style: none; Hide scrollbar for Chrome, Safari and Opera
+    -ms-overflow-style: none; /* Hide scrollbar for Chrome, Safari and Opera */
     color: yellow;
     font-size: 110%;
-} */
+}
 
 /* Hide scrollbar for IE and Edge */
-/* .scroll::-webkit-scrollbar {
+.scroll::-webkit-scrollbar {
     display: none;
-} */
-#graphFrame{
+}
+#graphFrame {
     display: inline-flex;
     /* height: 100%; */
     width: 100%;
@@ -38,7 +38,7 @@ rect {
     overflow: scroll;
 } */
 
-#Overlay{
+#Overlay {
     width: 20%;
     /* position: absolute; */
     /* top: 0px;
@@ -49,9 +49,11 @@ rect {
     margin : 0.5%;
     pointer-events:none;
     /* width: 300px; */
+    min-width: 140px;
+
 }
 
-.Panel{
+.Panel {
     width: 100%;
     height: fit-content;
     pointer-events:auto;
@@ -61,12 +63,12 @@ rect {
     margin-bottom: 2%;
 }
 
-#scrollPanel{
+#scrollPanel {
     display: none;
     height: 5%;
 }
 
-.PanelHeader{
+.PanelHeader {
     font-size: large;
     font-weight: bold;
     text-align: center;
@@ -89,12 +91,11 @@ rect {
     text-align: right;
 }
 
-
-#AlgorithmPanelContent{
+#AlgorithmPanelContent {
     width: 100%;
 }
 
-#AlgorithmPanelContent button{
+#AlgorithmPanelContent button {
     width: 100%;
 }
 
@@ -103,7 +104,7 @@ p {
     width:max-content;
 }
 
-#groupList{
+#groupList {
     text-align-last:right;
     direction: rtl;
 }
@@ -123,7 +124,7 @@ text {
     fill:rgba(255, 255, 255, 0);
 }
 
-.loop{
+.loop {
     opacity: .6;
     fill:rgba(255, 255, 255, 0);
 }
@@ -202,7 +203,7 @@ button:hover{
     background-color: #2A2B2C;
 }
 
-.Panel>div:first-child{
+.Panel>div:first-child {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
