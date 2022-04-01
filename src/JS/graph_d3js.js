@@ -1,6 +1,6 @@
 //The graph properties
 var graphJSON, force, customColorScale;
-var width = function() {return document.documentElement.clientWidth};
+var width = function() {return document.documentElement.clientWidth * 0.8};
 var height = function() {return document.documentElement.clientHeight};
 var xshift = function() {return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;};
 var drag_in_progress = false;
@@ -151,7 +151,7 @@ function LoadGraphData(newGraph) {
 }
 
 function FillGroupFromGraph(graph) {
-    groupList=[];
+    groupList = [];
     graph.nodes.forEach(element => {
         if (!groupList.includes(element.group)) {
             groupList.push(element.group);
