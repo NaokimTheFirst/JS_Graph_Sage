@@ -54,6 +54,8 @@ rect {
 }
 
 .Panel {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: fit-content;
     pointer-events:auto;
@@ -61,6 +63,8 @@ rect {
     background: rgba(184, 184, 184, 0.473);
     padding: 0.5%;
     margin-bottom: 2%;
+    overflow: hidden;
+    resize: horizontal;
 }
 
 #scrollPanel {
@@ -83,9 +87,9 @@ rect {
     text-align: left;
 }
 
-.PanelContent th:nth-child(2) {
+/* .PanelContent th:nth-child(2) {
     text-align: right;
-}
+} */
 
 .PanelContent td:nth-child(2) {
     text-align: right;
@@ -112,7 +116,7 @@ p {
 .node {
     stroke: #fff;
     stroke-width: 1.5px;
-    z-index: 100;
+    /* z-index: 100; */
 }
 
 text {
@@ -120,7 +124,7 @@ text {
 }
 
 .link {
-    opacity: .6;
+    opacity: 0.6;
     fill:rgba(255, 255, 255, 0);
 }
 
@@ -162,7 +166,7 @@ marker {
 	background-color: #ff5248;
 	border-radius: 50%;
     margin: 5px;
-	}
+}
 
 .x::before, .x::after {
 	position: absolute;
@@ -173,17 +177,20 @@ marker {
 	content: "";
 	background-color: #eef5df;
 	visibility: hidden;
-	}
+}
 
 .x::before {
 	transform: rotate(-45deg);
-	}
+}
 
 .x::after {
 	transform: rotate(45deg);
-	}
+}
 
-.x:hover { cursor: pointer; }
+.x:hover { 
+    cursor: pointer;
+    background-color: #ff5248;
+}
 
 .x:hover::before, .x:hover::after { visibility: visible; }
 
@@ -207,4 +214,8 @@ button:hover{
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+#g6 button {
+    max-width: 150px;
 }
