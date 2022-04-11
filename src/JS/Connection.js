@@ -9,6 +9,7 @@ const convertGraphParameter = "convert";
 const closeConnectionParameter = "closeConnection";
 const renewGraphParameter = "renewGraph";
 const getG6RequestParameter = "Graph6";
+const showSpanTreeParameter = "showSpanTree";
 
 function InitWebSocketConnection() {
   // Connect to Web Socket
@@ -58,8 +59,11 @@ function TreatResponse(response){
           response.result[10],
           response.result[11]
           );
-      if (showSpanTree && Object.keys(response.result[12]).length != 0)
-        SetLinksColoration(new Array(response.result[12]), 1);
+      break;
+    case showSpanTreeParameter :
+      console.info(response.result);
+      if (showSpanTree && Object.keys(response.result).length != 0)
+        SetLinksColoration(new Array(response.result), 1);
       break;
     case vertexColoringRequestParameter :
       SetNodesColoration(response.result);
@@ -127,6 +131,10 @@ function RequestRenewGraph() {
 
 function RequestG6(){
   SubmitMessage(getG6RequestParameter);
+}
+
+function DisplaySpanTree() {
+  SubmitMessage(showSpanTreeParameter);
 }
 
 function SubmitMessage(parameter,message = "") {

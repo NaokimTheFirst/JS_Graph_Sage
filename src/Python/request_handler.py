@@ -9,6 +9,7 @@ __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
 __renewGraphParameter = 'renewGraph'
 __graph6Parameter = "Graph6"
+__showSpanTreeParameter = "showSpanTree"
 
 from json import JSONEncoder
 
@@ -38,15 +39,17 @@ def _get_graph_properties(graph):
 	response[1].append(graph.is_hamiltonian())
 	response[1].append(graph.is_eulerian())
 	response[1].append(graph.girth())
-	response[1].append(span_tree_as_string_array(graph))
 	return response, graph
 
-def span_tree_as_string_array(graph) :
+def _span_tree_as_string_array(graph) :
 	spanTree = graph.min_spanning_tree()
 	stringSpanTree = []
-	for v in spanTree :
-		stringSpanTree.append(str(v))
-	return stringSpanTree
+	for tuple in spanTree :
+		tupleOfStrings = ()
+		for v in tuple :
+			tupleOfStrings += (str(v),)
+		stringSpanTree.append(tupleOfStrings)
+	return [__showSpanTreeParameter, stringSpanTree], graph
 
 def convert_sage_types(target) :
 	if isinstance(target, sage.rings.integer.Integer) :
@@ -178,7 +181,8 @@ JS_functions_dict = {__propertiesParameter : _get_graph_properties,
 					 __edgeColoringParameter : _generate_edge_coloring_for_JS,
 					 __convertGraphParameter : _convert_graph_digraph_bidirectionnal_for_JS,
 					 __renewGraphParameter : _get_new_graph_in_JSON_for_JS,
-					 __graph6Parameter : _generate_graph6_formula}
+					 __graph6Parameter : _generate_graph6_formula,
+					 __showSpanTreeParameter : _span_tree_as_string_array}
 
 
 
