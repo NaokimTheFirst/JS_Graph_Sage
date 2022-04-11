@@ -85,3 +85,23 @@ https://blog.devgenius.io/d3-js-whats-new-in-version-6-5f45b00a85cb
 - Bug fixé dans l'affichage de l'arbre recouvrant
 - Plan du rapport preparé ;
 - Redaction du rapport commencé : [voir document sur OneDrive](https://1drv.ms/w/s!Ah20cN1s-zt3h78TY4GmdzCLvJmvOQ?e=JR4fun).
+
+#### 04/11/2022 - 8e rdv
+*Nouvelles choses à faire :*
+- Separer dans le menu Orientations et Algorithmic/Hard Stuff
+- Resoudre le probleme : les sommets recoivent les coordonées qu'ils n'ont pas a l'origin
+Lorsqu'on dessine le graph avec `show_CustomJS`, on ajoute les coordonées aux sommets, l'objet change donc de nature.
+**Solution :** 
+Faire un bouton("save") qui permet de fixer l'embedding (la possibilité de freeze les coordonéees des sommets). Mais si on ne clique pas ce bouton, les sommets ne doivent pas avoir des coordonnes.
+**Fonctions utiles :**
+`set_pos()` pour donner les coordonnees aux sommets.
+`graph.set_embedding()` position des sommets par rapport l'un a l'autre.
+- Utiliser le layout `spring` de Sage par defaut dans `show_CustomJS` pour bien dessiner le graphe.
+- Edge contraction : plutot que `graph.contract_edge(0,1)`, utiliser la methode `graph.merge_vertices()`
+
+*Travail fait :*
+- merge des branches effectué (branche `obada` et les dernieres versions des branches `jawad` et `mathis` en attente)
+- Problème de "Girth" reglé, mais pas encore ajouté à master
+- Bug corrigé dans l'affichage des graphes avec des sommets de type objet
+
+**Prochaine reunion :** mercredi 20/04 a 9h00
