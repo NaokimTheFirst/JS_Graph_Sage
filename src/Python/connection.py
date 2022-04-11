@@ -96,6 +96,7 @@ def message_received(client, server, message):
 			print(JSONmessage.message)
 
 		if response[1] != None :
+			print(response[1])
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
 			server.send_message(client,returnMessage)
 	else :

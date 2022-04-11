@@ -10,7 +10,7 @@ __errorParameter = "errorWhileTreatingRequest"
 __renewGraphParameter = 'renewGraph'
 __graph6Parameter = "Graph6"
 
-
+from json import JSONEncoder
 
 def _get_graph_properties(graph):
 	response = [__propertiesParameter,[]]
@@ -38,8 +38,15 @@ def _get_graph_properties(graph):
 	response[1].append(graph.is_hamiltonian())
 	response[1].append(graph.is_eulerian())
 	response[1].append(graph.girth())
-	response[1].append(graph.min_spanning_tree())
+	response[1].append(span_tree_as_string_array(graph))
 	return response, graph
+
+def span_tree_as_string_array(graph) :
+	spanTree = graph.min_spanning_tree()
+	stringSpanTree = []
+	for v in spanTree :
+		stringSpanTree.append(str(v))
+	return stringSpanTree
 
 def convert_sage_types(target) :
 	if isinstance(target, sage.rings.integer.Integer) :
