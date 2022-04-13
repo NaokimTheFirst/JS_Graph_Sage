@@ -148,12 +148,12 @@ var overlayElements = {
         }
         return this._iseulerian;
     },
-    _isGirth: null,
-    get isGirth() {
-        if (!this._isGirth) {
-            this._isGirth = document.getElementById("isGirth");
+    _girth: null,
+    get girth() {
+        if (!this._girth) {
+            this._girth = document.getElementById("Girth");
         }
-        return this._isGirth;
+        return this._girth;
     }
 }
 
@@ -191,7 +191,7 @@ function SetProperties(radius,
                        edges,
                        halmitonian,
                        eulerian,
-                       girth
+
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
     overlayElements.diameterLabel.innerHTML = diameter;
@@ -204,7 +204,6 @@ function SetProperties(radius,
     overlayElements.edgesNumber.innerHTML = edges;
     overlayElements.isHamiltonian.innerHTML = halmitonian;
     overlayElements.isEulerian.innerHTML = eulerian;
-    overlayElements.isGirth.innerHTML=girth;
 }
 
 function InitInterface() {
@@ -450,4 +449,8 @@ function develop(button){
     }
 
     return true;
+}
+
+function afficherResultGirth(parameter){
+       overlayElements.girth.innerHTML=parameter;
 }
