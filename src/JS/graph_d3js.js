@@ -6,8 +6,6 @@ var xshift = function() {return document.getElementById("graphFrame").childNodes
 var drag_in_progress = false;
 var is_frozen = false;
 var isDirected = false;
-var oldWidth, oldHeight;
-var oldWindowSize = [oldWidth, oldHeight];
 var g6;
 
 //DOM Elements / D3JS Elements
