@@ -110,9 +110,10 @@
                         </tr>
                         <tr>
                             <td>G6</td>
-                            <td id="g6">
-                                <button onclick="RequestG6()">Get and copy G6</button>
-                            </td>
+                                <td>
+                                    <textarea id="g6" rows="1" cols="7"></textarea>
+                                    <button onclick="checkIfExist(g6);">Exist?</button>
+                                </td>
                         </tr>
                     </table>
                 </div>
@@ -178,8 +179,8 @@
                         </tr>
 
                         <tr>
-                            <td>Un/Freeze Positions</td>
-                            <td>F</td>
+                            <td>Save graph</td>
+                            <td>S</td>
                         </tr>
                         <tr>
                             <td>Undo</td>

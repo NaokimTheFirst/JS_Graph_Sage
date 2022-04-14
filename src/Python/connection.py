@@ -87,10 +87,12 @@ def message_received(client, server, message):
 		# Reverse connection between Sage and JS
 		if JSONmessage.parameter == "renewGraph":
 			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)
+		elif JSONmessage.parameter == "save":
+			newGraph = ConstructGraphFromJSONObject(JSONmessage)
+			response, newGraph = handle_message2(JSONmessage.parameter, newGraph, targetGraph)
 		else:
 			newGraph = ConstructGraphFromJSONObject(JSONmessage)
 			response, newGraph = handle_message(JSONmessage.parameter,newGraph)
-			update_graph(targetGraph, newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
@@ -106,6 +108,12 @@ def handle_message(parameter,graph):
 	response = None
 	if parameter is not None:
 		response, graph = JS_functions_dict[parameter](graph)
+	return response, graph
+
+def handle_message2(parameter, nGraph, oGraph):
+	response = None
+	if parameter is not None:
+		response, graph = JS_functions_dict[parameter](nGraph, oGraph)
 	return response, graph
 
 

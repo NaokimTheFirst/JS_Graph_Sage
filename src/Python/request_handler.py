@@ -9,6 +9,7 @@ __renewGraphParameter = 'renewGraph'
 __graph6Parameter = "Graph6"
 __showSpanTreeParameter = "showSpanTree"
 __girthParameter = "girth"
+__saveGraphParameter = 'save'
 from json import JSONEncoder
 
 
@@ -195,7 +196,10 @@ def _get_girth(graph):
 def _the_graph_is_a_tree(graph):
 	return graph.is_tree()
 
-
+def _save_graph(newGraph, oldGraph):
+    response = ["oui", "oui"]
+    update_graph(oldGraph, newGraph)
+    return response, newGraph
 
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
@@ -206,7 +210,8 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __renewGraphParameter: _get_new_graph_in_JSON_for_JS,
                      __graph6Parameter: _generate_graph6_formula,
                      __showSpanTreeParameter: _span_tree_as_string_array,
-                     __girthParameter: _get_girth}
+                     __girthParameter: _get_girth,
+                     __saveGraphParameter: _save_graph}
 
 
 

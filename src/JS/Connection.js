@@ -11,6 +11,7 @@ const renewGraphParameter = "renewGraph";
 const getG6RequestParameter = "Graph6";
 const showSpanTreeParameter = "showSpanTree";
 const girthParameter = "girth";
+const saveGraphParamter = "save";
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -136,9 +137,16 @@ function DisplaySpanTree() {
     SubmitMessage(showSpanTreeParameter);
 }
 
+function SaveGraph() {
+    SubmitMessage(saveGraphParamter);
+}
+
 function SubmitMessage(parameter, message = "") {
     graphJSON.parameter = parameter;
     graphJSON.message = message;
+    var prettyJSON = PrettifyJSON();
+    webSocket.send(prettyJSON);
+    graphJSON.parameter = getG6RequestParameter;
     var prettyJSON = PrettifyJSON();
     webSocket.send(prettyJSON);
 }
