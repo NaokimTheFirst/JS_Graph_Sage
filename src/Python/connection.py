@@ -8,7 +8,7 @@ def new_client(client, server):
 		print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
 	else :
 		print("New client connected and was given id %d" % client['id'])
-	
+
 
 
 # Called for every client disconnecting
@@ -49,9 +49,9 @@ from time import gmtime, strftime
 # Called when a client sends a message
 def message_received(client, server, message):
 	global graph_client_dict
+
 	if client['id'] in graph_client_dict :
 		print(strftime('[%H:%M:%S]', gmtime()))
-
 		targetGraph = graph_client_dict[client['id']]
 		JSONmessage = DataGraph(message)
 

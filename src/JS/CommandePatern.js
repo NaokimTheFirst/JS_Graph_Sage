@@ -43,6 +43,9 @@ var InvertDirectionCommand = function (value, firstAction = true) {
 var MoveNodeCommand = function (value, firstAction = true) {
     return new Command(SetNewPosition, SetOldPosition, value, firstAction);
 };
+var MoveSelectedNodesCommand = function (tabNodes, firstAction = true) {
+    return new Command(SetNewSelectedNodesPosition, SetOldSelectedNodesPosition ,tabNodes, firstAction);
+}
 
 class CommandManager {
     constructor() {

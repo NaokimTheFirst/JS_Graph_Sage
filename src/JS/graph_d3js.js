@@ -1,11 +1,12 @@
 //The graph properties
 var graphJSON, force, customColorScale;
-var width = function() {return document.documentElement.clientWidth * 0.8};
+var width = function() {return document.documentElement.clientWidth};
 var height = function() {return document.documentElement.clientHeight};
 var xshift = function() {return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;};
 var drag_in_progress = false;
 var is_frozen = false;
 var isDirected = false;
+var g6;
 
 //DOM Elements / D3JS Elements
 var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
@@ -61,6 +62,7 @@ class GraphSelection {
 }
 
 window.onload = function () {
+    oldWindowSize = [document.documentElement.clientWidth, document.documentElement.clientHeight];
     InitWebSocketConnection();
 
     document.body.onmousemove = handleMouseMove;
@@ -69,6 +71,7 @@ window.onload = function () {
     KeyboardEventInit();
 
     InitNewGraph();
+    dragElement(document.getElementById("Overlay"));
 }
 
 function InitNewGraph(graph = null)
@@ -85,7 +88,7 @@ function InitNewGraph(graph = null)
     WaitGraphLoadToFreeze(2000);
 }
 
-function handleMouseMove(event) {   
+function handleMouseMove(event) {
     cursorPosition.x = event.pageX - xshift();
     cursorPosition.y = event.pageY;
 }
@@ -101,7 +104,7 @@ function GetGraphFromHTML() {
 // Loads the graph data
 function LoadGraphData(newGraph) {
     graphJSON = (newGraph) ? newGraph : GetGraphFromHTML();
-    
+
     //Init group
     FillGroupFromGraph(graphJSON);
     PopulateGroupList();
@@ -163,6 +166,11 @@ function ResetSelection() {
             });
         });
 
+        for(let node of document.querySelectorAll('.isSelected')){
+            node.setAttribute('class', 'node');
+        }
+
+        manageSelection();
         RefreshNodes();
         RefreshEdge();
         RefreshLoops();
@@ -221,8 +229,8 @@ function InitForce() {
 
         // Position of vertices
         nodes.attr("cx", function (d) {
-                return d.x;
-            })
+            return d.x;
+        })
             .attr("cy", function (d) {
                 return d.y;
             });
@@ -238,9 +246,9 @@ function InitForce() {
             else {
                 var p = third_point_of_curved_edge(d.source, d.target, d.curve)
                 return line([{
-                        'x': d.source.x,
-                        'y': d.source.y
-                    },
+                    'x': d.source.x,
+                    'y': d.source.y
+                },
                     {
                         'x': p[0],
                         'y': p[1]
@@ -290,7 +298,7 @@ function InitForce() {
     });
 }
 
-function ManageAllGraphicsElements() 
+function ManageAllGraphicsElements()
 {
     if(svg){
         let oldSVG = document.getElementById("svg");
@@ -312,7 +320,8 @@ function ManageAllGraphicsElements()
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000);
 
-        
+    //Resize
+
     InitBrush();
 
     ManageNodeLabels();
@@ -325,21 +334,21 @@ function ManageAllGraphicsElements()
 
 function InitBrush(){
     brush = svg.append("g")
-    .attr("class", "brush")
-    .call(d3.svg.brush()
-        .x(d3.scale.identity().domain([-100000, 100000]))
-        .y(d3.scale.identity().domain([-100000, 100000]))
-        .on("brushstart", function() {
+        .attr("class", "brush")
+        .call(d3.svg.brush()
+            .x(d3.scale.identity().domain([-100000, 100000]))
+            .y(d3.scale.identity().domain([-100000, 100000]))
+            .on("brushstart", function() {
                 ResetSelection();
-        })
-        .on("brushend", function() {
+            })
+            .on("brushend", function() {
                 var extent = d3.event.target.extent();
                 SelectElementsInsideExtent(extent);
 
                 //Remove Selection rectangle
                 d3.event.target.clear();
                 d3.select(this).call(d3.event.target);
-        }));
+            }));
 }
 
 function SelectElementsInsideExtent(extent) {
@@ -381,67 +390,67 @@ function ConstructRectangleFromExtent(extent)
 
 // Given three colinear points p, q, r, the function checks if 
 // point q lies on line segment 'pr' 
-function onSegment( p,  q,  r) 
-{ 
-    if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && 
-        q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y)) 
-    return true; 
+function onSegment( p,  q,  r)
+{
+    if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) &&
+        q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y))
+        return true;
 
-    return false; 
-} 
+    return false;
+}
 
 // To find orientation of ordered triplet (p, q, r). 
 // The function returns following values 
 // 0 --> p, q and r are colinear 
 // 1 --> Clockwise 
 // 2 --> Counterclockwise 
-function orientation(p,  q,  r) 
-{ 
+function orientation(p,  q,  r)
+{
     // See https://www.geeksforgeeks.org/orientation-3-ordered-points/ 
     // for details of below formula. 
-        val = (q.y - p.y) * (r.x - q.x) - 
-            (q.x - p.x) * (r.y - q.y); 
+    val = (q.y - p.y) * (r.x - q.x) -
+        (q.x - p.x) * (r.y - q.y);
 
     if (val == 0) return 0; // colinear 
 
     return (val > 0)? 1: 2; // clock or counterclock wise 
-} 
+}
 
-function doSegmentIntersect(firstSegment, secondSegment) 
+function doSegmentIntersect(firstSegment, secondSegment)
 {
     return doIntersect(firstSegment.start,firstSegment.end,secondSegment.start,secondSegment.end);
 }
 
 // The main function that returns true if line segment 'p1q1' 
 // and 'p2q2' intersect. 
-function doIntersect( p1,  q1,  p2,  q2) 
-{ 
+function doIntersect( p1,  q1,  p2,  q2)
+{
     // Find the four orientations needed for general and 
     // special cases 
-        o1 = orientation(p1, q1, p2); 
-        o2 = orientation(p1, q1, q2); 
-        o3 = orientation(p2, q2, p1); 
-        o4 = orientation(p2, q2, q1); 
+    o1 = orientation(p1, q1, p2);
+    o2 = orientation(p1, q1, q2);
+    o3 = orientation(p2, q2, p1);
+    o4 = orientation(p2, q2, q1);
 
     // General case 
-    if (o1 != o2 && o3 != o4) 
-        return true; 
+    if (o1 != o2 && o3 != o4)
+        return true;
 
     // Special Cases 
     // p1, q1 and p2 are colinear and p2 lies on segment p1q1 
-    if (o1 == 0 && onSegment(p1, p2, q1)) return true; 
+    if (o1 == 0 && onSegment(p1, p2, q1)) return true;
 
     // p1, q1 and q2 are colinear and q2 lies on segment p1q1 
-    if (o2 == 0 && onSegment(p1, q2, q1)) return true; 
+    if (o2 == 0 && onSegment(p1, q2, q1)) return true;
 
     // p2, q2 and p1 are colinear and p1 lies on segment p2q2 
-    if (o3 == 0 && onSegment(p2, p1, q2)) return true; 
+    if (o3 == 0 && onSegment(p2, p1, q2)) return true;
 
     // p2, q2 and q1 are colinear and q1 lies on segment p2q2 
-    if (o4 == 0 && onSegment(p2, q1, q2)) return true; 
+    if (o4 == 0 && onSegment(p2, q1, q2)) return true;
 
     return false; // Doesn't fall in any of the above cases 
-} 
+}
 
 function IsEdgeInsideExtent(extent,edge)
 {
@@ -449,7 +458,7 @@ function IsEdgeInsideExtent(extent,edge)
     {
         return true;
     }
-    else 
+    else
     {
         return DoesEdgeIntersectExtent(extent,edge);
     }
@@ -478,21 +487,21 @@ function IsNodeInsideExtent(extent, node){
 function ManageArrows(){
     // Arrows, for directed graphs
     arrows = svg.append("svg:defs").selectAll("marker")
-    .data(["directed"])
-    .enter().append("svg:marker")
-    .attr("id", String)
-    // viewbox is a rectangle with bottom-left corder (0,-2), width 4 and height 4
-    .attr("viewBox", "0 -2 4 4")
-    // This formula took some time ... :-P
-    .attr("refX", Math.ceil(2 * Math.sqrt(graphJSON.vertex_size)))
-    .attr("refY", 0)
-    .attr("markerWidth", 4)
-    .attr("markerHeight", 4)
-    .attr("orient", "auto")
-    .append("svg:path")
-    // triangles with endpoints (0,-2), (4,0), (0,2)
-    .attr("d", "M0,-2L4,0L0,2");
-    
+        .data(["directed"])
+        .enter().append("svg:marker")
+        .attr("id", String)
+        // viewbox is a rectangle with bottom-left corder (0,-2), width 4 and height 4
+        .attr("viewBox", "0 -2 4 4")
+        // This formula took some time ... :-P
+        .attr("refX", Math.ceil(2 * Math.sqrt(graphJSON.vertex_size)))
+        .attr("refY", 0)
+        .attr("markerWidth", 4)
+        .attr("markerHeight", 4)
+        .attr("orient", "auto")
+        .append("svg:path")
+        // triangles with endpoints (0,-2), (4,0), (0,2)
+        .attr("d", "M0,-2L4,0L0,2");
+
     DisplayArrows();
 }
 
@@ -683,7 +692,7 @@ function ManageNodes() {
             })
             .on('dragend', function (d) {
                 drag_in_progress = false;
-                
+
                 if(d.previousPos[0] != d.x && d.previousPos[1] != d.y)
                 {
                     let finalPos = [d.x, d.y];
@@ -700,8 +709,54 @@ function ManageNodes() {
     nodes.exit().remove();
 }
 
+function manageSelection(){
+    selectedNodes = svg.selectAll('.isSelected');
+    graphSelectedNodes = [];
+    let mousePreviousPos, nodePreviousPos;
+
+
+    for (let node of graphJSON.nodes){
+        if (node.isSelected){
+            graphSelectedNodes.push(node);
+        }
+    }
+
+    selectedNodes.call(force.drag()
+        .on('dragstart', function (d) {
+            mousePreviousPos = [window.event.clientX, window.event.clientY];
+            nodePreviousPos = [d.px, d.py];
+
+            drag_in_progress = true;
+        })
+        .on('dragend', function (d) {
+            drag_in_progress = false;
+            let tabNodes = [];
+
+            for (let node of graphSelectedNodes) {
+                let previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
+                let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+
+                if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
+                    var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
+                    tabNodes.push(positions);
+                }
+            }
+
+            MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
+            UpdateGraphProperties("Node's positions changed");
+        }));
+
+    RefreshNodes();
+}
+
 function SetNewPosition(registeredPos) {
     SetNodePosition(registeredPos.newValue, registeredPos.element);
+}
+
+function SetNewSelectedNodesPosition(tabNodes){
+    for (let node of tabNodes){
+        SetNodePosition(node.newValue, node.element);
+    }
 }
 
 function SetNodePosition(Pos, nodeData) {
@@ -716,10 +771,16 @@ function SetOldPosition(registeredPos) {
     SetNodePosition(registeredPos.oldValue, registeredPos.element);;
 }
 
+function SetOldSelectedNodesPosition(tabNodes) {
+    for (let node of tabNodes){
+        SetNodePosition(node.oldValue, node.element);
+    }
+}
+
 function RefreshNodes() {
     nodes.attr("name", function (d) {
-            return d.name;
-        })
+        return d.name;
+    })
         .attr("fill", function (d) {
             return customColorScale(groupList.indexOf(d.group));
         });
@@ -729,8 +790,8 @@ function RefreshNodes() {
 
 function RefreshNodeOutline() {
     nodes.style("stroke", function (d) {
-            return (d.isSelected == true) ? "red" : "white";
-        })
+        return (d.isSelected == true) ? "red" : "white";
+    })
         .style("stroke-width", function (d) {
             return (d.isSelected == true) ? "3" : "2";
         })
@@ -741,6 +802,13 @@ function SelectElement(element) {
     switch (element.type) {
         case NodeType:
             RefreshNodes();
+            let nodes = document.querySelectorAll('.node');
+            for (let circle of nodes){
+                if (circle.getAttribute('name') == element.data.name){
+                    circle.setAttribute('class', 'node isSelected');
+                }
+            }
+            manageSelection();
             break;
         case EdgeType:
             RefreshEdge();
@@ -795,7 +863,7 @@ function AddNode(newNode) {
 
     //Restart the force layout with the new elements
     force.start();
-    
+
     return true;
 }
 
@@ -992,14 +1060,14 @@ function RemoveElementFromGraph(element, _isFirst = true) {
                 break;
             }
 
-            
+
     }
 }
 
 function AddNewNode() {
     var newNode = CreateNode();
     MyManager.Execute(new AddNodeCommand(newNode));
-    return true; 
+    return true;
 }
 
 function RemoveSelection() {
@@ -1015,12 +1083,12 @@ function RemoveSelection() {
                 isFirst = false;
             });
         });
-        
+
 
         ManageLoops();
         ManageEdges();
         ManageNodes();
-     
+
 
         return true;
     }
@@ -1142,7 +1210,7 @@ function PrettifyJSON() {
     prettyJSON.loops.forEach(loop => {
         loop.source = loop.target = loop.source.name;
     });
-    
+
     //Return the Y to correspond with Sage Plan
     prettyJSON.nodes.forEach(node => {
         node.y = -node.y;
@@ -1244,4 +1312,55 @@ function SetLinksColoration(colorationList){
     });
 
     ManageEdges();
+}
+
+function UpdateG6Form(newg6){
+    g6 = newg6;
+    document.querySelector('#g6').textContent = g6;
+}
+
+function checkIfExist(g){
+    window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String="+g6);
+}
+
+function dragElement(elmnt) {
+    let mouseX = 0, mouseY = 0, offsetX, offsetY;
+    if (document.getElementById(elmnt.id + "header")) {
+        /* if present, the header is where you move the DIV from:*/
+        document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+    } else {
+        /* otherwise, move the DIV from anywhere inside the DIV:*/
+        elmnt.onmousedown = dragMouseDown;
+    }
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+
+        offsetX = e.clientX - elmnt.style.left;
+        offsetY = e.clientY - elmnt.style.top;
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        document.onmouseup = closeDragElement;
+
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        elmnt.style.top = -offsetY + mouseY + "px";
+        elmnt.style.left = -offsetX + mouseX + "px";
+    }
+
+    function closeDragElement() {
+
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
 }

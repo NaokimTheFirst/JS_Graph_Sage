@@ -6,7 +6,8 @@ const randomOrientationRequestParameter = "randomOrientation";
 const vertexColoringRequestParameter = "vertexColoring";
 const edgeColoringRequestParameter = "edgeColoring";
 const convertGraphParameter = "convert";
-const closeConnectionParameter = "closeConnection"
+const closeConnectionParameter = "closeConnection";
+const getG6RequestParameter = "Graph6";
 
 function InitWebSocketConnection() {
   // Connect to Web Socket
@@ -50,6 +51,9 @@ function TreatResponse(response){
     case convertGraphParameter :
       CustomWarn("Graph : "+ response.result +" open in new Window");
       break;
+    case getG6RequestParameter :
+      UpdateG6Form(response.result);
+      break;
     case closeConnectionParameter :
       webSocket.close();
       break;
@@ -76,15 +80,21 @@ function RequestRandomOrientation(){
   SubmitMessage(randomOrientationRequestParameter);
 }
 
-
 function RequestConvertGraph(){
   SubmitMessage(convertGraphParameter);
+}
+
+function RequestG6(){
+  SubmitMessage(getG6RequestParameter);
 }
 
 
 function SubmitMessage(parameter,message = "") {
   graphJSON.parameter = parameter;
   graphJSON.message = message;
+  var prettyJSON = PrettifyJSON();
+  webSocket.send(prettyJSON);
+  graphJSON.parameter = getG6RequestParameter;
   var prettyJSON = PrettifyJSON();
   webSocket.send(prettyJSON);
 }

@@ -1,7 +1,10 @@
 /* graph_style.css */
 body {
-    background-color: rgb(15, 15, 73);
-    margin : 0%;
+    display: flex;
+    flex-direction: row;
+    font-family: Arial, serif;
+    background-color: #18191A;
+    margin : 0;
 }
 
 .extent{
@@ -9,7 +12,7 @@ body {
 }
 
 rect {
-    fill: rgb(15, 15, 73);
+    fill: #18191A;
 }
 
 .scroll{
@@ -25,18 +28,23 @@ rect {
 .scroll::-webkit-scrollbar {
     display: none;
 }
-
 #graphFrame{
     display: inline-flex;
-    width: 100%;
-}
-
-#Overlay{
-    width: 20%;
     height: 100%;
+}
+#graphFrame > svg {
+    overflow: scroll;
+}
+#Overlay{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    overflow: auto;
     background: none;
     margin : 0.5%;
     pointer-events:none;
+    width: 300px;
 }
 
 .Panel{
@@ -59,7 +67,6 @@ rect {
     font-weight: bold;
     text-align: center;
 }
-
 
 .PanelContent th {
     padding : 3%;
@@ -119,4 +126,23 @@ text {
 
 marker {
     fill: #bbb;
+}
+
+button{
+    padding: 3px;
+    color: whitesmoke;
+    background-color: #3A3B3C;
+    border : #3A3B3C;
+}
+button:hover{
+    background-color: #2A2B2C;
+}
+
+.Panel>div:first-child{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#g6{
+    word-break: break-all;
 }

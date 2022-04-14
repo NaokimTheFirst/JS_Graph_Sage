@@ -22,10 +22,13 @@
     // GRAPH_DATA_HEREEEEEEEEEEE
   </div>
   <div id="graphFrame">
-    <div id="Overlay">
+    <div id="Overlay" onmousedown="dragElement(this);">
       <div id ="leftSide">
         <div class="Panel">
-          <p class="PanelHeader">Tools</p>
+          <div>
+            <p class="PanelHeader">Tools</p>
+            <button class="hidingButton" onclick="develop(this)">v</button>
+          </div>
           <div id="ToolPanelContent" class="PanelContent">
             <table>
               <tr>
@@ -42,7 +45,10 @@
           </div>
         </div>
         <div class="Panel">
-          <p class="PanelHeader">Properties</p>
+          <div>
+            <p class="PanelHeader">Properties</p>
+            <button class="hidingButton" onclick="develop(this)">v</button>
+          </div>
           <div id="PropertyPanelContent" class="PanelContent">
             <table>
               <tr>
@@ -65,11 +71,23 @@
                 <td>Is bipartite</td>
                 <td id="bipartiteLabel">False</td>
               </tr>
+               <tr>
+
+                <td id="numberOfNode"></td>
+                 <td><button onclick="NumberOfNodes()">calcul nombre node</button></td>
+              </tr>
+              <tr>
+                <td>G6</td>
+                <td><textarea id="g6" rows="1" cols="7"></textarea><button onclick="checkIfExist(g6);">Does it exist?</button></td>
+              </tr>
             </table>
           </div>
         </div>
         <div class="Panel">
-          <p class="PanelHeader">Algorithms</p>
+          <div>
+            <p class="PanelHeader">Algorithms</p>
+            <button class="hidingButton" onclick="develop(this)">v</button>
+          </div>
           <div id="AlgorithmPanelContent" class="PanelContent">
             <table>
               <tr>
@@ -105,7 +123,10 @@
           </div>
         </div>
         <div class="Panel">
-          <p class="PanelHeader">Key Helper</p>
+          <div>
+            <p class="PanelHeader">Key Helper</p>
+            <button class="hidingButton" onclick="develop(this)">v</button>
+          </div>
           <div id="KeyPanelContent" class="PanelContent">
             <table>
               <tr>
@@ -180,6 +201,9 @@
           </div>
         </div>
         <div class="Panel" id="scrollPanel">
+          <div>
+            <button class="hidingButton" onclick="develop(this)">v</button>
+          </div>
           <div class="scroll"></div>
         </div>
       </div>

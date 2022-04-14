@@ -1,10 +1,37 @@
-#Your path to the repository JS_Graph_Sage
-path_To_Project_Repo = 'Mes Documents/Git'
-def _update_JS_Repo(path) :
-	global path_To_Project_Repo
-	if path != "1" :
-		path_To_Project_Repo = str(path)
+import inspect, os
 
+#Your path to the repository JS_Graph_Sage
+def getPathRepo() :
+	filename = inspect.getframeinfo(inspect.currentframe()).filename #get the name of this file
+	path = filename
+	
+	for i in range (4) :
+		path = os.path.dirname(os.path.abspath(path))	 #get the path from this file
+		
+	return str(path)
+
+def attachFiles(path) :
+	directory = path+'/JS_Graph_Sage/src/Python/'
+	print(directory)
+	try:
+		print('Loading files...')
+		for i in os.listdir(directory):
+			if i != 'init_CustomJS.py':
+				attach(directory + i)
+				print(i + ' loaded')
+		#attach(path + 'JS_Graph_Sage/src/Python/customJsGraph.py')
+		#attach(path + '/update.py')
+		#attach(path + '/tests.py')
+		#attach(path + '/websocket_server.py')
+		#attach(path + '/connection.py')
+		#attach(path + '/request_handler.py')
+		#print('Files succesfully loaded')
+	except:
+		print('Files not found')
+		
+pathRepo = getPathRepo()
+
+attachFiles(pathRepo)
 
 # #Your path to the repository where you'll save the JSON version of the graphs (for example JS_Graph_Sage/obj)
 # path_To_JSON_Repo = 'Mes Documents/Git/JS_Graph_Sage/obj/'
@@ -17,18 +44,6 @@ def _update_JS_Repo(path) :
 # 	global JSON_name
 # 	JSON_name = name
 
-
-
-_update_JS_Repo(input('Please enter the path to the repository containing the project : '))
-
 # _update_JSON_Repo(path_To_Project_Repo+'/JS_Graph_Sage/obj/')
 
-try:
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/customJsGraph.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/update.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/tests.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/websocket_server.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/connection.py')
-	attach(path_To_Project_Repo+'/JS_Graph_Sage/src/Python/request_handler.py')
-except:
-	print('Files not found')
+
