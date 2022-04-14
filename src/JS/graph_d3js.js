@@ -76,28 +76,6 @@ window.onload = function () {
     dragElement(document.getElementById("Overlay"));
 }
 
-window.onresize = function() {
-    let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
-
-    oldWindowSize[0] = width();
-    oldWindowSize[1] = height();
-
-    svg = d3.select("svg")
-        .attr("width", width())
-        .attr("height", height());
-
-    graph = graphJSON;
-    for (let node of graphJSON.nodes){
-        node.x *= resizeRate[0];
-        node.y *= resizeRate[1];
-        let nodePositions = new ValueRegisterer([node.px,node.py], [node.x, node.y], new Element(node, NodeType));
-        node.px *= resizeRate[0];
-        node.py *= resizeRate[1];
-        SetNewPosition(nodePositions);
-    }
-
-}
-
 function InitNewGraph(graph = null)
 {
     if(force){force.stop();}
