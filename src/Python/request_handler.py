@@ -148,7 +148,7 @@ def _generate_graph6_formula(graph):
 	else :
 		response.append(graph.graph6_string())
 
-	return response, graph;
+	return response, graph
 
 JS_functions_dict = {__propertiesParameter : _get_graph_properties,
 					 __strongOrientationParameter : _strong_orientation_for_JS,

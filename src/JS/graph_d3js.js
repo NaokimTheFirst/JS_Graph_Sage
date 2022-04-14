@@ -738,6 +738,7 @@ function manageSelection(){
     graphSelectedNodes = [];
     let mousePreviousPos, nodePreviousPos;
 
+
     for (let node of graphJSON.nodes){
         if (node.isSelected){
             graphSelectedNodes.push(node);
