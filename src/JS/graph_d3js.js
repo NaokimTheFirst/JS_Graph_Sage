@@ -6,8 +6,6 @@ var xshift = function() {return document.getElementById("graphFrame").childNodes
 var drag_in_progress = false;
 var is_frozen = false;
 var isDirected = false;
-var oldWidth, oldHeight;
-var oldWindowSize = [oldWidth, oldHeight];
 var g6;
 
 //DOM Elements / D3JS Elements
@@ -89,7 +87,6 @@ function PageOpenOrReload() {
         UpdateGraphProperties();
     }
 }
-
 /*
 window.onresize = function() {
     let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
@@ -112,7 +109,6 @@ window.onresize = function() {
     }
 
 }*/
-
 function InitNewGraph(graph = null)
 {
     if(force){force.stop();}
@@ -753,6 +749,7 @@ function manageSelection(){
     selectedNodes = svg.selectAll('.isSelected');
     graphSelectedNodes = [];
     let mousePreviousPos, nodePreviousPos;
+
 
     for (let node of graphJSON.nodes){
         if (node.isSelected){

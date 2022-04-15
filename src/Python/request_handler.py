@@ -158,7 +158,6 @@ def __convert_DtoG(graph):
 
 tmpJSgraphs = []
 
-
 def __create_temporary_JS_graph(graph):
     global tmpJSgraphs
 
@@ -212,6 +211,7 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __showSpanTreeParameter: _span_tree_as_string_array,
                      __girthParameter: _get_girth,
                      __saveGraphParameter: _save_graph}
+
 
 
 
