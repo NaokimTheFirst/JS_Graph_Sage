@@ -10,7 +10,9 @@ body {
 .extent {
     fill: rgba(200, 200, 209,0.3);
 }
-
+.PanelContent{
+    display: none;
+}
 rect {
     fill: #18191A;
 }
