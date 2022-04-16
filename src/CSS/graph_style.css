@@ -162,6 +162,7 @@ marker {
     background: inherit;
 }
 .hidingButton:hover{
+    scale: none;
     background: inherit;
 }
 /* 'x' button style, idea copied from https://impossiblue.github.io/log/141026/index.html : */
@@ -209,9 +210,11 @@ button {
     color: whitesmoke;
     background-color: #3A3B3C;
     border : #3A3B3C;
+    transition: scale 150ms;
 }
 
 button:hover{
+    scale: 1.1;
     background-color: #2A2B2C;
 }
 
