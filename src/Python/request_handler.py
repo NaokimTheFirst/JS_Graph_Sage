@@ -175,10 +175,15 @@ def _get_new_graph_in_JSON_for_JS(graph):
 
 def _generate_graph6_formula(graph):
     response = [__graph6Parameter]
-    if (graph.is_directed()):
-        response.append(graph.dig6_string())
-    else:
-        response.append(graph.graph6_string())
+
+    if (graph.has_loops()) :
+        response.append("None")
+        print("G6 can be applied on simple graph only")
+    else :
+        if (graph.is_directed()):
+            response.append(graph.dig6_string())
+        else:
+            response.append(graph.graph6_string())
 
     return response, graph
 
