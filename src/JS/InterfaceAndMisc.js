@@ -328,6 +328,10 @@ function KeyboardEventInit() {
                 //T for Test, to remove before build
                 LaunchAllTest();
                 break;
+            case 85:
+                //U for Unlock/lock auto save
+                switchLock();
+                break;
             case 89:
                 //Y to redo
                 result = [MyManager.Redo(), "Redo previous reverted action"];

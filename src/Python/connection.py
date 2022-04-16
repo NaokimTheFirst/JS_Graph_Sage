@@ -7,6 +7,7 @@ reloaded_graph = None
 # Called for every client connecting
 def new_client(client, server):
 	global reloaded_graph
+	client['lock'] = True
 	if client['id'] not in graph_client_dict :
 		# If some other client has left (cf. client_left())
 		if reloaded_graph :
@@ -87,15 +88,20 @@ def message_received(client, server, message):
 		# Reverse connection between Sage and JS
 		if JSONmessage.parameter == "renewGraph":
 			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)
+
+		newGraph = ConstructGraphFromJSONObject(JSONmessage)
+		if JSONmessage.parameter == "switchLock":
+			response = handle_message(JSONmessage.parameter, None, None, client)
 		elif JSONmessage.parameter == "save":
-			newGraph = ConstructGraphFromJSONObject(JSONmessage)
-			response, newGraph = handle_message2(JSONmessage.parameter, newGraph, targetGraph)
+			response = handle_message(JSONmessage.parameter, newGraph, targetGraph)
 		else:
-			newGraph = ConstructGraphFromJSONObject(JSONmessage)
 			response, newGraph = handle_message(JSONmessage.parameter,newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
+
+		if client['lock'] :
+			update_graph(targetGraph, newGraph)
 
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
@@ -104,10 +110,15 @@ def message_received(client, server, message):
 		end_connection_client(client, server)
 
 
-def handle_message(parameter,graph):
+def handle_message(parameter,graph, oldGraph = None, client=None):
 	response = None
 	if parameter is not None:
-		response, graph = JS_functions_dict[parameter](graph)
+		if oldGraph is not None :
+			response, graph = JS_functions_dict[parameter](graph, oldGraph)
+		elif client is not None :
+			response, graph = JS_functions_dict[parameter](client)
+		else :
+			response, graph = JS_functions_dict[parameter](graph)
 	return response, graph
 
 def handle_message2(parameter, nGraph, oGraph):
@@ -115,7 +126,6 @@ def handle_message2(parameter, nGraph, oGraph):
 	if parameter is not None:
 		response, graph = JS_functions_dict[parameter](nGraph, oGraph)
 	return response, graph
-
 
 def end_connection_client(client, server):
 	returnMessage = JSONEncoder().encode({"request":'closeConnection', "result": ''})

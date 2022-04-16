@@ -10,6 +10,7 @@ __graph6Parameter = "Graph6"
 __showSpanTreeParameter = "showSpanTree"
 __girthParameter = "girth"
 __saveGraphParameter = 'save'
+__switchLockParameter = "switchLock"
 from json import JSONEncoder
 
 
@@ -196,9 +197,25 @@ def _the_graph_is_a_tree(graph):
 	return graph.is_tree()
 
 def _save_graph(newGraph, oldGraph):
-    response = ["oui", "oui"]
+    response = ["save", "Graph saved"]
+    print("Graph saved");
     update_graph(oldGraph, newGraph)
-    return response, newGraph
+    return response
+
+def _switch_lock(client):
+    response = [__switchLockParameter]
+    client['lock'] = not client['lock']
+    s = "Save auto "
+
+    if client['lock'] :
+        s += "enabled"
+    else :
+        s += "disabled"
+
+    print(s)
+    response.append(s)
+
+    return response
 
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
@@ -210,7 +227,8 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __graph6Parameter: _generate_graph6_formula,
                      __showSpanTreeParameter: _span_tree_as_string_array,
                      __girthParameter: _get_girth,
-                     __saveGraphParameter: _save_graph}
+                     __saveGraphParameter: _save_graph,
+                     __switchLockParameter: _switch_lock}
 
 
 
