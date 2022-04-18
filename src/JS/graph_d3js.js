@@ -1,8 +1,14 @@
 //The graph properties
 var graphJSON, force, customColorScale;
-var width = function() {return document.documentElement.clientWidth * 0.77};
-var height = function() {return document.documentElement.clientHeight};
-var xshift = function() {return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;};
+var width = function () {
+    return document.documentElement.clientWidth * 0.77
+};
+var height = function () {
+    return document.documentElement.clientHeight
+};
+var xshift = function () {
+    return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;
+};
 var drag_in_progress = false;
 var is_frozen = false;
 var isDirected = false;
@@ -11,11 +17,12 @@ var oldWindowSize = [oldWidth, oldHeight];
 var g6;
 
 //DOM Elements / D3JS Elements
-var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush,arrows;
+var nodes, links, loops, v_labels, e_labels, l_labels, line, svg, brush, arrows;
 var groupList = [];
 var currentGroupIndex = 0;
 var currentObject = null;
 const MyManager = new CommandManager();
+
 
 const cursorPosition = {
     x: 0,
@@ -74,16 +81,16 @@ window.onload = function () {
     customColorScale = d3.scale.category20();
     KeyboardEventInit();
     // dragElement(document.getElementById("Overlay"));
+
 }
 
 // Called in webSocket.onopen, reloads page opening a new connection or opens a new page
 function PageOpenOrReload() {
     if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
-        console.info( "The page is reloaded" );
+        console.info("The page is reloaded");
         graphJSON = JSON.parse(sessionStorage.getItem('graph'));
         RequestRenewGraph();
-    }
-    else {
+    } else {
         console.info("The page is opened");
         InitNewGraph();
         UpdateGraphProperties();
@@ -113,9 +120,10 @@ window.onresize = function() {
 
 }*/
 
-function InitNewGraph(graph = null)
-{
-    if(force){force.stop();}
+function InitNewGraph(graph = null) {
+    if (force) {
+        force.stop();
+    }
     LoadGraphData(graph);
     InitGraph();
     InitInterface();
@@ -206,7 +214,7 @@ function ResetSelection() {
             });
         });
 
-        for(let node of document.querySelectorAll('.isSelected')){
+        for (let node of document.querySelectorAll('.isSelected')) {
             node.setAttribute('class', 'node');
         }
 
@@ -338,27 +346,28 @@ function InitForce() {
     });
 }
 
-function ManageAllGraphicsElements()
-{
-    if(svg){
+function ManageAllGraphicsElements() {
+    if (svg) {
         let oldSVG = document.getElementById("svg");
         oldSVG.parentElement.removeChild(oldSVG);
     }
 
     // SVG window
     svg = d3.select("#graphFrame").append("svg")
-        .attr("id","svg")
+        .attr("id", "svg")
         .attr("width", width())
         .attr("height", height())
         .attr("pointer-events", "all") // Zoom+move management
         .append('svg:g')
+
 
     // Zooming
     svg.append('svg:rect')
         .attr('x', -10000)
         .attr('y', -10000)
         .attr('width', 2 * 10000)
-        .attr('height', 2 * 10000);
+        .attr('height', 2 * 10000)
+
 
     //Resize
 
@@ -372,16 +381,16 @@ function ManageAllGraphicsElements()
 }
 
 
-function InitBrush(){
+function InitBrush() {
     brush = svg.append("g")
         .attr("class", "brush")
         .call(d3.svg.brush()
             .x(d3.scale.identity().domain([-100000, 100000]))
             .y(d3.scale.identity().domain([-100000, 100000]))
-            .on("brushstart", function() {
+            .on("brushstart", function () {
                 ResetSelection();
             })
-            .on("brushend", function() {
+            .on("brushend", function () {
                 var extent = d3.event.target.extent();
                 SelectElementsInsideExtent(extent);
 
@@ -393,45 +402,41 @@ function InitBrush(){
 
 function SelectElementsInsideExtent(extent) {
     nodes.each(function (d) {
-        if (IsNodeInsideExtent(extent, d))
-        {
-            SelectElement(new Element(d,NodeType));
+        if (IsNodeInsideExtent(extent, d)) {
+            SelectElement(new Element(d, NodeType));
         }
     })
     loops.each(function (d) {
-        if (IsNodeInsideExtent(extent, d.source))
-        {
-            SelectElement(new Element(d,LoopType));
+        if (IsNodeInsideExtent(extent, d.source)) {
+            SelectElement(new Element(d, LoopType));
         }
     })
     links.each(function (d) {
-        if(IsEdgeInsideExtent(extent,d)){
-            SelectElement(new Element(d,EdgeType));
+        if (IsEdgeInsideExtent(extent, d)) {
+            SelectElement(new Element(d, EdgeType));
         }
     })
 }
 
-function ConstructRectangleFromExtent(extent)
-{
-    topLeftCorner = new Point(extent[0][0],extent[0][1]);
-    topRightCorner = new Point(extent[1][0],extent[0][1]);
-    bottomLefttCorner = new Point(extent[0][0],extent[1][1]);
-    bottomRightCorner = new Point(extent[1][0],extent[1][1]);
+function ConstructRectangleFromExtent(extent) {
+    topLeftCorner = new Point(extent[0][0], extent[0][1]);
+    topRightCorner = new Point(extent[1][0], extent[0][1]);
+    bottomLefttCorner = new Point(extent[0][0], extent[1][1]);
+    bottomRightCorner = new Point(extent[1][0], extent[1][1]);
 
-    topBorder = new Segment(topLeftCorner,topRightCorner);
+    topBorder = new Segment(topLeftCorner, topRightCorner);
     leftBorder = new Segment(topLeftCorner, bottomLefttCorner);
     rightBorder = new Segment(topRightCorner, bottomRightCorner);
     bottomBorder = new Segment(bottomRightCorner, bottomLefttCorner);
 
-    rectangle = [topBorder,leftBorder,rightBorder,bottomBorder];
+    rectangle = [topBorder, leftBorder, rightBorder, bottomBorder];
 
     return rectangle;
 }
 
 // Given three colinear points p, q, r, the function checks if 
 // point q lies on line segment 'pr' 
-function onSegment( p,  q,  r)
-{
+function onSegment(p, q, r) {
     if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) &&
         q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y))
         return true;
@@ -444,8 +449,7 @@ function onSegment( p,  q,  r)
 // 0 --> p, q and r are colinear 
 // 1 --> Clockwise 
 // 2 --> Counterclockwise 
-function orientation(p,  q,  r)
-{
+function orientation(p, q, r) {
     // See https://www.geeksforgeeks.org/orientation-3-ordered-points/ 
     // for details of below formula. 
     val = (q.y - p.y) * (r.x - q.x) -
@@ -453,18 +457,16 @@ function orientation(p,  q,  r)
 
     if (val == 0) return 0; // colinear
 
-    return (val > 0)? 1: 2; // clock or counterclock wise 
+    return (val > 0) ? 1 : 2; // clock or counterclock wise
 }
 
-function doSegmentIntersect(firstSegment, secondSegment)
-{
-    return doIntersect(firstSegment.start,firstSegment.end,secondSegment.start,secondSegment.end);
+function doSegmentIntersect(firstSegment, secondSegment) {
+    return doIntersect(firstSegment.start, firstSegment.end, secondSegment.start, secondSegment.end);
 }
 
 // The main function that returns true if line segment 'p1q1' 
 // and 'p2q2' intersect. 
-function doIntersect( p1,  q1,  p2,  q2)
-{
+function doIntersect(p1, q1, p2, q2) {
     // Find the four orientations needed for general and 
     // special cases 
     o1 = orientation(p1, q1, p2);
@@ -492,39 +494,33 @@ function doIntersect( p1,  q1,  p2,  q2)
     return false; // Doesn't fall in any of the above cases
 }
 
-function IsEdgeInsideExtent(extent,edge)
-{
-    if (IsNodeInsideExtent(extent, edge.source) || IsNodeInsideExtent(extent, edge.target))
-    {
+function IsEdgeInsideExtent(extent, edge) {
+    if (IsNodeInsideExtent(extent, edge.source) || IsNodeInsideExtent(extent, edge.target)) {
         return true;
-    }
-    else
-    {
-        return DoesEdgeIntersectExtent(extent,edge);
+    } else {
+        return DoesEdgeIntersectExtent(extent, edge);
     }
 }
 
-function DoesEdgeIntersectExtent(extent,edge)
-{
+function DoesEdgeIntersectExtent(extent, edge) {
     rectangle = ConstructRectangleFromExtent(extent);
     edgeSegment = new Segment(edge.source, edge.target);
     doesIntersect = false;
     count = 0;
 
-    while(doesIntersect == false && count < rectangle.length)
-    {
-        doesIntersect = doSegmentIntersect(rectangle[count],edgeSegment);
+    while (doesIntersect == false && count < rectangle.length) {
+        doesIntersect = doSegmentIntersect(rectangle[count], edgeSegment);
         count += 1;
     }
 
     return doesIntersect;
 }
 
-function IsNodeInsideExtent(extent, node){
+function IsNodeInsideExtent(extent, node) {
     return extent[0][0] <= node.x && node.x < extent[1][0] && extent[0][1] <= node.y && node.y < extent[1][1];
 }
 
-function ManageArrows(){
+function ManageArrows() {
     // Arrows, for directed graphs
     arrows = svg.append("svg:defs").selectAll("marker")
         .data(["directed"])
@@ -577,7 +573,7 @@ function ManageLoops() {
             currentObject = null;
         })
         .on("dblclick", function (currentData) {
-            SelectElement(new Element(currentData,LoopType));
+            SelectElement(new Element(currentData, LoopType));
         })
         .style("stroke", function (d) {
             return d.color;
@@ -621,7 +617,6 @@ function RefreshLoopLabels() {
 }
 
 
-
 function ManageEdges() {
     // Edges
     links = svg.selectAll(".link")
@@ -637,7 +632,7 @@ function ManageEdges() {
             currentObject = null;
         })
         .on("dblclick", function (currentData) {
-            SelectElement(new Element(currentData,EdgeType));
+            SelectElement(new Element(currentData, EdgeType));
         })
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
@@ -723,7 +718,7 @@ function ManageNodes() {
             currentObject = null;
         })
         .on("dblclick", function (currentData) {
-            SelectElement(new Element(currentData,NodeType));
+            SelectElement(new Element(currentData, NodeType));
         })
         .call(force.drag()
             .on('dragstart', function (d) {
@@ -733,8 +728,7 @@ function ManageNodes() {
             .on('dragend', function (d) {
                 drag_in_progress = false;
 
-                if(d.previousPos[0] != d.x && d.previousPos[1] != d.y)
-                {
+                if (d.previousPos[0] != d.x && d.previousPos[1] != d.y) {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
                     MyManager.Execute(new MoveNodeCommand(positions));
@@ -749,13 +743,13 @@ function ManageNodes() {
     nodes.exit().remove();
 }
 
-function manageSelection(){
+function manageSelection() {
     selectedNodes = svg.selectAll('.isSelected');
     graphSelectedNodes = [];
     let mousePreviousPos, nodePreviousPos;
 
-    for (let node of graphJSON.nodes){
-        if (node.isSelected){
+    for (let node of graphJSON.nodes) {
+        if (node.isSelected) {
             graphSelectedNodes.push(node);
         }
     }
@@ -792,8 +786,8 @@ function SetNewPosition(registeredPos) {
     SetNodePosition(registeredPos.newValue, registeredPos.element);
 }
 
-function SetNewSelectedNodesPosition(tabNodes){
-    for (let node of tabNodes){
+function SetNewSelectedNodesPosition(tabNodes) {
+    for (let node of tabNodes) {
         SetNodePosition(node.newValue, node.element);
     }
 }
@@ -807,11 +801,12 @@ function SetNodePosition(Pos, nodeData) {
 }
 
 function SetOldPosition(registeredPos) {
-    SetNodePosition(registeredPos.oldValue, registeredPos.element);;
+    SetNodePosition(registeredPos.oldValue, registeredPos.element);
+    ;
 }
 
 function SetOldSelectedNodesPosition(tabNodes) {
-    for (let node of tabNodes){
+    for (let node of tabNodes) {
         SetNodePosition(node.oldValue, node.element);
     }
 }
@@ -842,8 +837,8 @@ function SelectElement(element) {
         case NodeType:
             RefreshNodes();
             let nodes = document.querySelectorAll('.node');
-            for (let circle of nodes){
-                if (circle.getAttribute('name') == element.data.name){
+            for (let circle of nodes) {
+                if (circle.getAttribute('name') == element.data.name) {
                     circle.setAttribute('class', 'node isSelected');
                 }
             }
@@ -928,17 +923,13 @@ function CreateNode(pos = null) {
     return newNode;
 }
 
-function FindLowestIDAvailable(){
+function FindLowestIDAvailable() {
     let lowestID = Infinity;
     let i = 0;
-    while (lowestID == Infinity)
-    {
-        if(graphJSON.nodes.find(node => node.name == i) != undefined)
-        {
+    while (lowestID == Infinity) {
+        if (graphJSON.nodes.find(node => node.name == i) != undefined) {
             i++;
-        }
-        else
-        {
+        } else {
             lowestID = i;
         }
     }
@@ -958,7 +949,7 @@ function AddLoopOnSelection() {
         if (selectedNodes.length > 0) {
             let isFirst = true;
             for (let i = 0; i < selectedNodes.length; i++) {
-                AddLoopOnNode(selectedNodes[i].data,isFirst);
+                AddLoopOnNode(selectedNodes[i].data, isFirst);
                 isFirst = false;
             }
             return true;
@@ -978,8 +969,7 @@ function SetGroupOfSelection() {
 
         if (selectedNodes.length > 0) {
             for (let i = 0; i < selectedNodes.length; i++) {
-                if(selectedNodes[i].data.group != groupList[currentGroupIndex])
-                {
+                if (selectedNodes[i].data.group != groupList[currentGroupIndex]) {
                     let vr = new ValueRegisterer(selectedNodes[i].data.group, groupList[currentGroupIndex], selectedNodes[i]);
                     MyManager.Execute(new ChangeGroupCommand(vr, isFirst));
                     isFirst = false;
@@ -1035,7 +1025,7 @@ function CreateEdge(src, dest) {
         "curve": 0,
         "source": src,
         "name": "",
-        "isSelected":selected,
+        "isSelected": selected,
     }
 
     return link;
@@ -1048,13 +1038,13 @@ function AddLoop(newLoop) {
     force.start();
 }
 
-function PlaceBeforeNode(className){
+function PlaceBeforeNode(className) {
 
     elements = document.getElementsByClassName(className);
     let elem = elements[elements.length - 1];
 
     let firstNode = document.getElementsByClassName("node")[0];
-    firstNode.parentNode.insertBefore(elem,firstNode);
+    firstNode.parentNode.insertBefore(elem, firstNode);
 }
 
 function CreateLoop(src) {
@@ -1066,7 +1056,7 @@ function CreateLoop(src) {
         "curve": 20,
         "source": src,
         "name": "",
-        "isSelected":selected,
+        "isSelected": selected,
     }
 
     return loop;
@@ -1088,14 +1078,12 @@ function RemoveElementFromGraph(element, _isFirst = true) {
             MyManager.Execute(new SupprNodeCommand(element.data, false));
             break;
         case EdgeType:
-            if(graphJSON.links.indexOf(element.data) != -1)
-            {
+            if (graphJSON.links.indexOf(element.data) != -1) {
                 MyManager.Execute(new SupprEdgeCommand(element.data, _isFirst));
             }
             break;
         case LoopType:
-            if(graphJSON.loops.indexOf(element.data) != -1)
-            {
+            if (graphJSON.loops.indexOf(element.data) != -1) {
                 MyManager.Execute(new SupprLoopCommand(element.data, _isFirst));
                 break;
             }
@@ -1131,8 +1119,7 @@ function RemoveSelection() {
 
 
         return true;
-    }
-    else {
+    } else {
         CustomWarn("Nothing to delete");
     }
     return false;
@@ -1231,7 +1218,7 @@ function InvertEdgesOnSelection() {
     }
 }
 
-function InvertEdge(edge, isFirst = true){
+function InvertEdge(edge, isFirst = true) {
     let vr = new ValueRegisterer([edge.data.source, edge.data.target], [edge.data.target, edge.data.source], edge);
     MyManager.Execute(new InvertDirectionCommand(vr, isFirst));
 }
@@ -1262,8 +1249,8 @@ function PrettifyJSON() {
 
     //Shrink graph to adapt to the scale of SageMath Show() method
     prettyJSON.nodes.forEach(function (node) {
-        node.x = node.x/100;
-        node.y = node.y/100;
+        node.x = node.x / 100;
+        node.y = node.y / 100;
     });
 
     return JSON.stringify(prettyJSON);
@@ -1321,20 +1308,20 @@ function FindElementInGraph(element) {
 }
 
 
-function UpdateGraphProperties(message = ""){
-    SubmitMessage(propertiesRequestParameter,message = message);
+function UpdateGraphProperties(message = "") {
+    SubmitMessage(propertiesRequestParameter, message = message);
 }
 
-function SetNodesColoration(colorationList){
+function SetNodesColoration(colorationList) {
     var id = 0;
     colorationList.forEach(coloration => {
         coloration.forEach(name => {
-            node = graphJSON.nodes.find(function(node){
+            node = graphJSON.nodes.find(function (node) {
                 return node.name == name;
             });
-            SetGroupElement(new ValueRegisterer(id,id,new Element(node,NodeType)));
+            SetGroupElement(new ValueRegisterer(id, id, new Element(node, NodeType)));
         });
-        id ++;
+        id++;
     });
 
     FillGroupFromGraph(graphJSON);
@@ -1345,27 +1332,26 @@ function SetNodesColoration(colorationList){
 function SetLinksColoration(colorationList, id = 0) {
     colorationList.forEach(coloration => {
         coloration.forEach(tuple => {
-            link = graphJSON.links.find(function(link){
+            link = graphJSON.links.find(function (link) {
                 return link.source.name == tuple[0] && link.target.name == tuple[1];
             });
-            SetGroupElement(new ValueRegisterer(id,id,new Element(link,EdgeType)));
+            SetGroupElement(new ValueRegisterer(id, id, new Element(link, EdgeType)));
         });
-        id ++;
+        id++;
     });
     ManageEdges();
 }
 
 var showSpanTree = false;
 document.addEventListener('DOMContentLoaded', (e) => {
-    document.getElementById("span_tree").addEventListener('change', function() {
+    document.getElementById("span_tree").addEventListener('change', function () {
         DeleteAllEdgeGroups();
         if (this.checked) {
-        showSpanTree = true;
-        DisplaySpanTree();
-        } 
-        else {
-        showSpanTree = false;
-        ManageEdges();
+            showSpanTree = true;
+            DisplaySpanTree();
+        } else {
+            showSpanTree = false;
+            ManageEdges();
         }
     });
 });
@@ -1376,7 +1362,7 @@ function DeleteAllEdgeGroups() {
     });
 }
 
-function UpdateG6Form(newg6){
+function UpdateG6Form(newg6) {
     g6 = newg6;
     alert(g6);
 }
@@ -1422,3 +1408,29 @@ function UpdateG6Form(newg6){
 //         document.onmousemove = null;
 //     }
 // }
+
+function lightMode() {
+
+    document.querySelector("rect").style.fill = "white"
+    document.querySelector("body").style.backgroundColor = "white"
+
+    var all = document.getElementsByTagName("*");
+
+    for (var i = 0, max = all.length; i < max; i++) {
+        all[i].style.color = "black";
+    }
+
+}
+
+function darkMode() {
+    document.querySelector("rect").style.fill = "black"
+    document.querySelector("body").style.backgroundColor = "black"
+    var all = document.getElementsByTagName("*");
+
+    for (var i = 0, max = all.length; i < max; i++) {
+        all[i].style.color = "white";
+    }
+
+
+}
+

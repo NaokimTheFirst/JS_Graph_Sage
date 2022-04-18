@@ -11,6 +11,10 @@ const renewGraphParameter = "renewGraph";
 const getG6RequestParameter = "Graph6";
 const showSpanTreeParameter = "showSpanTree";
 const girthParameter = "girth";
+const vertexConnectivityParameter = "vertexConnectivity"
+const chromaticNumberParamater = "chromaticNumber"
+const chromaticIndexParameter="chromaticIndex"
+const edgeConnectivityParamater="edgeConnectivity"
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -93,6 +97,18 @@ function TreatResponse(response) {
         case girthParameter :
             afficherResultGirth(response.result);
             break;
+        case vertexConnectivityParameter:
+            afficherVertexConnectivity(response.result);
+            break;
+        case chromaticNumberParamater:
+            afficherChromaticNumber(response.result)
+            break;
+        case chromaticIndexParameter:
+            afficherChromaticIndex(response.result)
+            break;
+        case edgeConnectivityParamater:
+            afficherEdgeConnectivity(response.result)
+            break;
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
             break;
@@ -100,8 +116,23 @@ function TreatResponse(response) {
     }
 }
 
-function montrerGirth(){
+function montrerGirth() {
     SubmitMessage(girthParameter);
+}
+
+function montrerVertexConnectivity() {
+    SubmitMessage(vertexConnectivityParameter);
+}
+
+function montrerEdgeConnectivity(){
+    SubmitMessage(edgeConnectivityParamater);
+}
+
+function montrerChromaticNumber() {
+    SubmitMessage(chromaticNumberParamater);
+}
+function montrerChromaticIndex(){
+    SubmitMessage(chromaticIndexParameter);
 }
 
 function RequestVertexColoring() {
