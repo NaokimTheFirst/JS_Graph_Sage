@@ -101,18 +101,12 @@
                             <td id="isEulerian"></td>
                         </tr>
                         <tr>
-                            <td>Girth</td>
-                            <td id="isGirth"></td>
-                        </tr>
-                        <tr>
                             <input type="checkbox" id="span_tree"/>
                             <label for="span_tree">Show spanning tree</label>
                         </tr>
                         <tr>
-                            <td>G6</td>
-                            <td id="g6">
-                                <button onclick="RequestG6()">Get and copy G6</button>
-                            </td>
+                          <td>G6</td>
+                          <td><span id="g6"></span><button onclick="checkIfExist(g6);">Does it exist?</button></td>
                         </tr>
                     </table>
                 </div>
@@ -176,7 +170,6 @@
                         <tr>
                             <th>General :</th>
                         </tr>
-
                         <tr>
                             <td>Un/Freeze Positions</td>
                             <td>F</td>
@@ -245,9 +238,9 @@
                 </div>
             </div>
             <div class="Panel" id="scrollPanel">
-                <!-- <div>
+                <div>
                   <button class="hidingButton" onclick="develop(this)">v</button>
-                </div> -->
+                </div>
                 <div class="scroll"></div>
             </div>
         </div>

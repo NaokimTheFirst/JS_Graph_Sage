@@ -258,6 +258,7 @@ function CreateGroupElement(name) {
 
     let list = overlayElements.groupList;
     let lastIndex = list.childElementCount - 1;
+    
     newElem.style.backgroundColor = customColorScale(lastIndex);
     list.insertBefore(newElem, list.childNodes[lastIndex]);
 

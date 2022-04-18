@@ -78,7 +78,6 @@ rect {
     text-align: center;
 }
 
-
 .PanelContent th {
     padding : 3%;
 }
@@ -210,7 +209,7 @@ button:hover{
     background-color: #2A2B2C;
 }
 
-.Panel>div:first-child {
+.Panel>div:first-child{
     display: flex;
     flex-direction: row;
     justify-content: space-between;

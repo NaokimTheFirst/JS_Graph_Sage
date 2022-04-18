@@ -17,7 +17,9 @@ def new_client(client, server):
 			print("Client %d could not connect. Use show_CustomJS(graph)" % client['id'])
 	else :
 		print("New client connected and was given id %d" % client['id'])
+
 	reloaded_graph = None
+
 
 
 # Called for every client disconnecting
