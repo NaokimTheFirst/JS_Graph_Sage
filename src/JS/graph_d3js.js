@@ -119,8 +119,6 @@ function InitNewGraph(graph = null)
     InitForce();
     //Start the automatic force layout
     force.start();
-    //Freeze the graph after 2 sec
-    WaitGraphLoadToFreeze(2000);
 }
 
 function handleMouseMove(event) {
@@ -544,15 +542,6 @@ function ManageArrows(){
 function DisplayArrows() {
     arrows.style("fill", function () {
         return (isDirected) ? "" : "#ffffff00";
-    });
-}
-
-//Enable or disable the forces
-function FreezeGraph() {
-    is_frozen = !is_frozen;
-
-    graphJSON.nodes.forEach(function (d) {
-        d.fixed = is_frozen;
     });
 }
 
@@ -1231,13 +1220,6 @@ function InvertEdgesOnSelection() {
 function InvertEdge(edge, isFirst = true){
     let vr = new ValueRegisterer([edge.data.source, edge.data.target], [edge.data.target, edge.data.source], edge);
     MyManager.Execute(new InvertDirectionCommand(vr, isFirst));
-}
-
-
-function WaitGraphLoadToFreeze(waitingTime) {
-    setTimeout(function () {
-        FreezeGraph();
-    }, waitingTime);
 }
 
 function PrettifyJSON() {

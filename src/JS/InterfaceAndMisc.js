@@ -304,9 +304,9 @@ function KeyboardEventInit() {
                 //E for Edges
                 result = [AddEdgesOnSelection(), "Add edge between selected nodes"];
                 break;
-            case 83:
+            case 70:
                 //F for Freeze
-                SaveGraph();
+                FreezeGraph();
                 break;
             case 73 :
                 //I for invert
@@ -323,6 +323,10 @@ function KeyboardEventInit() {
             case 82:
                 //R to reset selection
                 ResetSelection();
+                break;
+            case 83:
+                //S for Save
+                SaveGraph();
                 break;
             case 84:
                 //T for Test, to remove before build

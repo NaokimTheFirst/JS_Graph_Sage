@@ -11,6 +11,8 @@ __showSpanTreeParameter = "showSpanTree"
 __girthParameter = "girth"
 __saveGraphParameter = 'save'
 __switchLockParameter = "switchLock"
+__freezeGraphParameter = "freezePositions"
+
 from json import JSONEncoder
 
 
@@ -222,6 +224,9 @@ def _switch_lock(client):
 
     return response
 
+def _freezePositions(graph):
+    return [__freezeGraphParameter, "Nodes' positions set"], graph
+
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
                      __randomOrientationParameter: _random_orientation_for_JS,
@@ -233,7 +238,8 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __showSpanTreeParameter: _span_tree_as_string_array,
                      __girthParameter: _get_girth,
                      __saveGraphParameter: _save_graph,
-                     __switchLockParameter: _switch_lock}
+                     __switchLockParameter: _switch_lock,
+                     __freezeGraphParameter: _freezePositions}
 
 
 

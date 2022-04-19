@@ -203,7 +203,6 @@ class DataGraph(object):
 import json
 from sage.graphs import graph
 def ConstructGraphFromJSONObject(JSONObject):
-  posdict={}
 
   G = None
 
@@ -218,12 +217,6 @@ def ConstructGraphFromJSONObject(JSONObject):
       original_nodes[node.get("name")] = int(node.get("name"))
     G.add_vertex(original_nodes[node.get("name")])
 
-  #Fill the dictionary of node coordinates
-  for n in JSONObject.nodes:
-    posdict[original_nodes[n.get("name")]] = (n.get("x"),n.get("y"))
-
-  G.set_pos(posdict)
-
   #Add edgesS
   for l in JSONObject.links:
     G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
@@ -233,6 +226,15 @@ def ConstructGraphFromJSONObject(JSONObject):
     G.allow_loops(True)
   for l in JSONObject.loops:
     G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
+
+  #Fill the dictionary of node coordinates
+  if (JSONObject.parameter == "freezePositions"):
+    posdict = {}
+    for n in JSONObject.nodes:
+        posdict[original_nodes[n.get("name")]] = (n.get("x"),n.get("y"))
+
+    G.set_pos(posdict)
+    print("Nodes' coordinates set")
 
   return G
 

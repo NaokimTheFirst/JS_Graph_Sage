@@ -13,6 +13,7 @@ const showSpanTreeParameter = "showSpanTree";
 const girthParameter = "girth";
 const saveGraphParamter = "save";
 const switchLockParameter = "switchLock"
+const freezeGraphCoordinates = "freezePositions";
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -102,6 +103,9 @@ function TreatResponse(response) {
         case switchLockParameter:
             CustomWarn(response.result)
             break;
+        case freezeGraphCoordinates:
+            CustomWarn(response.result);
+            break;
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
             break;
@@ -159,6 +163,10 @@ function SubmitMessage(parameter,message = "") {
 
 function SaveGraph() {
     SubmitMessage(saveGraphParamter);
+}
+
+function FreezeGraph() {
+    SubmitMessage(freezeGraphCoordinates);
 }
 
 function switchLock(){
