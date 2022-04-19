@@ -139,6 +139,8 @@ def graph_to_JSON(G,
     # Defines the vertices' layout if possible
     if layout is not None: 
       Gpos = G.graphplot(layout=layout)._pos
+    elif G.get_pos():
+      Gpos = G.get_pos()
     else :
       Gpos = G.graphplot(layout='spring')._pos
     pos = []
