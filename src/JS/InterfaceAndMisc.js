@@ -500,3 +500,5 @@ function afficherEdgeConnectivity(parameter){
 }
 
 
+
+

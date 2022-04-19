@@ -81,7 +81,6 @@ window.onload = function () {
     customColorScale = d3.scale.category20();
     KeyboardEventInit();
     // dragElement(document.getElementById("Overlay"));
-
 }
 
 // Called in webSocket.onopen, reloads page opening a new connection or opens a new page
@@ -95,6 +94,8 @@ function PageOpenOrReload() {
         InitNewGraph();
         UpdateGraphProperties();
     }
+
+
 }
 
 /*
@@ -1410,27 +1411,43 @@ function UpdateG6Form(newg6) {
 // }
 
 function lightMode() {
-
-    document.querySelector("rect").style.fill = "white"
-    document.querySelector("body").style.backgroundColor = "white"
-
+    document.querySelector("body").classList.remove("darkMode");
+    document.querySelector("body").classList.add("lightMode");
     var all = document.getElementsByTagName("*");
-
     for (var i = 0, max = all.length; i < max; i++) {
         all[i].style.color = "black";
     }
-
+    var allButton = document.getElementsByTagName("button");
+    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+        allButton[j].style.color = "white";
+    }
+    window.localStorage.setItem('themeSelect', 'lightMode');
 }
 
 function darkMode() {
-    document.querySelector("rect").style.fill = "black"
-    document.querySelector("body").style.backgroundColor = "black"
+    document.querySelector("body").classList.remove("lighMode");
+    document.querySelector("body").classList.add("darkMode");
     var all = document.getElementsByTagName("*");
-
     for (var i = 0, max = all.length; i < max; i++) {
         all[i].style.color = "white";
     }
-
-
+    window.localStorage.setItem('themeSelect', 'darkMode');
+    getCookieTheme();
 }
 
+function getCookieTheme() {
+    return window.localStorage.getItem('themeSelect')
+}
+
+function selectModeDependOfCookie() {
+
+    if (getCookieTheme() === 'darkMode') {
+        darkMode();
+        alert("darkk")
+    } else if (getCookieTheme() === 'lightMode') {
+        lightMode();
+        alert("lighttt")
+    } else {
+        alert("rien")
+    }
+}
