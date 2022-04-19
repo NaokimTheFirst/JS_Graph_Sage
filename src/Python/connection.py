@@ -100,7 +100,7 @@ def message_received(client, server, message):
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
 
-		if client['lock'] :
+		if client['lock'] or JSONmessage.parameter == "freezePositions" :
 			update_graph(targetGraph, newGraph)
 
 		if response[1] != None :
