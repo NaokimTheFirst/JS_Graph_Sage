@@ -42,7 +42,6 @@ rect {
 
 #Overlay {
     min-width: fit-content;
-    width: 15%;
     /* position: absolute; */
     /* top: 0px;
     left: 0px; */
@@ -65,6 +64,8 @@ rect {
     background: rgba(184, 184, 184, 0.473);
     padding: 0.5%;
     margin-bottom: 2%;
+    overflow:hidden;
+    resize:horizontal;
 }
 
 #scrollPanel {
