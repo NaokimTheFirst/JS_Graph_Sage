@@ -1,3 +1,4 @@
+from glob import glob
 import sys
 
 
@@ -199,11 +200,9 @@ class DataGraph(object):
   def __init__(self, data):
     self.__dict__ = json.loads(data)
 
-
 import json
 from sage.graphs import graph
 def ConstructGraphFromJSONObject(JSONObject):
-
   G = None
 
   if JSONObject.directed :
