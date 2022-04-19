@@ -1320,11 +1320,6 @@ function FindElementInGraph(element) {
     return list[list.indexOf(element.data)];
 }
 
-
-function UpdateGraphProperties(message = ""){
-    SubmitMessage(propertiesRequestParameter,message = message);
-}
-
 function SetNodesColoration(colorationList){
     var id = 0;
     colorationList.forEach(coloration => {

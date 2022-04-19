@@ -100,6 +100,11 @@ function TreatResponse(response) {
     }
 }
 
+function UpdateGraphProperties(message = ""){
+    SubmitMessage(propertiesRequestParameter,message = message);
+    RequestG6();
+}
+
 function montrerGirth(){
     SubmitMessage(girthParameter);
 }
@@ -139,9 +144,6 @@ function DisplaySpanTree() {
 function SubmitMessage(parameter,message = "") {
   graphJSON.parameter = parameter;
   graphJSON.message = message;
-  var prettyJSON = PrettifyJSON();
-  webSocket.send(prettyJSON);
-  graphJSON.parameter = getG6RequestParameter;
   var prettyJSON = PrettifyJSON();
   webSocket.send(prettyJSON);
 }

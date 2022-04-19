@@ -226,6 +226,7 @@ def ConstructGraphFromJSONObject(JSONObject):
 
   #Add edgesS
   for l in JSONObject.links:
+    print(l)
     G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
 
   #Add loops
