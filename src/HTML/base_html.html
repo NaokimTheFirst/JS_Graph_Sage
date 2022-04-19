@@ -14,7 +14,6 @@
     <script src="../src/JS/graph_d3js.js"></script>
     <script src='../src/JS/Tests.js'></script>
     <script src='../src/JS/Connection.js'></script>
-
 </head>
 
 <body>
@@ -30,8 +29,8 @@
             </div>
             <div class="Panel">
                 <div>
+                    <button class="hidingButton" onclick="develop(this)">></button>
                     <p class="PanelHeader">Tools</p>
-                    <button class="hidingButton" onclick="develop(this)">v</button>
                 </div>
                 <div id="ToolPanelContent" class="PanelContent">
                     <table>
@@ -51,8 +50,8 @@
             </div>
             <div class="Panel">
                 <div>
+                    <button class="hidingButton" onclick="develop(this)">></button>
                     <p class="PanelHeader">Properties</p>
-                    <button class="hidingButton" onclick="develop(this)">v</button>
                 </div>
                 <div id="PropertyPanelContent" class="PanelContent">
                     <table>
@@ -105,16 +104,19 @@
                             <label for="span_tree">Show spanning tree</label>
                         </tr>
                         <tr>
-                          <td>G6</td>
-                          <td><span id="g6"></span><button onclick="checkIfExist(g6);">Does it exist?</button></td>
+                            <td>G6</td>
+                                <td>
+                                    <textarea id="g6" rows="1" cols="7"></textarea>
+                                    <button onclick="checkIfExist(g6);">Exist?</button>
+                                </td>
                         </tr>
                     </table>
                 </div>
             </div>
             <div class="Panel">
                 <div>
+                    <button class="hidingButton" onclick="develop(this)">></button>
                     <p class="PanelHeader">Algorithms</p>
-                    <button class="hidingButton" onclick="develop(this)">v</button>
                 </div>
                 <div id="AlgorithmPanelContent" class="PanelContent">
                     <table>
@@ -162,8 +164,8 @@
             </div>
             <div class="Panel">
                 <div>
+                    <button class="hidingButton" onclick="develop(this)">></button>
                     <p class="PanelHeader">Key Helper</p>
-                    <button class="hidingButton" onclick="develop(this)">v</button>
                 </div>
                 <div id="KeyPanelContent" class="PanelContent">
                     <table>
@@ -171,8 +173,12 @@
                             <th>General :</th>
                         </tr>
                         <tr>
-                            <td>Un/Freeze Positions</td>
-                            <td>F</td>
+                            <td>Dis/Able sutomatic save</td>
+                            <td>U</td>
+                        </tr>
+                        <tr>
+                            <td>Save graph</td>
+                            <td>S</td>
                         </tr>
                         <tr>
                             <td>Undo</td>

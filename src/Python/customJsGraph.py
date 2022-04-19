@@ -139,7 +139,7 @@ def graph_to_JSON(G,
     if layout is not None: 
       Gpos = G.graphplot(layout=layout)._pos
     else :
-      Gpos = G.get_pos()
+      Gpos = G.graphplot(layout='spring')._pos
     pos = []
 
     if Gpos is not None:
@@ -226,7 +226,6 @@ def ConstructGraphFromJSONObject(JSONObject):
 
   #Add edgesS
   for l in JSONObject.links:
-    print(l)
     G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
 
   #Add loops

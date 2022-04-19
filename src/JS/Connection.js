@@ -11,6 +11,8 @@ const renewGraphParameter = "renewGraph";
 const getG6RequestParameter = "Graph6";
 const showSpanTreeParameter = "showSpanTree";
 const girthParameter = "girth";
+const saveGraphParamter = "save";
+const switchLockParameter = "switchLock"
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -41,6 +43,7 @@ function InitWebSocketConnection() {
 }
 
 function TreatResponse(response) {
+    console.log(response);
     switch (response.request) {
         case propertiesRequestParameter:
             SetProperties(response.result[0],
@@ -92,6 +95,12 @@ function TreatResponse(response) {
             break;
         case girthParameter :
             afficherResultGirth(response.result);
+            break;
+        case saveGraphParamter:
+            CustomWarn(response.result);
+            break;
+        case switchLockParameter:
+            CustomWarn(response.result)
             break;
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
@@ -146,6 +155,14 @@ function SubmitMessage(parameter,message = "") {
   graphJSON.message = message;
   var prettyJSON = PrettifyJSON();
   webSocket.send(prettyJSON);
+}
+
+function SaveGraph() {
+    SubmitMessage(saveGraphParamter);
+}
+
+function switchLock(){
+    SubmitMessage(switchLockParameter);
 }
 
 function onCloseClick() {

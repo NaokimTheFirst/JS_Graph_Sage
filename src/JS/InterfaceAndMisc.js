@@ -258,7 +258,6 @@ function CreateGroupElement(name) {
 
     let list = overlayElements.groupList;
     let lastIndex = list.childElementCount - 1;
-    
     newElem.style.backgroundColor = customColorScale(lastIndex);
     list.insertBefore(newElem, list.childNodes[lastIndex]);
 
@@ -305,9 +304,9 @@ function KeyboardEventInit() {
                 //E for Edges
                 result = [AddEdgesOnSelection(), "Add edge between selected nodes"];
                 break;
-            case 70:
+            case 83:
                 //F for Freeze
-                FreezeGraph();
+                SaveGraph();
                 break;
             case 73 :
                 //I for invert
@@ -328,6 +327,10 @@ function KeyboardEventInit() {
             case 84:
                 //T for Test, to remove before build
                 LaunchAllTest();
+                break;
+            case 85:
+                //U for Unlock/lock auto save
+                switchLock();
                 break;
             case 89:
                 //Y to redo

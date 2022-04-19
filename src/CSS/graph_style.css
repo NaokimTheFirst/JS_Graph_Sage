@@ -10,7 +10,9 @@ body {
 .extent {
     fill: rgba(200, 200, 209,0.3);
 }
-
+.PanelContent{
+    display: none;
+}
 rect {
     fill: #18191A;
 }
@@ -18,7 +20,6 @@ rect {
 .scroll {
     width:100%;
     height: 100%;
-    overflow:auto;
     -ms-overflow-style: none; /* Hide scrollbar for Chrome, Safari and Opera */
     color: yellow;
     font-size: 110%;
@@ -38,8 +39,10 @@ rect {
     overflow: scroll;
 } */
 
+
 #Overlay {
-    width: 20%;
+    min-width: fit-content;
+    width: 15%;
     /* position: absolute; */
     /* top: 0px;
     left: 0px; */
@@ -49,7 +52,6 @@ rect {
     margin : 0.5%;
     pointer-events:none;
     /* width: 300px; */
-    min-width: 140px;
 
 }
 
@@ -63,8 +65,6 @@ rect {
     background: rgba(184, 184, 184, 0.473);
     padding: 0.5%;
     margin-bottom: 2%;
-    overflow: hidden;
-    resize: horizontal;
 }
 
 #scrollPanel {
@@ -157,7 +157,14 @@ marker {
 #vertexColoring div, #edgeColoring div {
     margin: 5px 2px;
 }
-
+.hidingButton{
+    height: fit-content;
+    background: inherit;
+}
+.hidingButton:hover{
+    scale: none;
+    background: inherit;
+}
 /* 'x' button style, idea copied from https://impossiblue.github.io/log/141026/index.html : */
 .x {
 	position: relative;
@@ -203,18 +210,18 @@ button {
     color: whitesmoke;
     background-color: #3A3B3C;
     border : #3A3B3C;
+    transition: scale 150ms;
 }
 
 button:hover{
+    scale: 1.1;
     background-color: #2A2B2C;
 }
 
 .Panel>div:first-child{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
 }
-
 #g6 button {
     max-width: 150px;
 }
