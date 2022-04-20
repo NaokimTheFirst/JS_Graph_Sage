@@ -7,6 +7,7 @@ reloaded_graph = None
 # Called for every client connecting
 def new_client(client, server):
 	global reloaded_graph
+	client['lock'] = True
 	if client['id'] not in graph_client_dict :
 		# If some other client has left (cf. client_left())
 		if reloaded_graph :
@@ -19,10 +20,9 @@ def new_client(client, server):
 		print("New client connected and was given id %d" % client['id'])
 	reloaded_graph = None
 
-
 # Called for every client disconnecting
 def client_left(client, server):
-	global graph_client_dict,current_server, reloaded_graph
+	global graph_client_dict, current_server, reloaded_graph
 
 	if client['id'] in graph_client_dict :
 		print("Client(%d) disconnected" % client['id'])
@@ -46,6 +46,7 @@ def port_in_use(port: int) -> bool:
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('localhost', port)) == 0
+
 def connect():
 	PORT=9001
 	#version avec un if
@@ -89,11 +90,18 @@ def message_received(client, server, message):
 			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)
 		else:
 			newGraph = ConstructGraphFromJSONObject(JSONmessage)
-			response, newGraph = handle_message(JSONmessage.parameter,newGraph)
-			update_graph(targetGraph, newGraph)
+			if JSONmessage.parameter == "switchLock":
+				response = handle_message(JSONmessage.parameter, None, None, client)
+			elif JSONmessage.parameter == "save":
+				response = handle_message(JSONmessage.parameter, newGraph, targetGraph)
+			else:
+				response, newGraph = handle_message(JSONmessage.parameter,newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
+
+		if client['lock'] or JSONmessage.parameter == "freezePositions" :
+			update_graph(targetGraph, newGraph)
 
 		if response[1] != None :
 			returnMessage = JSONEncoder().encode({"request":response[0], "result": response[1]})
@@ -102,12 +110,22 @@ def message_received(client, server, message):
 		end_connection_client(client, server)
 
 
-def handle_message(parameter,graph):
+def handle_message(parameter,graph, oldGraph = None, client=None):
 	response = None
 	if parameter is not None:
-		response, graph = JS_functions_dict[parameter](graph)
+		if oldGraph is not None :
+			response, graph = JS_functions_dict[parameter](graph, oldGraph)
+		elif client is not None :
+			response, graph = JS_functions_dict[parameter](client)
+		else :
+			response, graph = JS_functions_dict[parameter](graph)
 	return response, graph
 
+def handle_message2(parameter, nGraph, oGraph):
+	response = None
+	if parameter is not None:
+		response, graph = JS_functions_dict[parameter](nGraph, oGraph)
+	return response, graph
 
 def end_connection_client(client, server):
 	returnMessage = JSONEncoder().encode({"request":'closeConnection', "result": ''})

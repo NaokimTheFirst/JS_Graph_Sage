@@ -30,14 +30,8 @@ def __update_graph_nodes(gold, gnew, print_update = True):
 
 
 def __update_graph_positions(gold, gnew, print_update = True):
-	did_smth = None
-
-	if gnew.get_pos() != gold.get_pos():
-		did_smth = "Updated nodes position"
+	if gnew.get_pos() and gnew.get_pos() != gold.get_pos():
 		gold.set_pos(gnew.get_pos())
-
-	# if did_smth is not None and print_update :
-	# 	print(did_smth)
 
 def __update_graph_edges(gold, gnew, print_update = True):
 	did_smth = None

@@ -353,9 +353,17 @@ function KeyboardEventInit() {
                 //R to reset selection
                 ResetSelection();
                 break;
+            case 83:
+                //S for Save
+                SaveGraph();
+                break;
             case 84:
                 //T for Test, to remove before build
                 LaunchAllTest();
+                break;
+            case 85:
+                //U for Unlock/lock auto save
+                switchLock();
                 break;
             case 89:
                 //Y to redo

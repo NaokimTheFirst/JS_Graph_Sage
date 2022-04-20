@@ -13,6 +13,9 @@ __vertexConnectivityParameter="vertexConnectivity"
 __chromaticNumberParameter="chromaticNumber"
 __chromaticIndexParamater="chromaticIndex"
 __edgeConnectivityParamater= "edgeConnectivity"
+__saveGraphParameter = 'save'
+__switchLockParameter = "switchLock"
+__freezeGraphParameter = "freezePositions"
 from json import JSONEncoder
 
 
@@ -161,7 +164,6 @@ def __convert_DtoG(graph):
 
 tmpJSgraphs = []
 
-
 def __create_temporary_JS_graph(graph):
     global tmpJSgraphs
 
@@ -178,10 +180,15 @@ def _get_new_graph_in_JSON_for_JS(graph):
 
 def _generate_graph6_formula(graph):
     response = [__graph6Parameter]
-    if (graph.is_directed()):
-        response.append(graph.dig6_string())
-    else:
-        response.append(graph.graph6_string())
+
+    if (graph.has_loops()) :
+        response.append("None")
+        print("G6 can be applied on simple graph only")
+    else :
+        if (graph.is_directed()):
+            response.append(graph.dig6_string())
+        else:
+            response.append(graph.graph6_string())
 
     return response, graph
 
@@ -199,6 +206,7 @@ def _get_girth(graph):
 def _the_graph_is_a_tree(graph):
 	return graph.is_tree()
 
+
 def _get_Vertex_Connectivity(graph):
     result=graph.vertex_connectivity()
     return [__vertexConnectivityParameter,result], graph
@@ -215,6 +223,30 @@ def _get_Edge_Connectivity(graph):
     result=graph.edge_connectivity()
     return [__edgeConnectivityParamater, result], graph
 
+def _save_graph(newGraph, oldGraph):
+    response = ["save", "Graph saved"]
+    print("Graph saved");
+    update_graph(oldGraph, newGraph)
+    return response
+
+
+def _switch_lock(client):
+    response = [__switchLockParameter]
+    client['lock'] = not client['lock']
+    s = "Save auto "
+
+    if client['lock'] :
+        s += "enabled"
+    else :
+        s += "disabled"
+
+    print(s)
+    response.append(s)
+
+    return response
+
+def _freezePositions(graph):
+    return [__freezeGraphParameter, "Nodes' positions set"], graph
 
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
@@ -229,7 +261,10 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __vertexConnectivityParameter: _get_Vertex_Connectivity,
                      __chromaticNumberParameter:_get_Chromatic_Number,
                      __chromaticIndexParamater:_get_Chromatic_Index,
-                     __edgeConnectivityParamater:_get_Edge_Connectivity}
+                     __edgeConnectivityParamater:_get_Edge_Connectivity,
+                     __saveGraphParameter: _save_graph,
+                     __switchLockParameter: _switch_lock,
+                     __freezeGraphParameter: _freezePositions}
 
 
 

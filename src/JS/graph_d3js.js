@@ -12,8 +12,6 @@ var xshift = function () {
 var drag_in_progress = false;
 var is_frozen = false;
 var isDirected = false;
-var oldWidth, oldHeight;
-var oldWindowSize = [oldWidth, oldHeight];
 var g6;
 
 //DOM Elements / D3JS Elements
@@ -96,7 +94,6 @@ function PageOpenOrReload() {
         UpdateGraphProperties();
     }
 }
-
 /*
 window.onresize = function() {
     let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
@@ -120,10 +117,11 @@ window.onresize = function() {
 
 }*/
 
-function InitNewGraph(graph = null) {
-    if (force) {
-        force.stop();
-    }
+
+function InitNewGraph(graph = null)
+{
+    if(force) force.stop();
+
     LoadGraphData(graph);
     InitGraph();
     InitInterface();
@@ -131,8 +129,6 @@ function InitNewGraph(graph = null) {
     InitForce();
     //Start the automatic force layout
     force.start();
-    //Freeze the graph after 2 sec
-    WaitGraphLoadToFreeze(2000);
 }
 
 function handleMouseMove(event) {
@@ -544,15 +540,6 @@ function ManageArrows() {
 function DisplayArrows() {
     arrows.style("fill", function () {
         return (isDirected) ? "" : "#ffffff00";
-    });
-}
-
-//Enable or disable the forces
-function FreezeGraph() {
-    is_frozen = !is_frozen;
-
-    graphJSON.nodes.forEach(function (d) {
-        d.fixed = is_frozen;
     });
 }
 
@@ -1223,13 +1210,6 @@ function InvertEdge(edge, isFirst = true) {
     MyManager.Execute(new InvertDirectionCommand(vr, isFirst));
 }
 
-
-function WaitGraphLoadToFreeze(waitingTime) {
-    setTimeout(function () {
-        FreezeGraph();
-    }, waitingTime);
-}
-
 function PrettifyJSON() {
     var prettyJSON = JSON.parse(JSON.stringify(graphJSON));
 
@@ -1364,7 +1344,11 @@ function DeleteAllEdgeGroups() {
 
 function UpdateG6Form(newg6) {
     g6 = newg6;
-    alert(g6);
+    document.querySelector('#g6').textContent = g6;
+}
+
+function checkIfExist(g){
+    window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String="+g6);
 }
 
 // function dragElement(elmnt) {

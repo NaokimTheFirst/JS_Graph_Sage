@@ -15,6 +15,10 @@ const vertexConnectivityParameter = "vertexConnectivity"
 const chromaticNumberParamater = "chromaticNumber"
 const chromaticIndexParameter="chromaticIndex"
 const edgeConnectivityParamater="edgeConnectivity"
+const saveGraphParamter = "save";
+const switchLockParameter = "switchLock"
+const freezeGraphCoordinates = "freezePositions";
+
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -45,6 +49,7 @@ function InitWebSocketConnection() {
 }
 
 function TreatResponse(response) {
+    console.log(response);
     switch (response.request) {
         case propertiesRequestParameter:
             SetProperties(response.result[0],
@@ -108,6 +113,14 @@ function TreatResponse(response) {
             break;
         case edgeConnectivityParamater:
             afficherEdgeConnectivity(response.result)
+        case saveGraphParamter:
+            CustomWarn(response.result);
+            break;
+        case switchLockParameter:
+            CustomWarn(response.result)
+            break;
+        case freezeGraphCoordinates:
+            CustomWarn(response.result);
             break;
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
@@ -116,7 +129,13 @@ function TreatResponse(response) {
     }
 }
 
-function montrerGirth() {
+
+function UpdateGraphProperties(message = ""){
+    SubmitMessage(propertiesRequestParameter,message = message);
+    RequestG6();
+}
+
+function montrerGirth(){
     SubmitMessage(girthParameter);
 }
 
@@ -167,11 +186,23 @@ function DisplaySpanTree() {
     SubmitMessage(showSpanTreeParameter);
 }
 
-function SubmitMessage(parameter, message = "") {
-    graphJSON.parameter = parameter;
-    graphJSON.message = message;
-    var prettyJSON = PrettifyJSON();
-    webSocket.send(prettyJSON);
+function SubmitMessage(parameter,message = "") {
+  graphJSON.parameter = parameter;
+  graphJSON.message = message;
+  var prettyJSON = PrettifyJSON();
+  webSocket.send(prettyJSON);
+}
+
+function SaveGraph() {
+    SubmitMessage(saveGraphParamter);
+}
+
+function FreezeGraph() {
+    SubmitMessage(freezeGraphCoordinates);
+}
+
+function switchLock(){
+    SubmitMessage(switchLockParameter);
 }
 
 function onCloseClick() {
