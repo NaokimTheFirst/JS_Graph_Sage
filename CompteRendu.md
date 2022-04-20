@@ -86,7 +86,7 @@ https://blog.devgenius.io/d3-js-whats-new-in-version-6-5f45b00a85cb
 - Plan du rapport preparé ;
 - Redaction du rapport commencé : [voir document sur OneDrive](https://1drv.ms/w/s!Ah20cN1s-zt3h78TY4GmdzCLvJmvOQ?e=JR4fun).
 
-#### 11/04/2022 - 8e rdv
+#### 11/04/2022 - 9e rdv
 *Nouvelles choses à faire :*
 - Separer dans le menu Orientations et Algorithmic/Hard Stuff
 - Resoudre le probleme : les sommets recoivent les coordonées qu'ils n'ont pas a l'origin
