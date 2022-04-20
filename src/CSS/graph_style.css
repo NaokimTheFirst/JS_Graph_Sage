@@ -227,3 +227,16 @@ button:hover{
 #g6 button {
     max-width: 150px;
 }
+.lightMode{
+    background-color: white;
+}
+.lightMode rect{
+
+    fill: white ;
+}
+.darkMode rect{
+    fill:black;
+}
+.darkMode{
+    background-color: #18191A;
+}

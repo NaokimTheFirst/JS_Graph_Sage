@@ -28,6 +28,7 @@ function InitWebSocketConnection() {
         PageOpenOrReload();
         // Display the body hidden in window.onload
         document.body.style.display = "inline";
+        selectModeDependOfCookie();
     };
 
     webSocket.onmessage = function (message) {
@@ -143,14 +144,15 @@ function montrerVertexConnectivity() {
     SubmitMessage(vertexConnectivityParameter);
 }
 
-function montrerEdgeConnectivity(){
+function montrerEdgeConnectivity() {
     SubmitMessage(edgeConnectivityParamater);
 }
 
 function montrerChromaticNumber() {
     SubmitMessage(chromaticNumberParamater);
 }
-function montrerChromaticIndex(){
+
+function montrerChromaticIndex() {
     SubmitMessage(chromaticIndexParameter);
 }
 

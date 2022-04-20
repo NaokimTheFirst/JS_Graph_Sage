@@ -508,3 +508,5 @@ function afficherEdgeConnectivity(parameter){
 }
 
 
+
+
