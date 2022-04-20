@@ -1443,11 +1443,9 @@ function selectModeDependOfCookie() {
 
     if (getCookieTheme() === 'darkMode') {
         darkMode();
-        alert("darkk")
+
     } else if (getCookieTheme() === 'lightMode') {
         lightMode();
-        alert("lighttt")
     } else {
-        alert("rien")
     }
 }
