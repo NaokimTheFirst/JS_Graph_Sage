@@ -1409,7 +1409,7 @@ function lightMode() {
 }
 
 function darkMode() {
-    document.querySelector("body").classList.remove("lighMode");
+    document.querySelector("body").classList.remove("lightMode");
     document.querySelector("body").classList.add("darkMode");
     var all = document.getElementsByTagName("*");
     for (var i = 0, max = all.length; i < max; i++) {

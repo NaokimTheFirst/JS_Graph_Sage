@@ -13,9 +13,6 @@ body {
 .PanelContent{
     display: none;
 }
-rect {
-    fill: #18191A;
-}
 
 .scroll {
     width:100%;
@@ -228,13 +225,13 @@ button:hover{
     max-width: 150px;
 }
 .lightMode{
-    background-color: white;
-}
-.lightMode rect{
+   fill: white;
 
-    fill: white ;
 }
-.darkMode rect{
+.lightMode rect.backgound{
+background-color: white;
+}
+.darkMode rect.backgound{
     fill:black;
 }
 .darkMode{
