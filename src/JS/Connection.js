@@ -11,8 +11,14 @@ const renewGraphParameter = "renewGraph";
 const getG6RequestParameter = "Graph6";
 const showSpanTreeParameter = "showSpanTree";
 const girthParameter = "girth";
+const vertexConnectivityParameter = "vertexConnectivity"
+const chromaticNumberParamater = "chromaticNumber"
+const chromaticIndexParameter="chromaticIndex"
+const edgeConnectivityParamater="edgeConnectivity"
 const saveGraphParamter = "save";
 const switchLockParameter = "switchLock"
+const freezeGraphCoordinates = "freezePositions";
+
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -22,6 +28,7 @@ function InitWebSocketConnection() {
         PageOpenOrReload();
         // Display the body hidden in window.onload
         document.body.style.display = "inline";
+        selectModeDependOfCookie();
     };
 
     webSocket.onmessage = function (message) {
@@ -96,11 +103,25 @@ function TreatResponse(response) {
         case girthParameter :
             afficherResultGirth(response.result);
             break;
+        case vertexConnectivityParameter:
+            afficherVertexConnectivity(response.result);
+            break;
+        case chromaticNumberParamater:
+            afficherChromaticNumber(response.result)
+            break;
+        case chromaticIndexParameter:
+            afficherChromaticIndex(response.result)
+            break;
+        case edgeConnectivityParamater:
+            afficherEdgeConnectivity(response.result)
         case saveGraphParamter:
             CustomWarn(response.result);
             break;
         case switchLockParameter:
             CustomWarn(response.result)
+            break;
+        case freezeGraphCoordinates:
+            CustomWarn(response.result);
             break;
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
@@ -109,8 +130,30 @@ function TreatResponse(response) {
     }
 }
 
+
+function UpdateGraphProperties(message = ""){
+    SubmitMessage(propertiesRequestParameter,message = message);
+    RequestG6();
+}
+
 function montrerGirth(){
     SubmitMessage(girthParameter);
+}
+
+function montrerVertexConnectivity() {
+    SubmitMessage(vertexConnectivityParameter);
+}
+
+function montrerEdgeConnectivity() {
+    SubmitMessage(edgeConnectivityParamater);
+}
+
+function montrerChromaticNumber() {
+    SubmitMessage(chromaticNumberParamater);
+}
+
+function montrerChromaticIndex() {
+    SubmitMessage(chromaticIndexParameter);
 }
 
 function RequestVertexColoring() {
@@ -145,22 +188,23 @@ function DisplaySpanTree() {
     SubmitMessage(showSpanTreeParameter);
 }
 
+function SubmitMessage(parameter,message = "") {
+  graphJSON.parameter = parameter;
+  graphJSON.message = message;
+  var prettyJSON = PrettifyJSON();
+  webSocket.send(prettyJSON);
+}
+
 function SaveGraph() {
     SubmitMessage(saveGraphParamter);
 }
 
-function switchLock(){
-    SubmitMessage(switchLockParameter);
+function FreezeGraph() {
+    SubmitMessage(freezeGraphCoordinates);
 }
 
-function SubmitMessage(parameter, message = "") {
-    graphJSON.parameter = parameter;
-    graphJSON.message = message;
-    var prettyJSON = PrettifyJSON();
-    webSocket.send(prettyJSON);
-    graphJSON.parameter = getG6RequestParameter;
-    var prettyJSON = PrettifyJSON();
-    webSocket.send(prettyJSON);
+function switchLock(){
+    SubmitMessage(switchLockParameter);
 }
 
 function onCloseClick() {

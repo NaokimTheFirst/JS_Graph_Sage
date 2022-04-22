@@ -100,10 +100,6 @@
                             <td id="isEulerian"></td>
                         </tr>
                         <tr>
-                            <td>Girth</td>
-                            <td id="isGirth"></td>
-                        </tr>
-                        <tr>
                             <input type="checkbox" id="span_tree"/>
                             <label for="span_tree">Show spanning tree</label>
                         </tr>
@@ -163,6 +159,30 @@
                             </td>
                             <td id="Girth"></td>
                         </tr>
+                        <tr>
+                            <td>
+                                <button onclick="montrerVertexConnectivity()">vertex Connectivity</button>
+                            </td>
+                            <td id="vertexConnectivity"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button onclick="montrerEdgeConnectivity()">edge Connectivity</button>
+                            </td>
+                            <td id="edgeConnectivity"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button onclick="montrerChromaticNumber()">chromatic number</button>
+                            </td>
+                            <td id="chromaticNumber"></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <button onclick="montrerChromaticIndex()">chromatic Index</button>
+                            </td>
+                            <td id="chromaticIndex"></td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -177,7 +197,11 @@
                             <th>General :</th>
                         </tr>
                         <tr>
-                            <td>Dis/Able sutomatic save</td>
+                            <td>(Un)freeze nodes' positions</td>
+                            <td>F</td>
+                        </tr>
+                        <tr>
+                            <td>Dis/Enable automatic save</td>
                             <td>U</td>
                         </tr>
                         <tr>
@@ -248,10 +272,28 @@
                 </div>
             </div>
             <div class="Panel" id="scrollPanel">
-                <!-- <div>
+                <div>
                   <button class="hidingButton" onclick="develop(this)">v</button>
-                </div> -->
+                </div>
                 <div class="scroll"></div>
+            </div>
+            <div class="Panel" id="UserInterface">
+                <p class="PanelHeader">User Interface</p>
+                <tr>
+                    <!--                    <td><button  onclick="nightMode()">night mode</button></td>-->
+
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="lightMode()">light mode</button>
+                    </td>
+                    <td>
+                        <button onclick="darkMode()">dark mode</button>
+                    </td>
+
+                </tr>
+
+
             </div>
         </div>
     </div>

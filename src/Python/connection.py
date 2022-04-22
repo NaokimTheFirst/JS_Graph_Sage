@@ -20,10 +20,9 @@ def new_client(client, server):
 		print("New client connected and was given id %d" % client['id'])
 	reloaded_graph = None
 
-
 # Called for every client disconnecting
 def client_left(client, server):
-	global graph_client_dict,current_server, reloaded_graph
+	global graph_client_dict, current_server, reloaded_graph
 
 	if client['id'] in graph_client_dict :
 		print("Client(%d) disconnected" % client['id'])
@@ -47,6 +46,7 @@ def port_in_use(port: int) -> bool:
     import socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(('localhost', port)) == 0
+
 def connect():
 	PORT=9001
 	#version avec un if
@@ -88,19 +88,19 @@ def message_received(client, server, message):
 		# Reverse connection between Sage and JS
 		if JSONmessage.parameter == "renewGraph":
 			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)
-
-		newGraph = ConstructGraphFromJSONObject(JSONmessage)
-		if JSONmessage.parameter == "switchLock":
-			response = handle_message(JSONmessage.parameter, None, None, client)
-		elif JSONmessage.parameter == "save":
-			response = handle_message(JSONmessage.parameter, newGraph, targetGraph)
 		else:
-			response, newGraph = handle_message(JSONmessage.parameter,newGraph)
+			newGraph = ConstructGraphFromJSONObject(JSONmessage)
+			if JSONmessage.parameter == "switchLock":
+				response = handle_message(JSONmessage.parameter, None, None, client)
+			elif JSONmessage.parameter == "save":
+				response = handle_message(JSONmessage.parameter, newGraph, targetGraph)
+			else:
+				response, newGraph = handle_message(JSONmessage.parameter,newGraph)
 
 		if(JSONmessage.message != ""):
 			print(JSONmessage.message)
 
-		if client['lock'] :
+		if client['lock'] or JSONmessage.parameter == "freezePositions" :
 			update_graph(targetGraph, newGraph)
 
 		if response[1] != None :

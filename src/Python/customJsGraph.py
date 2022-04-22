@@ -1,3 +1,4 @@
+from glob import glob
 import sys
 
 
@@ -24,9 +25,8 @@ def gen_html_code(JSONgraph):
     #    with open(d3js_filepath, 'r') as d3js_code_file:
     #        d3js_script = '<script>' + d3js_code_file.read() + '</script>'
     #else:
-
+        
     d3js_script = '<script src="../lib/d3.v3.min.js"></script>'
-
     js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
     # Writes the temporary .html file
@@ -139,6 +139,8 @@ def graph_to_JSON(G,
     # Defines the vertices' layout if possible
     if layout is not None: 
       Gpos = G.graphplot(layout=layout)._pos
+    elif G.get_pos():
+      Gpos = G.get_pos()
     else :
       Gpos = G.graphplot(layout='spring')._pos
     pos = []
@@ -200,12 +202,9 @@ class DataGraph(object):
   def __init__(self, data):
     self.__dict__ = json.loads(data)
 
-
 import json
 from sage.graphs import graph
 def ConstructGraphFromJSONObject(JSONObject):
-  posdict={}
-
   G = None
 
   if JSONObject.directed :
@@ -219,12 +218,6 @@ def ConstructGraphFromJSONObject(JSONObject):
       original_nodes[node.get("name")] = int(node.get("name"))
     G.add_vertex(original_nodes[node.get("name")])
 
-  #Fill the dictionary of node coordinates
-  for n in JSONObject.nodes:
-    posdict[original_nodes[n.get("name")]] = (n.get("x"),n.get("y"))
-
-  G.set_pos(posdict)
-
   #Add edgesS
   for l in JSONObject.links:
     G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
@@ -234,6 +227,15 @@ def ConstructGraphFromJSONObject(JSONObject):
     G.allow_loops(True)
   for l in JSONObject.loops:
     G.add_edge(original_nodes[l.get("source")],original_nodes[l.get("target")])
+
+  #Fill the dictionary of node coordinates
+  if (JSONObject.parameter == "freezePositions"):
+    posdict = {}
+    for n in JSONObject.nodes:
+        posdict[original_nodes[n.get("name")]] = (n.get("x"),n.get("y"))
+
+    G.set_pos(posdict)
+    print("Nodes' coordinates set")
 
   return G
 

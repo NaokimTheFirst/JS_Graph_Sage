@@ -9,8 +9,13 @@ __renewGraphParameter = 'renewGraph'
 __graph6Parameter = "Graph6"
 __showSpanTreeParameter = "showSpanTree"
 __girthParameter = "girth"
+__vertexConnectivityParameter="vertexConnectivity"
+__chromaticNumberParameter="chromaticNumber"
+__chromaticIndexParamater="chromaticIndex"
+__edgeConnectivityParamater= "edgeConnectivity"
 __saveGraphParameter = 'save'
 __switchLockParameter = "switchLock"
+__freezeGraphParameter = "freezePositions"
 from json import JSONEncoder
 
 
@@ -201,11 +206,29 @@ def _get_girth(graph):
 def _the_graph_is_a_tree(graph):
 	return graph.is_tree()
 
+
+def _get_Vertex_Connectivity(graph):
+    result=graph.vertex_connectivity()
+    return [__vertexConnectivityParameter,result], graph
+
+def _get_Chromatic_Number(graph):
+    result=graph.chromatic_number()
+    return [__chromaticNumberParameter,result],graph
+
+def _get_Chromatic_Index(graph):
+    result=graph.chromatic_index()
+    return [__chromaticIndexParamater,result],graph
+
+def _get_Edge_Connectivity(graph):
+    result=graph.edge_connectivity()
+    return [__edgeConnectivityParamater, result], graph
+
 def _save_graph(newGraph, oldGraph):
     response = ["save", "Graph saved"]
     print("Graph saved");
     update_graph(oldGraph, newGraph)
     return response
+
 
 def _switch_lock(client):
     response = [__switchLockParameter]
@@ -222,6 +245,9 @@ def _switch_lock(client):
 
     return response
 
+def _freezePositions(graph):
+    return [__freezeGraphParameter, "Nodes' positions set"], graph
+
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
                      __randomOrientationParameter: _random_orientation_for_JS,
@@ -232,9 +258,13 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __graph6Parameter: _generate_graph6_formula,
                      __showSpanTreeParameter: _span_tree_as_string_array,
                      __girthParameter: _get_girth,
+                     __vertexConnectivityParameter: _get_Vertex_Connectivity,
+                     __chromaticNumberParameter:_get_Chromatic_Number,
+                     __chromaticIndexParamater:_get_Chromatic_Index,
+                     __edgeConnectivityParamater:_get_Edge_Connectivity,
                      __saveGraphParameter: _save_graph,
-                     __switchLockParameter: _switch_lock}
-
+                     __switchLockParameter: _switch_lock,
+                     __freezeGraphParameter: _freezePositions}
 
 
 
