@@ -257,3 +257,6 @@ button:hover {
 .darkMode {
     background-color: #18191A;
 }
+#isHamiltonian{
+    visibility: hidden;
+}

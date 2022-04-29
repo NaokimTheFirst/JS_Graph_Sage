@@ -92,10 +92,6 @@
                             <td id="minimaldegre"></td>
                         </tr>
                         <tr>
-                            <td>Is Hamiltonian</td>
-                            <td id="isHamiltonian"></td>
-                        </tr>
-                        <tr>
                             <td>Is eulerian</td>
                             <td id="isEulerian"></td>
                         </tr>
@@ -105,10 +101,10 @@
                         </tr>
                         <tr>
                             <td>G6</td>
-                                <td>
-                                    <textarea id="g6" rows="1" cols="7"></textarea>
-                                    <button onclick="checkIfExist(g6);">Exist?</button>
-                                </td>
+                            <td>
+                                <textarea id="g6" rows="1" cols="7"></textarea>
+                                <button onclick="checkIfExist(g6);">Exist?</button>
+                            </td>
                         </tr>
                     </table>
                 </div>
@@ -153,6 +149,7 @@
                                 <button onclick="RequestConvertGraph()">Convert to Di/Graph</button>
                             </td>
                         </tr>
+
                         <tr>
                             <td>
                                 <button onclick="montrerGirth()">Girth</button>
@@ -173,6 +170,11 @@
                         </tr>
                         <tr>
                             <td>
+                                <p class="PanelHeader">Hard Algorithms</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <button onclick="montrerChromaticNumber()">chromatic number</button>
                             </td>
                             <td id="chromaticNumber"></td>
@@ -182,6 +184,10 @@
                                 <button onclick="montrerChromaticIndex()">chromatic Index</button>
                             </td>
                             <td id="chromaticIndex"></td>
+                        </tr>
+                        <tr>
+                            <td><button onclick="montrerHamiltonian()"> Hamiltonian</button></td>
+                            <td id="isHamiltonian"></td>
                         </tr>
                     </table>
                 </div>
@@ -273,7 +279,7 @@
             </div>
             <div class="Panel" id="scrollPanel">
                 <div>
-                  <button class="hidingButton" onclick="develop(this)">v</button>
+                    <button class="hidingButton" onclick="develop(this)">v</button>
                 </div>
                 <div class="scroll"></div>
             </div>

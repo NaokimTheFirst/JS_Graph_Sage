@@ -1434,3 +1434,8 @@ function selectModeDependOfCookie() {
     } else {
     }
 }
+
+function montrerHamiltonian(){
+    var element=document.getElementById("isHamiltonian");
+    element.style.visibility="visible";
+}
