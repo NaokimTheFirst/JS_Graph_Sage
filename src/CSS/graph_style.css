@@ -260,3 +260,6 @@ button:hover {
 #isHamiltonian{
     visibility: hidden;
 }
+#PropertyPanelContent{
+    display: block;
+}

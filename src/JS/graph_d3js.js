@@ -95,6 +95,7 @@ function PageOpenOrReload() {
 
 
 }
+
 /*
 window.onresize = function() {
     let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
@@ -119,9 +120,8 @@ window.onresize = function() {
 }*/
 
 
-function InitNewGraph(graph = null)
-{
-    if(force) force.stop();
+function InitNewGraph(graph = null) {
+    if (force) force.stop();
 
     LoadGraphData(graph);
     InitGraph();
@@ -1348,8 +1348,8 @@ function UpdateG6Form(newg6) {
     document.querySelector('#g6').textContent = g6;
 }
 
-function checkIfExist(g){
-    window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String="+g6);
+function checkIfExist(g) {
+    window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + g6);
 }
 
 // function dragElement(elmnt) {
@@ -1407,6 +1407,7 @@ function lightMode() {
         allButton[j].style.backgroundColor = "lightblue";
     }
     window.localStorage.setItem('themeSelect', 'lightMode');
+    getCookieTheme();
 }
 
 function darkMode() {
@@ -1416,7 +1417,13 @@ function darkMode() {
     for (var i = 0, max = all.length; i < max; i++) {
         all[i].style.color = "white";
     }
+    var allButton = document.getElementsByTagName("button");
+    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+        allButton[j].style.color = "grey";
+        allButton[j].style.backgroundColor = "black";
+    }
     window.localStorage.setItem('themeSelect', 'darkMode');
+    document.querySelector('#g6').style.color = "black";
     getCookieTheme();
 }
 
@@ -1435,7 +1442,7 @@ function selectModeDependOfCookie() {
     }
 }
 
-function montrerHamiltonian(){
-    var element=document.getElementById("isHamiltonian");
-    element.style.visibility="visible";
+function montrerHamiltonian() {
+    var element = document.getElementById("isHamiltonian");
+    element.style.visibility = "visible";
 }
