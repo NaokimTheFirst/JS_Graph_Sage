@@ -751,16 +751,21 @@ function manageSelection() {
         .on('dragstart', function (d) {
             mousePreviousPos = [window.event.clientX, window.event.clientY];
             nodePreviousPos = [d.px, d.py];
+            console.log("Ancienne pos souris : " + mousePreviousPos[0] + ", " + mousePreviousPos[1]);
 
             drag_in_progress = true;
         })
         .on('dragend', function (d) {
             drag_in_progress = false;
             let tabNodes = [];
+            let mouseCurrentPos = [window.event.clientX, window.event.clientY];
+            console.log("Nouvelle pos souris : " + mouseCurrentPos[0] + ", " + mouseCurrentPos[1]);
 
             for (let node of graphSelectedNodes) {
                 let previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
                 let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+                console.log("Node previous pos : " + previousPos[0] + ", " + previousPos[1]);
+                console.log("Node final Pos : " + finalPos[0] + ", " + finalPos[1]);
 
                 if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
                     var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
@@ -769,7 +774,6 @@ function manageSelection() {
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
-            UpdateGraphProperties("Node's positions changed");
         }));
 
     RefreshNodes();

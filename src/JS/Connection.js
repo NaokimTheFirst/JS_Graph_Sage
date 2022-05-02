@@ -175,10 +175,6 @@ function RequestRenewGraph() {
     SubmitMessage(renewGraphParameter);
 }
 
-function RequestG6() {
-    SubmitMessage(getG6RequestParameter);
-}
-
 function DisplaySpanTree() {
     SubmitMessage(showSpanTreeParameter);
 }
