@@ -148,6 +148,13 @@ var overlayElements = {
         }
         return this._iseulerian;
     },
+    _g6:null,
+    get g6() {
+        if (!this._g6){
+            this._g6 = document.getElementById("g6");
+        }
+        return this._g6;
+    },
     _girth: null,
     get girth() {
         if (!this._girth) {
@@ -220,6 +227,7 @@ function SetProperties(radius,
                        edges,
                        halmitonian,
                        eulerian,
+                       g6Value
 
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
@@ -233,6 +241,7 @@ function SetProperties(radius,
     overlayElements.edgesNumber.innerHTML = edges;
     overlayElements.isHamiltonian.innerHTML = halmitonian;
     overlayElements.isEulerian.innerHTML = eulerian;
+    overlayElements.g6.textContent = g6Value;
 }
 
 function InitInterface() {

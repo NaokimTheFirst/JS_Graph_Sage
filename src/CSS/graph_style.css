@@ -237,13 +237,12 @@ button:hover {
     flex-direction: row;
 }
 
-#g6 button {
-    max-width: 150px;
-}
-
 .lightMode {
     fill: white;
 
+}
+#g6{
+    color: black;
 }
 
 .lightMode rect.backgound {
