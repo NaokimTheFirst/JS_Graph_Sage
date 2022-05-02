@@ -95,6 +95,14 @@ function PageOpenOrReload() {
 
 
 }
+
+window.onresize = function() {
+    if(force) force.stop();
+    ManageAllGraphicsElements();
+    InitForce();
+    force.start();
+}
+
 /*
 window.onresize = function() {
     let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
@@ -279,7 +287,6 @@ function InitForce() {
             .attr("cy", function (d) {
                 return d.y;
             });
-
         // Position of edges
         links.attr("d", function (d) {
 
@@ -357,14 +364,12 @@ function ManageAllGraphicsElements() {
         .attr("pointer-events", "all") // Zoom+move management
         .append('svg:g')
 
-
     // Zooming
     svg.append('svg:rect')
         .attr('x', -10000)
         .attr('y', -10000)
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000)
-
 
     //Resize
 
