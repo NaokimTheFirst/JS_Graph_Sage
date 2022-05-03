@@ -96,8 +96,8 @@ function PageOpenOrReload() {
 
 }
 
-window.onresize = function() {
-    if(force) force.stop();
+window.onresize = function () {
+    if (force) force.stop();
     ManageAllGraphicsElements();
     InitForce();
     force.start();
@@ -131,10 +131,10 @@ window.onresize = function() {
 function InitNewGraph(graph = null) {
     if (force) force.stop();
 
-    LoadGraphData(graph);
-    InitGraph();
-    InitInterface();
-    ManageAllGraphicsElements();
+    LoadGraphData(graph); // transformation des données JSON et format D3 JS
+    InitGraph(); // on rajoute les premiers attributs SVG et réalise les calculs des placements des points
+    InitInterface(); // on place l'interface en fonction de la taille du navigateur
+    ManageAllGraphicsElements(); //implementation de tout les élements graphique
     InitForce();
     //Start the automatic force layout
     force.start();
