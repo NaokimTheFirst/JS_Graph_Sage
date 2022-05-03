@@ -49,9 +49,9 @@ body {
 
 #Overlay {
     min-width: fit-content;
-    /* position: absolute; */
-    /* top: 0px;
-    left: 0px; */
+    /*position: absolute;
+    top: 0px;
+    left: 0px;*/
     height: 100%;
     /* overflow: auto; */
     background: none;
@@ -237,13 +237,12 @@ button:hover {
     flex-direction: row;
 }
 
-#g6 button {
-    max-width: 150px;
-}
-
 .lightMode {
     fill: white;
 
+}
+#g6{
+    color: black;
 }
 
 .lightMode rect.backgound {

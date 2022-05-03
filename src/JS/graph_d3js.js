@@ -747,20 +747,25 @@ function manageSelection() {
         }
     }
 
-    selectedNodes.call(force.drag()
+    selectedNodes.each(force.drag()
         .on('dragstart', function (d) {
             mousePreviousPos = [window.event.clientX, window.event.clientY];
             nodePreviousPos = [d.px, d.py];
+            console.log("Ancienne pos souris : " + mousePreviousPos[0] + ", " + mousePreviousPos[1]);
 
             drag_in_progress = true;
         })
         .on('dragend', function (d) {
             drag_in_progress = false;
             let tabNodes = [];
+            let mouseCurrentPos = [window.event.clientX, window.event.clientY];
+            console.log("Nouvelle pos souris : " + mouseCurrentPos[0] + ", " + mouseCurrentPos[1]);
 
             for (let node of graphSelectedNodes) {
                 let previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
                 let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+                console.log("Node previous pos : " + previousPos[0] + ", " + previousPos[1]);
+                console.log("Node final Pos : " + finalPos[0] + ", " + finalPos[1]);
 
                 if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
                     var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
@@ -769,7 +774,6 @@ function manageSelection() {
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
-            UpdateGraphProperties("Node's positions changed");
         }));
 
     RefreshNodes();
@@ -1348,6 +1352,7 @@ function DeleteAllEdgeGroups() {
     });
 }
 
+
 function UpdateG6Form(newg6) {
     g6 = newg6;
     document.querySelector('#g6').textContent = g6;
@@ -1356,6 +1361,7 @@ function UpdateG6Form(newg6) {
 function checkIfExist(g) {
     window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + g6);
 }
+
 
 // function dragElement(elmnt) {
 //     let mouseX = 0, mouseY = 0, offsetX, offsetY;
@@ -1399,55 +1405,56 @@ function checkIfExist(g) {
 //     }
 // }
 
-function lightMode() {
-    document.querySelector("body").classList.remove("darkMode");
-    document.querySelector("body").classList.add("lightMode");
-    var all = document.getElementsByTagName("*");
-    for (var i = 0, max = all.length; i < max; i++) {
-        all[i].style.color = "black";
+    function lightMode() {
+        document.querySelector("body").classList.remove("darkMode");
+        document.querySelector("body").classList.add("lightMode");
+        var all = document.getElementsByTagName("*");
+        for (var i = 0, max = all.length; i < max; i++) {
+            all[i].style.color = "black";
+        }
+        var allButton = document.getElementsByTagName("button");
+        for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+            allButton[j].style.color = "white";
+            allButton[j].style.backgroundColor = "lightblue";
+        }
+        window.localStorage.setItem('themeSelect', 'lightMode');
+        getCookieTheme();
     }
-    var allButton = document.getElementsByTagName("button");
-    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
-        allButton[j].style.color = "white";
-        allButton[j].style.backgroundColor = "lightblue";
+
+    function darkMode() {
+        document.querySelector("body").classList.remove("lightMode");
+        document.querySelector("body").classList.add("darkMode");
+        var all = document.getElementsByTagName("*");
+        for (var i = 0, max = all.length; i < max; i++) {
+            all[i].style.color = "white";
+        }
+        var allButton = document.getElementsByTagName("button");
+        for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+            allButton[j].style.color = "grey";
+            allButton[j].style.backgroundColor = "black";
+        }
+        window.localStorage.setItem('themeSelect', 'darkMode');
+        document.querySelector('#g6').style.color = "black";
+        getCookieTheme();
     }
-    window.localStorage.setItem('themeSelect', 'lightMode');
-    getCookieTheme();
-}
 
-function darkMode() {
-    document.querySelector("body").classList.remove("lightMode");
-    document.querySelector("body").classList.add("darkMode");
-    var all = document.getElementsByTagName("*");
-    for (var i = 0, max = all.length; i < max; i++) {
-        all[i].style.color = "white";
+    function getCookieTheme() {
+        return window.localStorage.getItem('themeSelect')
     }
-    var allButton = document.getElementsByTagName("button");
-    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
-        allButton[j].style.color = "grey";
-        allButton[j].style.backgroundColor = "black";
+
+    function selectModeDependOfCookie() {
+
+        if (getCookieTheme() === 'darkMode') {
+            darkMode();
+
+        } else if (getCookieTheme() === 'lightMode') {
+            lightMode();
+        } else {
+        }
     }
-    window.localStorage.setItem('themeSelect', 'darkMode');
-    document.querySelector('#g6').style.color = "black";
-    getCookieTheme();
-}
 
-function getCookieTheme() {
-    return window.localStorage.getItem('themeSelect')
-}
-
-function selectModeDependOfCookie() {
-
-    if (getCookieTheme() === 'darkMode') {
-        darkMode();
-
-    } else if (getCookieTheme() === 'lightMode') {
-        lightMode();
-    } else {
+    function montrerHamiltonian() {
+        var element = document.getElementById("isHamiltonian");
+        element.style.visibility = "visible";
     }
-}
 
-function montrerHamiltonian() {
-    var element = document.getElementById("isHamiltonian");
-    element.style.visibility = "visible";
-}
