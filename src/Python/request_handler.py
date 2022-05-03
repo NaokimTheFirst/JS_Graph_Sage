@@ -38,6 +38,8 @@ def _get_graph_properties(graph):
     response[1].append(graph.is_bipartite())
     response[1].append(len(graph.vertices()))
     ds = graph.degree_sequence()
+    if not ds:
+        ds = ['None']
     response[1].append(ds[0])  # get max degree of the graph
     response[1].append(ds[len(ds) - 1])  # get minimum degree of the graph
     response[1].append(graph.size())
@@ -180,14 +182,13 @@ def _get_new_graph_in_JSON_for_JS(graph):
 
 def _generate_graph6_formula(graph):
     if (graph.has_loops()) :
-        response == "None"
+        response = ("None")
         print("G6 can be applied on simple graph only")
     else :
         if (graph.is_directed()):
-            response = graph.dig6_string()
+            response = (graph.dig6_string())
         else:
-            response = graph.graph6_string()
-
+            response = (graph.graph6_string())
     return response
 
 def _get_girth(graph):

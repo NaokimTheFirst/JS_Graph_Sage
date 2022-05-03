@@ -49,7 +49,6 @@ function InitWebSocketConnection() {
 }
 
 function TreatResponse(response) {
-    console.log(response);
     switch (response.request) {
         case propertiesRequestParameter:
             SetProperties(response.result[0],

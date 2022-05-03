@@ -95,6 +95,14 @@ function PageOpenOrReload() {
 
 
 }
+
+window.onresize = function() {
+    if(force) force.stop();
+    ManageAllGraphicsElements();
+    InitForce();
+    force.start();
+}
+
 /*
 window.onresize = function() {
     let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
@@ -279,7 +287,6 @@ function InitForce() {
             .attr("cy", function (d) {
                 return d.y;
             });
-
         // Position of edges
         links.attr("d", function (d) {
 
@@ -357,14 +364,12 @@ function ManageAllGraphicsElements() {
         .attr("pointer-events", "all") // Zoom+move management
         .append('svg:g')
 
-
     // Zooming
     svg.append('svg:rect')
         .attr('x', -10000)
         .attr('y', -10000)
         .attr('width', 2 * 10000)
         .attr('height', 2 * 10000)
-
 
     //Resize
 
@@ -746,23 +751,29 @@ function manageSelection() {
         .on('dragstart', function (d) {
             mousePreviousPos = [window.event.clientX, window.event.clientY];
             nodePreviousPos = [d.px, d.py];
+            console.log("Ancienne pos souris : " + mousePreviousPos[0] + ", " + mousePreviousPos[1]);
 
             drag_in_progress = true;
         })
         .on('dragend', function (d) {
             drag_in_progress = false;
             let tabNodes = [];
+            let mouseCurrentPos = [window.event.clientX, window.event.clientY];
+            console.log("Nouvelle pos souris : " + mouseCurrentPos[0] + ", " + mouseCurrentPos[1]);
 
-            let previousPos = [node.px, node.py];
-            let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+            for (let node of graphSelectedNodes) {
+                let previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
+                let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+                console.log("Node previous pos : " + previousPos[0] + ", " + previousPos[1]);
+                console.log("Node final Pos : " + finalPos[0] + ", " + finalPos[1]);
 
-            if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
-                var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
-                tabNodes.push(positions);
+                if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
+                    var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
+                    tabNodes.push(positions);
+                }
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
-            UpdateGraphProperties("Node's positions changed");
         }));
 
     RefreshNodes();
@@ -1397,6 +1408,7 @@ function lightMode() {
     var allButton = document.getElementsByTagName("button");
     for (var j = 0, jmax = allButton.length; j < jmax; j++) {
         allButton[j].style.color = "white";
+        allButton[j].style.backgroundColor = "lightblue";
     }
     window.localStorage.setItem('themeSelect', 'lightMode');
 }
