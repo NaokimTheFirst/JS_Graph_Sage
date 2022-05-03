@@ -6,7 +6,6 @@ __edgeColoringParameter = 'edgeColoring'
 __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
 __renewGraphParameter = 'renewGraph'
-__graph6Parameter = "Graph6"
 __showSpanTreeParameter = "showSpanTree"
 __girthParameter = "girth"
 __vertexConnectivityParameter="vertexConnectivity"
@@ -44,6 +43,7 @@ def _get_graph_properties(graph):
     response[1].append(graph.size())
     response[1].append(graph.is_hamiltonian())
     response[1].append(graph.is_eulerian())
+    response[1].append(_generate_graph6_formula(graph))
     return response, graph
 
 
@@ -179,18 +179,16 @@ def _get_new_graph_in_JSON_for_JS(graph):
 
 
 def _generate_graph6_formula(graph):
-    response = [__graph6Parameter]
-
     if (graph.has_loops()) :
-        response.append("None")
+        response == "None"
         print("G6 can be applied on simple graph only")
     else :
         if (graph.is_directed()):
-            response.append(graph.dig6_string())
+            response = graph.dig6_string()
         else:
-            response.append(graph.graph6_string())
+            response = graph.graph6_string()
 
-    return response, graph
+    return response
 
 def _get_girth(graph):
 
@@ -255,7 +253,6 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __edgeColoringParameter: _generate_edge_coloring_for_JS,
                      __convertGraphParameter: _convert_graph_digraph_bidirectionnal_for_JS,
                      __renewGraphParameter: _get_new_graph_in_JSON_for_JS,
-                     __graph6Parameter: _generate_graph6_formula,
                      __showSpanTreeParameter: _span_tree_as_string_array,
                      __girthParameter: _get_girth,
                      __vertexConnectivityParameter: _get_Vertex_Connectivity,

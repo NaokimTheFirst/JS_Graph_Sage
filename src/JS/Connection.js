@@ -8,7 +8,6 @@ const edgeColoringRequestParameter = "edgeColoring";
 const convertGraphParameter = "convert";
 const closeConnectionParameter = "closeConnection";
 const renewGraphParameter = "renewGraph";
-const getG6RequestParameter = "Graph6";
 const showSpanTreeParameter = "showSpanTree";
 const girthParameter = "girth";
 const vertexConnectivityParameter = "vertexConnectivity"
@@ -65,6 +64,7 @@ function TreatResponse(response) {
                 response.result[9],
                 response.result[10],
                 response.result[11],
+                response.result[12]
             );
             break;
         case showSpanTreeParameter :
@@ -89,9 +89,6 @@ function TreatResponse(response) {
             break;
         case convertGraphParameter :
             CustomWarn("Graph : " + response.result + " open in new Window");
-            break;
-        case getG6RequestParameter :
-            UpdateG6Form(response.result);
             break;
         case closeConnectionParameter :
             webSocket.close();
@@ -133,7 +130,6 @@ function TreatResponse(response) {
 
 function UpdateGraphProperties(message = ""){
     SubmitMessage(propertiesRequestParameter,message = message);
-    RequestG6();
 }
 
 function montrerGirth(){
@@ -178,10 +174,6 @@ function RequestConvertGraph() {
 
 function RequestRenewGraph() {
     SubmitMessage(renewGraphParameter);
-}
-
-function RequestG6() {
-    SubmitMessage(getG6RequestParameter);
 }
 
 function DisplaySpanTree() {

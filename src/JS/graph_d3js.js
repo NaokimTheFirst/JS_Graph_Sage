@@ -742,7 +742,7 @@ function manageSelection() {
         }
     }
 
-    selectedNodes.call(force.drag()
+    selectedNodes.each(force.drag()
         .on('dragstart', function (d) {
             mousePreviousPos = [window.event.clientX, window.event.clientY];
             nodePreviousPos = [d.px, d.py];
@@ -753,14 +753,12 @@ function manageSelection() {
             drag_in_progress = false;
             let tabNodes = [];
 
-            for (let node of graphSelectedNodes) {
-                let previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
-                let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+            let previousPos = [node.px, node.py];
+            let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
 
-                if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
-                    var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
-                    tabNodes.push(positions);
-                }
+            if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
+                var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
+                tabNodes.push(positions);
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
@@ -1341,11 +1339,6 @@ function DeleteAllEdgeGroups() {
     links.each(function (d) {
         delete d.group;
     });
-}
-
-function UpdateG6Form(newg6) {
-    g6 = newg6;
-    document.querySelector('#g6').textContent = g6;
 }
 
 function checkIfExist(g){

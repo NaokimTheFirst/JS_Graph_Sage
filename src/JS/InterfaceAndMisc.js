@@ -182,6 +182,13 @@ var overlayElements = {
             this._edgeConnectivity=document.getElementById("edgeConnectivity")
         }
         return this._edgeConnectivity
+    },
+    _g6:null,
+    get g6(){
+        if(!this._g6){
+            this._g6=document.getElementById("g6");
+        }
+        return this._g6;
     }
 
 }
@@ -220,6 +227,7 @@ function SetProperties(radius,
                        edges,
                        halmitonian,
                        eulerian,
+                       g6value
 
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
@@ -233,6 +241,7 @@ function SetProperties(radius,
     overlayElements.edgesNumber.innerHTML = edges;
     overlayElements.isHamiltonian.innerHTML = halmitonian;
     overlayElements.isEulerian.innerHTML = eulerian;
+    overlayElements.g6.innerHTML = g6value;
 }
 
 function InitInterface() {
