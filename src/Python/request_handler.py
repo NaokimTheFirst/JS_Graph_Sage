@@ -193,18 +193,23 @@ def _generate_graph6_formula(graph):
 
 def _get_girth(graph):
 
-	isTree = _the_graph_is_a_tree(graph)
+    isTree = _the_graph_is_a_tree(graph)
+    empty=_the_graph_is_a_forest(graph)
 
-	if (isTree):
-		result="Infinite"
-	else:
-		result=graph.girth()
+    if (isTree):
+        result="Infinite"
 
-	return [__girthParameter, result], graph
+    if(empty):
+        result="Infinite"
+    else:
+        result=graph.girth()
+
+    return [__girthParameter, result], graph
 
 def _the_graph_is_a_tree(graph):
-	return graph.is_tree()
-
+    return graph.is_tree()
+def _the_graph_is_a_forest(graph):
+    return graph.is_forest()
 
 def _get_Vertex_Connectivity(graph):
     result=graph.vertex_connectivity()
