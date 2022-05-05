@@ -8,13 +8,14 @@ __errorParameter = "errorWhileTreatingRequest"
 __renewGraphParameter = 'renewGraph'
 __showSpanTreeParameter = "showSpanTree"
 __girthParameter = "girth"
-__vertexConnectivityParameter="vertexConnectivity"
-__chromaticNumberParameter="chromaticNumber"
-__chromaticIndexParamater="chromaticIndex"
-__edgeConnectivityParamater= "edgeConnectivity"
+__vertexConnectivityParameter = "vertexConnectivity"
+__chromaticNumberParameter = "chromaticNumber"
+__chromaticIndexParamater = "chromaticIndex"
+__edgeConnectivityParamater = "edgeConnectivity"
 __saveGraphParameter = 'save'
 __switchLockParameter = "switchLock"
 __freezeGraphParameter = "freezePositions"
+
 from json import JSONEncoder
 
 
@@ -166,6 +167,7 @@ def __convert_DtoG(graph):
 
 tmpJSgraphs = []
 
+
 def __create_temporary_JS_graph(graph):
     global tmpJSgraphs
 
@@ -181,46 +183,51 @@ def _get_new_graph_in_JSON_for_JS(graph):
 
 
 def _generate_graph6_formula(graph):
-    if (graph.has_loops()) :
-        response = ("None")
+    if (graph.has_loops()):
+        response = "None"
         print("G6 can be applied on simple graph only")
-    else :
+    else:
         if (graph.is_directed()):
             response = (graph.dig6_string())
         else:
             response = (graph.graph6_string())
     return response
 
+
 def _get_girth(graph):
+    isTree = _the_graph_is_a_tree(graph)
 
-	isTree = _the_graph_is_a_tree(graph)
+    if (isTree):
+        result = "Infinite"
+    else:
+        result = graph.girth()
 
-	if (isTree):
-		result="Infinite"
-	else:
-		result=graph.girth()
+    return [__girthParameter, result], graph
 
-	return [__girthParameter, result], graph
 
 def _the_graph_is_a_tree(graph):
-	return graph.is_tree()
+    return graph.is_tree()
 
 
 def _get_Vertex_Connectivity(graph):
-    result=graph.vertex_connectivity()
-    return [__vertexConnectivityParameter,result], graph
+    result = graph.vertex_connectivity()
+    return [__vertexConnectivityParameter, result], graph
+
 
 def _get_Chromatic_Number(graph):
-    result=graph.chromatic_number()
-    return [__chromaticNumberParameter,result],graph
+    result = graph.chromatic_number()
+    return [__chromaticNumberParameter, result], graph
+
 
 def _get_Chromatic_Index(graph):
-    result=graph.chromatic_index()
-    return [__chromaticIndexParamater,result],graph
+    result = graph.chromatic_index()
+    return [__chromaticIndexParamater, result], graph
+
 
 def _get_Edge_Connectivity(graph):
-    result=graph.edge_connectivity()
+    result = graph.edge_connectivity()
     return [__edgeConnectivityParamater, result], graph
+
 
 def _save_graph(newGraph, oldGraph):
     response = ["save", "Graph saved"]
@@ -234,9 +241,9 @@ def _switch_lock(client):
     client['lock'] = not client['lock']
     s = "Save auto "
 
-    if client['lock'] :
+    if client['lock']:
         s += "enabled"
-    else :
+    else:
         s += "disabled"
 
     print(s)
@@ -244,8 +251,10 @@ def _switch_lock(client):
 
     return response
 
+
 def _freezePositions(graph):
     return [__freezeGraphParameter, "Nodes' positions set"], graph
+
 
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
@@ -257,16 +266,12 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __showSpanTreeParameter: _span_tree_as_string_array,
                      __girthParameter: _get_girth,
                      __vertexConnectivityParameter: _get_Vertex_Connectivity,
-                     __chromaticNumberParameter:_get_Chromatic_Number,
-                     __chromaticIndexParamater:_get_Chromatic_Index,
-                     __edgeConnectivityParamater:_get_Edge_Connectivity,
+                     __chromaticNumberParameter: _get_Chromatic_Number,
+                     __chromaticIndexParamater: _get_Chromatic_Index,
+                     __edgeConnectivityParamater: _get_Edge_Connectivity,
                      __saveGraphParameter: _save_graph,
                      __switchLockParameter: _switch_lock,
                      __freezeGraphParameter: _freezePositions}
-
-
-
-
 
 # def create_show_global_tmp_graph(graph):
 # 	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'
