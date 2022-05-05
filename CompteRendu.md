@@ -118,4 +118,26 @@ Faire un bouton("save") qui permet de fixer l'embedding (la possibilité de free
 - Fonctionnalité *Freeze positions* en cliquant 'F' (layout `spring` par defaut s'il n'y a pas de positions fixes).
 - Dark et Light Mode avec l'utilisation des cookies pour sauvegarder les preferences de l'utilisateur.
 
-**Prochaine reunion :** mercredi 03/05 a 9h00
+#### 03/05/2022 - 10e rdv
+*Nouvelles choses à faire :*
+- Regarder la fonctionnalite de Zoom dans la solution [IPE](https://ipe.otfried.org/), voir si on peut faire le même.
+- Changer la taille des sommets on window.resize.
+- Penser comment régler le problème de sommets qui sortent de la fenêtre quand on diminue sa taille.
+- Fixer la taille du menu.
+- Is Hamiltonian mettre en *Hard Algorithmes*.
+- Penser à afficher le cycle Hamiltonian (comme on fait pour le spanning tree).
+- Mettre Girth et les 2 connectivities en *Properties* - ce n'est pas Hard stuff.
+- Dans la section *Hard algorithmes* mettre : Coloring, chromatic, is Hamiltonian.
+- Le reste mettre dans la section *Oriented graphs*.
+- Corriger les bugs de coloration et de *Redraw Graph* avec le graph de type `graphs.HortonGraph()`.
+- Ne pas appeler `UpdateGraphProperties` lorsqu'on bouge des sommets ou les renomme.
+- Remplacer `is_tree()` par `is_forest()` dans le calcul de Girth.
+- Décider si on veut faire une demande pour présenter notre solution pour les Sage Days à Montpellier (la semaine du 13 juin).
+- Voir [*phitigra*](https://github.com/jfraymond/phitigra) par J. F. Raymond - solution qui permet de manipuler les graphes comme le notre. Se positionner par rapport à lui. Voir si son truc est trop dépendant de Jupiter.
+
+*Travail fait :*
+- Problème d'affichage des graphes vides corrigé.
+- L'interface graphique (<rect>) s'adapte à la taille de l'écran on window.resize().
+- Amélioration des styles de dark et light modes (quelques bugs corrigés).
+    
+**Prochaine reunion :** lundi 09/05 a 16h40
