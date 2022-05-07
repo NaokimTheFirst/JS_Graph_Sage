@@ -1,3 +1,8 @@
+//Counter that will count how many times we press a key
+var countKey = [0,''];
+
+var originVertex;
+
 //Structure that allow to search DOM element only once
 var overlayElements = {
     _groupListElement: null,
@@ -315,6 +320,35 @@ function KeyboardEventInit() {
             case 76 :
                 //L for Loops
                 result = [AddLoopOnSelection(), "Add loop on selected nodes"];
+                break;
+            case 77 :
+                //M for Merge Vertices
+      
+                let selectedVertices = [];
+                if (countKey[0] == 0 || countKey[1] != 'M'){ 
+                    if(GetCurrentSelection()['nodes'].length != 1 ){
+                        CustomWarn('Select only one Vertex');
+                    }
+                    else {
+                        countKey[0] ++;
+                        countKey[1] = 'M';
+                        originVertex = GetCurrentSelection()['nodes'][0]['data']['name'];
+                        CustomWarn('Origin Vertex ' + originVertex + ' selected')
+                    }
+                }
+                else { //peut etre un if à rajouter pour que ça ne suprime pas un sommet
+                    selectedVertices.push(originVertex);
+                
+
+                    for (let vertex of GetCurrentSelection()['nodes']){
+                        let vertexname = vertex['data']['name'];
+                        selectedVertices.push(vertexname);
+                    }
+
+                    countKey[0] = 0;
+                    countKey[1] = '';
+                    mergeVertices(selectedVertices);
+                } 
                 break;
             case 78 :
                 //N for Rename

@@ -14,6 +14,7 @@ const girthParameter = "girth";
 const saveGraphParamter = "save";
 const switchLockParameter = "switchLock"
 const freezeGraphCoordinates = "freezePositions";
+const mergeVerticesParameter = "mergeVertices";
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -106,6 +107,12 @@ function TreatResponse(response) {
         case freezeGraphCoordinates:
             CustomWarn(response.result);
             break;
+        case mergeVerticesParameter:
+          InitNewGraph(StringToObject(response.result));
+          UpdateGraphProperties();
+          CustomWarn("Nodes merged");
+
+              break; 
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
             break;
@@ -175,6 +182,10 @@ function switchLock(){
 
 function onCloseClick() {
     webSocket.close();
+}
+
+function mergeVertices(verticesToMerge){
+  SubmitMessage(mergeVerticesParameter, verticesToMerge);
 }
 
 

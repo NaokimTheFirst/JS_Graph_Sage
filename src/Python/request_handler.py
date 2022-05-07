@@ -12,6 +12,7 @@ __girthParameter = "girth"
 __saveGraphParameter = 'save'
 __switchLockParameter = "switchLock"
 __freezeGraphParameter = "freezePositions"
+__mergeVerticesParameter = "mergeVertices"
 
 from json import JSONEncoder
 
@@ -227,6 +228,27 @@ def _switch_lock(client):
 def _freezePositions(graph):
     return [__freezeGraphParameter, "Nodes' positions set"], graph
 
+def _mergeVertices(graph, verticesToMerge) :
+    #print("Les GRAPH Choco ")
+    print(graph.vertices())
+    verticesToMerge2=casteTypeVertex(graph, verticesToMerge)
+
+    for i in verticesToMerge2:
+        #print("LE I Choco ") 
+        print(type(i))
+    
+    graph.merge_vertices(verticesToMerge2)     
+    return [__mergeVerticesParameter, graph_to_JSON(graph, layout=None)], graph
+
+def casteTypeVertex(graph, verticesToMerge) :
+    vertecies = graph.vertices()
+    verteciesToReturn = [];
+    for i in verticesToMerge :
+        for j in vertecies :
+            if (i == str(j)):
+                verteciesToReturn.append(j)
+    return verteciesToReturn
+
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
                      __randomOrientationParameter: _random_orientation_for_JS,
@@ -239,7 +261,8 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __girthParameter: _get_girth,
                      __saveGraphParameter: _save_graph,
                      __switchLockParameter: _switch_lock,
-                     __freezeGraphParameter: _freezePositions}
+                     __freezeGraphParameter: _freezePositions,
+                     __mergeVerticesParameter: _mergeVertices}
 
 
 
