@@ -229,16 +229,13 @@ def _freezePositions(graph):
     return [__freezeGraphParameter, "Nodes' positions set"], graph
 
 def _mergeVertices(graph, verticesToMerge) :
-    #print("Les GRAPH Choco ")
-    print(graph.vertices())
     verticesToMerge2=casteTypeVertex(graph, verticesToMerge)
 
-    for i in verticesToMerge2:
-        #print("LE I Choco ") 
-        print(type(i))
+
     
-    graph.merge_vertices(verticesToMerge2)     
-    return [__mergeVerticesParameter, graph_to_JSON(graph, layout=None)], graph
+    graph.merge_vertices(verticesToMerge2)  
+
+    return [__mergeVerticesParameter, graph_to_JSON(graph, layout=None)]
 
 def casteTypeVertex(graph, verticesToMerge) :
     vertecies = graph.vertices()
@@ -248,6 +245,7 @@ def casteTypeVertex(graph, verticesToMerge) :
             if (i == str(j)):
                 verteciesToReturn.append(j)
     return verteciesToReturn
+    
 
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
