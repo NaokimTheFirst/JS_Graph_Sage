@@ -48,6 +48,8 @@ def port_in_use(port: int) -> bool:
         return s.connect_ex(('localhost', port)) == 0
 
 def connect():
+	global current_server
+
 	PORT=9001
 	try :
 		server = None
@@ -55,7 +57,6 @@ def connect():
 		server.set_fn_new_client(new_client)
 		server.set_fn_client_left(client_left)
 		server.set_fn_message_received(message_received)
-		global current_server
 		current_server = server
 		server.run_forever()
 	
@@ -66,7 +67,6 @@ def connect():
 		server.set_fn_new_client(new_client)
 		server.set_fn_client_left(client_left)
 		server.set_fn_message_received(message_received)
-		global current_server
 		current_server = server
 		server.run_forever()
 	
