@@ -723,7 +723,6 @@ function ManageNodes() {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
                     MyManager.Execute(new MoveNodeCommand(positions));
-                    UpdateGraphProperties("Node's positions changed");
                 }
 
             }));
@@ -768,7 +767,6 @@ function manageSelection() {
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
-            UpdateGraphProperties("Node's positions changed");
         }));
 
     RefreshNodes();
@@ -1290,11 +1288,6 @@ function FindElementInGraph(element) {
             break;
     }
     return list[list.indexOf(element.data)];
-}
-
-
-function UpdateGraphProperties(message = "") {
-    SubmitMessage(propertiesRequestParameter, message = message);
 }
 
 function SetNodesColoration(colorationList) {
