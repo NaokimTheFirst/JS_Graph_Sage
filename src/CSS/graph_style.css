@@ -48,7 +48,7 @@ body {
 
 
 #Overlay {
-    min-width: fit-content;
+    width: 180px;
     /*position: absolute;
     top: 0px;
     left: 0px;*/

@@ -1,7 +1,7 @@
 //The graph properties
 var graphJSON, force, customColorScale;
 var width = function () {
-    return document.documentElement.clientWidth * 0.77
+    return document.documentElement.clientWidth * 0.7
 };
 var height = function () {
     return document.documentElement.clientHeight
@@ -92,17 +92,31 @@ function PageOpenOrReload() {
         InitNewGraph();
         UpdateGraphProperties();
     }
-
-
 }
 
 window.onresize = function() {
     if(force) force.stop();
+    OptimizeVertexSize();
     ManageAllGraphicsElements();
     InitForce();
     force.start();
 }
 
+function OptimizeVertexSize() {
+    var w = window.innerWidth;
+    if (w > 800) {
+        graphJSON.vertex_size = 12;
+        graphJSON.edge_thickness = 4;
+    }
+    else if (w > 500) {
+        graphJSON.vertex_size = 9;
+        graphJSON.edge_thickness = 3;
+    }
+    else {
+        graphJSON.vertex_size = 6;
+        graphJSON.edge_thickness = 2;
+    }
+}
 
 /*
 window.onresize = function() {
@@ -132,6 +146,7 @@ function InitNewGraph(graph = null) {
     if (force) force.stop();
 
     LoadGraphData(graph);
+    OptimizeVertexSize();
     InitGraph();
     InitInterface();
     ManageAllGraphicsElements();
@@ -262,13 +277,13 @@ function center_and_scale() {
         miny = Math.min(miny, graphJSON.pos[i][1]);
     });
 
-    var border = 60
+    var border = 60;
     var xspan = maxx - minx;
     var yspan = maxy - miny;
 
     var scale = Math.min((height() - border) / yspan, (width() - border) / xspan);
-    var xshift = (width() - scale * xspan) / 2
-    var yshift = (height() - scale * yspan) / 2
+    var xshift = (width() - scale * xspan) / 2;
+    var yshift = (height() - scale * yspan) / 2;
 
     force.nodes().forEach(function (d, i) {
         d.x = scale * (graphJSON.pos[i][0] - minx) + xshift;
