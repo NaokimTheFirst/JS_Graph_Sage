@@ -1347,12 +1347,6 @@ function DeleteAllEdgeGroups() {
     });
 }
 
-
-function UpdateG6Form(newg6) {
-    g6 = newg6;
-    document.querySelector('#g6').textContent = g6;
-}
-
 function checkIfExist(g) {
     window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + g6);
 }
