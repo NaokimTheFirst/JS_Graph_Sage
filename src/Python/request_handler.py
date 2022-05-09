@@ -202,7 +202,7 @@ def _get_girth(graph):
     if (isTree):
         result="Infinite"
 
-    if(empty):
+    if(empty==False):
         result="Infinite"
     else:
         result=graph.girth()
