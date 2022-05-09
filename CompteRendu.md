@@ -139,5 +139,33 @@ Faire un bouton("save") qui permet de fixer l'embedding (la possibilité de free
 - Problème d'affichage des graphes vides corrigé.
 - L'interface graphique (<rect>) s'adapte à la taille de l'écran on window.resize().
 - Amélioration des styles de dark et light modes (quelques bugs corrigés).
+
+#### 09/05/2022 - 11e rdv
+*Nouvelles choses à faire :*
+- Garder seulement la fonctionnalité de 'U' (renommer comme "On/Off automatic save"), pas besion de 'S' (on peut obtenir le même resultat en appuyant 'U' 2 fois).
+- Pour le "merge" des sommets prendre le premier sommet aléatoirement pour ne pas rendre le processus trop compliqué.
+- Ne pas redessiner le graphe lors du merge et mettre le nouveau sommet résultant du merge dans le centre du rectangle formé par les sommets fusionnés. Algorithme pour faire un merge sans la fonction sage :
+    ```
+    liste = []
+    s = set()
+    for i in liste:
+        s.union(g.neighbors(i))
+    s.difference(liste)
+    ```
+- Ajouter des interlignes dans Key Helper pour une mise en page plus claire.
+- Renommer "Subdivide Edge" dans Key Helper en "Subdivide Edges".
+- Enlever le resize manuel du menu dans css.
+- Ne pas afficher les classes de coloration en texte après "Redraw".
+- Edge coloring ne marche pas après la subdivision des arêtes.
+- Ne pas permettre à l'utilisateur de déplacer les sommets en dehors de la fenêtre !!!
+- Renommer "Exist" en "Exists on House of Graphs" (mettre House of Graphs sous le style d'un lien).
+- Repositionner le bouton G6 et la zone de texte.
     
-**Prochaine reunion :** lundi 09/05 a 16h40
+*Travail fait :*
+- Resize des sommets et arêtes on window resize.
+- `UpdateGraphProperties` n'est plus appelé lors de la repositionnement des sommets.
+- Bugs du HortonGraph corrigés.
+- Taille du menu fixé.
+- Améliorer le positionnement du graphe dans le centre (problème du décalage vers le droit fixé).
+    
+**Prochaine reunion :** lundi 16/05 a 16h20 ? 8h30 ? (envoyer un mail au prof)
