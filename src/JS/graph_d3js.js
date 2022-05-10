@@ -97,6 +97,7 @@ function PageOpenOrReload() {
 window.onresize = function() {
     if(force) force.stop();
     OptimizeVertexSize();
+    center_and_scale();
     ManageAllGraphicsElements();
     InitForce();
     force.start();
@@ -104,16 +105,17 @@ window.onresize = function() {
 
 function OptimizeVertexSize() {
     var w = window.innerWidth;
-    if (w > 800) {
+    var h = window.innerHeight;
+    if (w > 800 && h > 600) {
         graphJSON.vertex_size = 12;
         graphJSON.edge_thickness = 4;
     }
-    else if (w > 500) {
-        graphJSON.vertex_size = 9;
+    else if (w > 500 && h > 400) {
+        graphJSON.vertex_size = w/100;
         graphJSON.edge_thickness = 3;
     }
     else {
-        graphJSON.vertex_size = 6;
+        graphJSON.vertex_size = 5;
         graphJSON.edge_thickness = 2;
     }
 }
@@ -144,7 +146,6 @@ window.onresize = function() {
 
 function InitNewGraph(graph = null) {
     if (force) force.stop();
-
     LoadGraphData(graph);
     OptimizeVertexSize();
     InitGraph();
@@ -281,13 +282,17 @@ function center_and_scale() {
     var xspan = maxx - minx;
     var yspan = maxy - miny;
 
-    var scale = Math.min((height() - border) / yspan, (width() - border) / xspan);
-    var xshift = (width() - scale * xspan) / 2;
-    var yshift = (height() - scale * yspan) / 2;
+    var w = width();
+    var h = height();
+    var scale = Math.min((h - border) / yspan, (w - border) / xspan);
+    var xshift = (w - scale * xspan) / 2;
+    var yshift = (h - scale * yspan) / 2;
 
     force.nodes().forEach(function (d, i) {
         d.x = scale * (graphJSON.pos[i][0] - minx) + xshift;
         d.y = scale * (graphJSON.pos[i][1] - miny) + yshift;
+        d.px = d.x;
+        d.py = d.y;
     });
 }
 
