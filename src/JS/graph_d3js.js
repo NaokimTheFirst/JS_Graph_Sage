@@ -205,8 +205,7 @@ function InitGraph() {
         .force("charge", d3.forceManyBody().strength(graphJSON.charge))
         .force("link", d3.forceLink()
             .distance(graphJSON.link_distance)
-            .strength(graphJSON.link_strength)
-            .id(function(d) { return d.name; }))
+            .strength(graphJSON.link_strength))
         .force("x", d3.forceX(graphJSON.gravity).x(width()))
         .force("y", d3.forceY(graphJSON.gravity).y(height()));
         // .charge(graphJSON.charge)
