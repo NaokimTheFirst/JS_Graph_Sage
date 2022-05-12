@@ -1348,7 +1348,7 @@ function DeleteAllEdgeGroups() {
 }
 
 function checkIfExist(g) {
-    window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + g6);
+   window.open("https://hog.grinvin.org/ListGraphs.action?"+g6);
 }
 
 
