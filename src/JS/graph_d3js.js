@@ -417,18 +417,17 @@ function InitBrush() {
     brush = svg.append("g")
         .attr("class", "brush")
         .call(d3.brush()
-            // .x(d3.scale.identity().domain([-100000, 100000]))
-            // .y(d3.scale.identity().domain([-100000, 100000]))
-            .on("start", function () {
+        .extent( [ [0,0], [100000,100000] ] )
+        .on("start", function () {
                 ResetSelection();
             })
-            .on("end", function () {
-                var extent = d3.event.target.extent();
+        .on("end", function () {
+                var extent = d3.brushSelection(this) ||
+                [[0,0],[0,0]];
                 SelectElementsInsideExtent(extent);
 
                 //Remove Selection rectangle
-                // d3.event.target.clear();
-                d3.select(this).call(d3.event.target);
+                d3.selectAll("rect.selection").style("display", "none");
             }));
 }
 
