@@ -104,19 +104,21 @@ window.onresize = function() {
 }
 
 function OptimizeVertexSize() {
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-    if (w > 800 && h > 600) {
-        graphJSON.vertex_size = 12;
-        graphJSON.edge_thickness = 4;
-    }
-    else if (w > 500 && h > 400) {
-        graphJSON.vertex_size = w/100;
-        graphJSON.edge_thickness = 3;
-    }
-    else {
-        graphJSON.vertex_size = 5;
-        graphJSON.edge_thickness = 2;
+    if (typeof graphJSON != "undefined") {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        if (w > 800 && h > 600) {
+            graphJSON.vertex_size = 12;
+            graphJSON.edge_thickness = 4;
+        }
+        else if (w > 500 && h > 400) {
+            graphJSON.vertex_size = w/100;
+            graphJSON.edge_thickness = 3;
+        }
+        else {
+            graphJSON.vertex_size = 5;
+            graphJSON.edge_thickness = 2;
+        }
     }
 }
 
@@ -242,7 +244,7 @@ function ResetSelection() {
     currentSelection = GetCurrentSelection(true);
 
     if (currentSelection != null) {
-        //For each list
+        // For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
@@ -250,14 +252,16 @@ function ResetSelection() {
             });
         });
 
+        let selectedNodes = svg.selectAll(".isSelected");
+
         for (let node of document.querySelectorAll('.isSelected')) {
             node.setAttribute('class', 'node');
         }
 
-        manageSelection();
         RefreshNodes();
         RefreshEdge();
         RefreshLoops();
+        SetDrag(selectedNodes);
     }
 }
 
@@ -733,22 +737,9 @@ function ManageNodes() {
         })
         .on("dblclick", function (currentData) {
             SelectElement(new Element(currentData, NodeType));
-        })
-        .call(d3.drag()
-            .on('start', function (d) {
-                drag_in_progress = true;
-                d.previousPos = [d.x, d.y];
-            })
-            .on('end', function (d) {
-                drag_in_progress = false;
+        });
 
-                if (d.previousPos[0] != d.x && d.previousPos[1] != d.y) {
-                    let finalPos = [d.x, d.y];
-                    var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
-                    MyManager.Execute(new MoveNodeCommand(positions));
-                }
-
-            }));
+    SetDrag(nodes);
 
     RefreshNodes();
 
@@ -756,10 +747,73 @@ function ManageNodes() {
     nodes.exit().remove();
 }
 
+function SetDrag(nodes) {
+    nodes
+        .call(d3.drag()
+            .on('start', function (d) {
+                if (!d3.event.active) force.alphaTarget(0.3).restart();
+                drag_in_progress = true;
+                d.previousPos = [d.x, d.y];
+            })
+            .on('drag', function (d) {
+                d.fx = d3.event.x;
+                d.fy = d3.event.y;
+            })
+            .on('end', function (d) {
+                if (!d3.event.active) force.alphaTarget(0);
+                drag_in_progress = false;
+                if (d.previousPos[0] != d.x && d.previousPos[1] != d.y) {
+                    let finalPos = [d.x, d.y];
+                    var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
+                    MyManager.Execute(new MoveNodeCommand(positions));
+                }
+            }));
+}
+
+// var mousePreviousPos;
+// var mouseOldPos;
+// var graphSelectedNodes = [];
+
+// function MultiDrag(call) {
+//     for (let node of graphJSON.nodes){
+//         if (node.isSelected){
+//             graphSelectedNodes.push(node);
+//         }
+//     }
+
+//     switch(call) {
+//         case 'start':
+//             mousePreviousPos = [window.event.clientX, window.event.clientY];
+//             mouseOldPos = [window.event.clientX, window.event.clientY];
+//             break;
+//         case 'drag':
+//             let mousePosX = window.event.clientX;
+//             let mousePosY = window.event.clientY;
+//             graphSelectedNodes.forEach((node) => { node.fx += mousePosX - mousePreviousPos[0]; node.fy += mousePosY - mousePreviousPos[1];})
+//             mousePreviousPos = [mousePosX, mousePosY];
+//             break;
+//         case 'end':
+//             let tabNodes = [];
+//             let positionsChanged = mouseOldPos[0] != mousePreviousPos[0] || mouseOldPos[1] != mousePreviousPos[1];
+//             for (let node of graphSelectedNodes) {
+//                 let previousPos = [node.fx - window.event.clientX + mouseOldPos[0], node.fy - window.event.clientY + mouseOldPos[1]];
+//                 let finalPos = [node.fx, node.fy];
+        
+//                 if (positionsChanged) {
+//                     var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
+//                     tabNodes.push(positions);
+//                 }
+//             }
+//             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
+//             break;
+//     }
+// }
+
 function manageSelection() {
-    selectedNodes = svg.selectAll('.isSelected');
+    selectedNodes = svg.selectAll(".isSelected");
     graphSelectedNodes = [];
-    let mousePreviousPos, nodePreviousPos;
+    let mousePreviousPos;
+    let mouseOldPos;
 
 
     for (let node of graphJSON.nodes){
@@ -770,20 +824,27 @@ function manageSelection() {
 
     selectedNodes.call(d3.drag()
         .on('start', function (d) {
+            if (!d3.event.active) force.alphaTarget(0.3).restart();
             mousePreviousPos = [window.event.clientX, window.event.clientY];
-            nodePreviousPos = [d.fx, d.fy];
-
+            mouseOldPos = [window.event.clientX, window.event.clientY];
             drag_in_progress = true;
         })
+        .on('drag', function (d) {
+            let mousePosX = window.event.clientX;
+            let mousePosY = window.event.clientY;
+            graphSelectedNodes.forEach((node) => { node.fx += mousePosX - mousePreviousPos[0]; node.fy += mousePosY - mousePreviousPos[1];})
+            mousePreviousPos = [mousePosX, mousePosY];
+        })
         .on('end', function (d) {
+            if (!d3.event.active) force.alphaTarget(0);
             drag_in_progress = false;
             let tabNodes = [];
-
+            let positionsChanged = mouseOldPos[0] != mousePreviousPos[0] || mouseOldPos[1] != mousePreviousPos[1];
             for (let node of graphSelectedNodes) {
-                let previousPos = node != d ? [node.fx, node.fy] : [nodePreviousPos[0], nodePreviousPos[1]];
-                let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+                let previousPos = [node.fx - window.event.clientX + mouseOldPos[0], node.fy - window.event.clientY + mouseOldPos[1]];
+                let finalPos = [node.fx, node.fy];
 
-                if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
+                if (positionsChanged) {
                     var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
                     tabNodes.push(positions);
                 }
