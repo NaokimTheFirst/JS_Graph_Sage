@@ -94,13 +94,13 @@ function PageOpenOrReload() {
     }
 }
 
-// window.onresize = function() {
-//     if (typeof graphJSON != "undefined") {
-//         OptimizeVertexSize();
-//         center_and_scale();
-//         UpdateLayout();
-//     }
-// }
+window.onresize = function() {
+    if (typeof graphJSON != "undefined") {
+        OptimizeVertexSize();
+        recenter_and_rescale();
+        UpdateLayout();
+    }
+}
 
 function UpdateLayout() {
     if(force) force.stop();
@@ -284,6 +284,37 @@ function third_point_of_curved_edge(pa, pb, d) {
     return [cx + d * nx / nn, cy + d * ny / nn]
 }
 
+function recenter_and_rescale() {
+    var minx = force.nodes()[0].x;
+    var maxx = force.nodes()[0].x;
+    var miny = force.nodes()[0].y;
+    var maxy = force.nodes()[0].y;
+
+    force.nodes().forEach(function (d, i) {
+        maxx = Math.max(maxx, d.x);
+        minx = Math.min(minx, d.x);
+        maxy = Math.max(maxy, d.y);
+        miny = Math.min(miny, d.y);
+    });
+
+    console.log(maxx)
+
+    var border = 60;
+    var xspan = maxx - minx;
+    var yspan = maxy - miny;
+
+    var w = width();
+    var h = height();
+    var scale = Math.min((h - border) / yspan, (w - border) / xspan);
+    var xshift = (w - scale * xspan) / 2;
+    var yshift = (h - scale * yspan) / 2;
+
+    force.nodes().forEach(function (d, i) {
+        d.fx = scale * (d.x - minx) + xshift;
+        d.fy = scale * (d.y - miny) + yshift;
+    });
+}
+
 // Applies an homothety to the points of the graph respecting the
 // aspect ratio, so that the graph takes the whole javascript
 // window and is centered
@@ -293,7 +324,7 @@ function center_and_scale() {
     var miny = graphJSON.pos[0][1];
     var maxy = graphJSON.pos[0][1];
 
-    //Determine Min/Max
+    // Determine Min/Max
     graphJSON.nodes.forEach(function (d, i) {
         maxx = Math.max(maxx, graphJSON.pos[i][0]);
         minx = Math.min(minx, graphJSON.pos[i][0]);
