@@ -285,10 +285,13 @@ function third_point_of_curved_edge(pa, pb, d) {
 }
 
 function recenter_and_rescale() {
-    var minx = force.nodes()[0].x;
-    var maxx = force.nodes()[0].x;
-    var miny = force.nodes()[0].y;
-    var maxy = force.nodes()[0].y;
+
+    if (force.nodes().length != 0) {
+        var minx = force.nodes()[0].x;
+        var maxx = force.nodes()[0].x;
+        var miny = force.nodes()[0].y;
+        var maxy = force.nodes()[0].y;
+    }
 
     force.nodes().forEach(function (d, i) {
         maxx = Math.max(maxx, d.x);
@@ -296,8 +299,6 @@ function recenter_and_rescale() {
         maxy = Math.max(maxy, d.y);
         miny = Math.min(miny, d.y);
     });
-
-    console.log(maxx)
 
     var border = 60;
     var xspan = maxx - minx;
