@@ -775,17 +775,17 @@ function ManageNodes() {
 function SetDrag(nodes) {
     nodes
         .call(d3.drag()
-            .on('start', function (d) {
-                if (!d3.event.active) force.alphaTarget(0.3).restart();
+            .on('start', function (event, d) {
+                if (!event.active) force.alphaTarget(0.3).restart();
                 drag_in_progress = true;
                 d.previousPos = [d.x, d.y];
             })
-            .on('drag', function (d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
+            .on('drag', function (event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
             })
-            .on('end', function (d) {
-                if (!d3.event.active) force.alphaTarget(0);
+            .on('end', function (event, d) {
+                if (!event.active) force.alphaTarget(0);
                 drag_in_progress = false;
                 if (d.previousPos[0] != d.x && d.previousPos[1] != d.y) {
                     let finalPos = [d.x, d.y];
@@ -848,8 +848,8 @@ function manageSelection() {
     }
 
     selectedNodes.call(d3.drag()
-        .on('start', function (d) {
-            if (!d3.event.active) force.alphaTarget(0.3).restart();
+        .on('start', function (event, d) {
+            if (!event.active) force.alphaTarget(0.3).restart();
             mousePreviousPos = [window.event.clientX, window.event.clientY];
             mouseOldPos = [window.event.clientX, window.event.clientY];
             drag_in_progress = true;
@@ -860,8 +860,8 @@ function manageSelection() {
             graphSelectedNodes.forEach((node) => { node.fx += mousePosX - mousePreviousPos[0]; node.fy += mousePosY - mousePreviousPos[1];})
             mousePreviousPos = [mousePosX, mousePosY];
         })
-        .on('end', function (d) {
-            if (!d3.event.active) force.alphaTarget(0);
+        .on('end', function (event, d) {
+            if (!event.active) force.alphaTarget(0);
             drag_in_progress = false;
             let tabNodes = [];
             let positionsChanged = mouseOldPos[0] != mousePreviousPos[0] || mouseOldPos[1] != mousePreviousPos[1];
