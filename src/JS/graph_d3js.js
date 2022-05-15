@@ -125,29 +125,6 @@ function OptimizeVertexSize() {
     }
 }
 
-/*
-window.onresize = function() {
-    let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
-
-    oldWindowSize[0] = width();
-    oldWindowSize[1] = height();
-
-    svg = d3.select("svg")
-        .attr("width", width())
-        .attr("height", height());
-
-    graph = graphJSON;
-    for (let node of graphJSON.nodes){
-        node.x *= resizeRate[0];
-        node.y *= resizeRate[1];
-        let nodePositions = new ValueRegisterer([node.px,node.py], [node.x, node.y], new Element(node, NodeType));
-        node.px *= resizeRate[0];
-        node.py *= resizeRate[1];
-        SetNewPosition(nodePositions);
-    }
-
-}*/
-
 
 function InitNewGraph(graph = null) {
     if (force) force.stop();
@@ -157,13 +134,6 @@ function InitNewGraph(graph = null) {
     InitInterface();
     ManageAllGraphicsElements();
     InitForce();
-    // ManageNodeLabels();
-    // ManageEdges();
-    // ManageLoops();
-    // ManageNodes();
-    // ManageArrows();
-    //Start the automatic force layout
-    // force.restart();
 }
 
 function handleMouseMove(event) {
@@ -213,14 +183,6 @@ function InitGraph() {
             .strength(graphJSON.link_strength))
         .force("x", d3.forceX(graphJSON.gravity).x(width()))
         .force("y", d3.forceY(graphJSON.gravity).y(height()));
-        
-        // .charge(graphJSON.charge)
-        // .linkDistance(graphJSON.link_distance)
-        // .linkStrength(graphJSON.link_strength)
-        // .gravity(graphJSON.gravity)
-        // .size([width(), height()])
-        // .links(graphJSON.links)
-        // .nodes(graphJSON.nodes);
 
     force.nodes(graphJSON.nodes);
     force.force("link").links(graphJSON.links);
@@ -235,8 +197,6 @@ function InitGraph() {
     // curve interpolating these points.
     line = d3.line()
         .curve(d3.curveCardinal.tension(.2))
-        // .interpolate("cardinal")
-        // .tension(.2)
         .x(function (d) {
             return d.x;
         })
@@ -601,13 +561,13 @@ function ManageLoops() {
         .attr("r", function (d) {
             return d.curve;
         })
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, LoopType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, LoopType));
         })
         .style("stroke", function (d) {
@@ -664,13 +624,13 @@ function ManageEdges() {
         .merge(links)
         .attr("class", "link directed")
         .attr("marker-end", "url(#directed)")
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, EdgeType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, EdgeType));
         })
         .style("stroke-width", graphJSON.edge_thickness + "px");
@@ -757,13 +717,13 @@ function ManageNodes() {
         .attr("class", "node")
         .attr("r", graphJSON.vertex_size)
         // .merge(nodes)
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, NodeType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, NodeType));
         });
     
@@ -794,45 +754,6 @@ function SetDrag(nodes) {
                 }
             }));
 }
-
-// var mousePreviousPos;
-// var mouseOldPos;
-// var graphSelectedNodes = [];
-
-// function MultiDrag(call) {
-//     for (let node of graphJSON.nodes){
-//         if (node.isSelected){
-//             graphSelectedNodes.push(node);
-//         }
-//     }
-
-//     switch(call) {
-//         case 'start':
-//             mousePreviousPos = [window.event.clientX, window.event.clientY];
-//             mouseOldPos = [window.event.clientX, window.event.clientY];
-//             break;
-//         case 'drag':
-//             let mousePosX = window.event.clientX;
-//             let mousePosY = window.event.clientY;
-//             graphSelectedNodes.forEach((node) => { node.fx += mousePosX - mousePreviousPos[0]; node.fy += mousePosY - mousePreviousPos[1];})
-//             mousePreviousPos = [mousePosX, mousePosY];
-//             break;
-//         case 'end':
-//             let tabNodes = [];
-//             let positionsChanged = mouseOldPos[0] != mousePreviousPos[0] || mouseOldPos[1] != mousePreviousPos[1];
-//             for (let node of graphSelectedNodes) {
-//                 let previousPos = [node.fx - window.event.clientX + mouseOldPos[0], node.fy - window.event.clientY + mouseOldPos[1]];
-//                 let finalPos = [node.fx, node.fy];
-        
-//                 if (positionsChanged) {
-//                     var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
-//                     tabNodes.push(positions);
-//                 }
-//             }
-//             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
-//             break;
-//     }
-// }
 
 function manageSelection() {
     selectedNodes = svg.selectAll(".isSelected");
@@ -1448,48 +1369,6 @@ function DeleteAllEdgeGroups() {
 function checkIfExist() {
     window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + document.querySelector("#g6").textContent);
 }
-
-// function dragElement(elmnt) {
-//     let mouseX = 0, mouseY = 0, offsetX, offsetY;
-//     if (document.getElementById(elmnt.id + "header")) {
-//         /* if present, the header is where you move the DIV from:*/
-//         document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-//     } else {
-//         /* otherwise, move the DIV from anywhere inside the DIV:*/
-//         elmnt.onmousedown = dragMouseDown;
-//     }
-
-//     function dragMouseDown(e) {
-//         e = e || window.event;
-//         e.preventDefault();
-
-//         offsetX = e.clientX - elmnt.style.left;
-//         offsetY = e.clientY - elmnt.style.top;
-
-//         mouseX = e.clientX;
-//         mouseY = e.clientY;
-//         document.onmouseup = closeDragElement;
-
-//         document.onmousemove = elementDrag;
-//     }
-
-//     function elementDrag(e) {
-//         e = e || window.event;
-//         e.preventDefault();
-
-//         mouseX = e.clientX;
-//         mouseY = e.clientY;
-
-//         elmnt.style.top = -offsetY + mouseY + "px";
-//         elmnt.style.left = -offsetX + mouseX + "px";
-//     }
-
-//     function closeDragElement() {
-
-//         document.onmouseup = null;
-//         document.onmousemove = null;
-//     }
-// }
 
 function lightMode() {
     document.querySelector("body").classList.remove("darkMode");
