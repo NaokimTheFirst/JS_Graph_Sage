@@ -76,7 +76,7 @@ window.onload = function () {
 
     document.body.onmousemove = handleMouseMove;
     // List of colors
-    customColorScale = d3.scaleOrdinal(d3.schemeCategory20);
+    customColorScale = d3.scaleOrdinal(d3.schemePaired);
     KeyboardEventInit();
     // dragElement(document.getElementById("Overlay"));
 }
