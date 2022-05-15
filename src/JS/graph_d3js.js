@@ -1203,6 +1203,7 @@ function RemoveSelection() {
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
+                element.data.isSelected = false;
                 RemoveElementFromGraph(element, isFirst)
                 isFirst = false;
             });
