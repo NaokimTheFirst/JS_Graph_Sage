@@ -86,7 +86,7 @@ https://blog.devgenius.io/d3-js-whats-new-in-version-6-5f45b00a85cb
 - Plan du rapport preparé ;
 - Redaction du rapport commencé : [voir document sur OneDrive](https://1drv.ms/w/s!Ah20cN1s-zt3h78TY4GmdzCLvJmvOQ?e=JR4fun).
 
-#### 04/11/2022 - 8e rdv
+#### 11/04/2022 - 8e rdv
 *Nouvelles choses à faire :*
 - Separer dans le menu Orientations et Algorithmic/Hard Stuff
 - Resoudre le probleme : les sommets recoivent les coordonées qu'ils n'ont pas a l'origin
@@ -105,3 +105,67 @@ Faire un bouton("save") qui permet de fixer l'embedding (la possibilité de free
 - Bug corrigé dans l'affichage des graphes avec des sommets de type objet
 
 **Prochaine reunion :** mercredi 20/04 a 9h00
+#### 20/04/2022 - 9e rdv
+*Nouvelles choses à faire :*
+- Nettoyer le code
+- Merge des sommets (effectuer le merge sur `newgraph` et pas `targetgraph`, puis l'importer vers interface). 
+- Migration D3.js
+- Restructurer l'interface
+- Merge de tout ce qui reste sur la branche `master`.
+
+*Travail fait :*
+- Fonctionnalité *Save* (autosauvegarde par defaut, possible de le desactiver en cliquant 'U' et sauvegarder les changements en cliquant 'S').
+- Fonctionnalité *Freeze positions* en cliquant 'F' (layout `spring` par defaut s'il n'y a pas de positions fixes).
+- Dark et Light Mode avec l'utilisation des cookies pour sauvegarder les preferences de l'utilisateur.
+
+#### 03/05/2022 - 10e rdv
+*Nouvelles choses à faire :*
+- Regarder la fonctionnalite de Zoom dans la solution [IPE](https://ipe.otfried.org/), voir si on peut faire le même.
+- Changer la taille des sommets on window.resize.
+- Penser comment régler le problème de sommets qui sortent de la fenêtre quand on diminue sa taille.
+- Fixer la taille du menu.
+- Is Hamiltonian mettre en *Hard Algorithmes*.
+- Penser à afficher le cycle Hamiltonian (comme on fait pour le spanning tree).
+- Mettre Girth et les 2 connectivities en *Properties* - ce n'est pas Hard stuff.
+- Dans la section *Hard algorithmes* mettre : Coloring, chromatic, is Hamiltonian.
+- Le reste mettre dans la section *Oriented graphs*.
+- Corriger les bugs de coloration et de *Redraw Graph* avec le graph de type `graphs.HortonGraph()`.
+- Ne pas appeler `UpdateGraphProperties` lorsqu'on bouge des sommets ou les renomme.
+- Remplacer `is_tree()` par `is_forest()` dans le calcul de Girth.
+- Décider si on veut faire une demande pour présenter notre solution pour les Sage Days à Montpellier (la semaine du 13 juin).
+- Voir [*phitigra*](https://github.com/jfraymond/phitigra) par J. F. Raymond - solution qui permet de manipuler les graphes comme le notre. Se positionner par rapport à lui. Voir si son truc est trop dépendant de Jupiter.
+
+*Travail fait :*
+- Problème d'affichage des graphes vides corrigé.
+- L'interface graphique (<rect>) s'adapte à la taille de l'écran on window.resize().
+- Amélioration des styles de dark et light modes (quelques bugs corrigés).
+
+#### 09/05/2022 - 11e rdv
+*Nouvelles choses à faire :*
+- Garder seulement la fonctionnalité de 'U' (renommer comme "On/Off automatic save"), pas besion de 'S' (on peut obtenir le même resultat en appuyant 'U' 2 fois).
+- Pour le "merge" des sommets prendre le premier sommet aléatoirement pour ne pas rendre le processus trop compliqué.
+- Ne pas redessiner le graphe lors du merge et mettre le nouveau sommet résultant du merge dans le centre du rectangle formé par les sommets fusionnés. Algorithme pour faire un merge sans la fonction sage :
+    ```
+    liste = []
+    s = set()
+    for i in liste:
+        s.union(g.neighbors(i))
+    s.difference(liste)
+    ```
+- Ajouter des interlignes dans Key Helper pour une mise en page plus claire.
+- Renommer "Subdivide Edge" dans Key Helper en "Subdivide Edges".
+- Enlever le resize manuel du menu dans css.
+- Ne pas afficher les classes de coloration en texte après "Redraw".
+- Edge coloring ne marche pas après la subdivision des arêtes.
+- Ne pas permettre à l'utilisateur de déplacer les sommets en dehors de la fenêtre !!!
+- Renommer "Exist" en "Exists on House of Graphs" (mettre House of Graphs sous le style d'un lien).
+- Repositionner le bouton G6 et la zone de texte.
+    
+*Travail fait :*
+- Resize des sommets et arêtes on window resize.
+- `UpdateGraphProperties` n'est plus appelé lors de la repositionnement des sommets.
+- Bugs du HortonGraph corrigés.
+- Taille du menu fixé.
+- Améliorer le positionnement du graphe dans le centre (problème du décalage vers le droit fixé).
+    
+**Prochaine reunion :** lundi 16/05 a 16h20 ? 8h30 ? (envoyer un mail au prof)

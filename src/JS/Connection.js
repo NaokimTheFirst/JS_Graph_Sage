@@ -8,13 +8,17 @@ const edgeColoringRequestParameter = "edgeColoring";
 const convertGraphParameter = "convert";
 const closeConnectionParameter = "closeConnection";
 const renewGraphParameter = "renewGraph";
-const getG6RequestParameter = "Graph6";
 const showSpanTreeParameter = "showSpanTree";
 const girthParameter = "girth";
+const vertexConnectivityParameter = "vertexConnectivity"
+const chromaticNumberParamater = "chromaticNumber"
+const chromaticIndexParameter="chromaticIndex"
+const edgeConnectivityParamater="edgeConnectivity"
 const saveGraphParamter = "save";
 const switchLockParameter = "switchLock"
 const freezeGraphCoordinates = "freezePositions";
 const mergeVerticesParameter = "mergeVertices";
+
 
 function InitWebSocketConnection() {
     // Connect to Web Socket
@@ -24,6 +28,7 @@ function InitWebSocketConnection() {
         PageOpenOrReload();
         // Display the body hidden in window.onload
         document.body.style.display = "inline";
+        selectModeDependOfCookie();
     };
 
     webSocket.onmessage = function (message) {
@@ -45,7 +50,6 @@ function InitWebSocketConnection() {
 }
 
 function TreatResponse(response) {
-    console.log(response);
     switch (response.request) {
         case propertiesRequestParameter:
             SetProperties(response.result[0],
@@ -60,6 +64,7 @@ function TreatResponse(response) {
                 response.result[9],
                 response.result[10],
                 response.result[11],
+                response.result[12]
             );
             break;
         case showSpanTreeParameter :
@@ -85,9 +90,6 @@ function TreatResponse(response) {
         case convertGraphParameter :
             CustomWarn("Graph : " + response.result + " open in new Window");
             break;
-        case getG6RequestParameter :
-            UpdateG6Form(response.result);
-            break;
         case closeConnectionParameter :
             webSocket.close();
             break;
@@ -98,6 +100,17 @@ function TreatResponse(response) {
         case girthParameter :
             afficherResultGirth(response.result);
             break;
+        case vertexConnectivityParameter:
+            afficherVertexConnectivity(response.result);
+            break;
+        case chromaticNumberParamater:
+            afficherChromaticNumber(response.result)
+            break;
+        case chromaticIndexParameter:
+            afficherChromaticIndex(response.result)
+            break;
+        case edgeConnectivityParamater:
+            afficherEdgeConnectivity(response.result)
         case saveGraphParamter:
             CustomWarn(response.result);
             break;
@@ -120,13 +133,29 @@ function TreatResponse(response) {
     }
 }
 
+
 function UpdateGraphProperties(message = ""){
     SubmitMessage(propertiesRequestParameter,message = message);
-    RequestG6();
 }
 
 function montrerGirth(){
     SubmitMessage(girthParameter);
+}
+
+function montrerVertexConnectivity() {
+    SubmitMessage(vertexConnectivityParameter);
+}
+
+function montrerEdgeConnectivity() {
+    SubmitMessage(edgeConnectivityParamater);
+}
+
+function montrerChromaticNumber() {
+    SubmitMessage(chromaticNumberParamater);
+}
+
+function montrerChromaticIndex() {
+    SubmitMessage(chromaticIndexParameter);
 }
 
 function RequestVertexColoring() {
@@ -151,10 +180,6 @@ function RequestConvertGraph() {
 
 function RequestRenewGraph() {
     SubmitMessage(renewGraphParameter);
-}
-
-function RequestG6() {
-    SubmitMessage(getG6RequestParameter);
 }
 
 function DisplaySpanTree() {

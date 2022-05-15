@@ -6,9 +6,12 @@ __edgeColoringParameter = 'edgeColoring'
 __convertGraphParameter = 'convert'
 __errorParameter = "errorWhileTreatingRequest"
 __renewGraphParameter = 'renewGraph'
-__graph6Parameter = "Graph6"
 __showSpanTreeParameter = "showSpanTree"
 __girthParameter = "girth"
+__vertexConnectivityParameter = "vertexConnectivity"
+__chromaticNumberParameter = "chromaticNumber"
+__chromaticIndexParamater = "chromaticIndex"
+__edgeConnectivityParamater = "edgeConnectivity"
 __saveGraphParameter = 'save'
 __switchLockParameter = "switchLock"
 __freezeGraphParameter = "freezePositions"
@@ -37,11 +40,14 @@ def _get_graph_properties(graph):
     response[1].append(graph.is_bipartite())
     response[1].append(len(graph.vertices()))
     ds = graph.degree_sequence()
+    if not ds:
+        ds = ['None']
     response[1].append(ds[0])  # get max degree of the graph
     response[1].append(ds[len(ds) - 1])  # get minimum degree of the graph
     response[1].append(graph.size())
-    response[1].append(graph.is_hamiltonian())
+    response[1].append(False)
     response[1].append(graph.is_eulerian())
+    response[1].append(_generate_graph6_formula(graph))
     return response, graph
 
 
@@ -129,7 +135,11 @@ def _generate_vertex_coloring_for_JS(graph):
         newGraph = Graph()
         update_graph(newGraph, graph)
         color = graph_coloring.vertex_coloring(newGraph)
-    return [__vertexColoringParameter, color], graph
+    coloration = []
+    for col in color:
+        coloration.append(list(col))
+
+    return [__vertexColoringParameter, coloration], graph
 
 
 def _generate_edge_coloring_for_JS(graph):
@@ -162,6 +172,7 @@ def __convert_DtoG(graph):
 
 tmpJSgraphs = []
 
+
 def __create_temporary_JS_graph(graph):
     global tmpJSgraphs
 
@@ -177,32 +188,51 @@ def _get_new_graph_in_JSON_for_JS(graph):
 
 
 def _generate_graph6_formula(graph):
-    response = [__graph6Parameter]
-
-    if (graph.has_loops()) :
-        response.append("None")
+    if (graph.has_loops()):
+        response = "None"
         print("G6 can be applied on simple graph only")
-    else :
+    else:
         if (graph.is_directed()):
-            response.append(graph.dig6_string())
+            response = (graph.dig6_string())
         else:
-            response.append(graph.graph6_string())
+            response = (graph.graph6_string())
+    return response
 
-    return response, graph
 
 def _get_girth(graph):
+    isTree = _the_graph_is_a_tree(graph)
 
-	isTree = _the_graph_is_a_tree(graph)
+    if (isTree):
+        result = "Infinite"
+    else:
+        result = graph.girth()
 
-	if (isTree):
-		result="Infinite"
-	else:
-		result=graph.girth()
+    return [__girthParameter, result], graph
 
-	return [__girthParameter, result], graph
 
 def _the_graph_is_a_tree(graph):
-	return graph.is_tree()
+    return graph.is_tree()
+
+
+def _get_Vertex_Connectivity(graph):
+    result = graph.vertex_connectivity()
+    return [__vertexConnectivityParameter, result], graph
+
+
+def _get_Chromatic_Number(graph):
+    result = graph.chromatic_number()
+    return [__chromaticNumberParameter, result], graph
+
+
+def _get_Chromatic_Index(graph):
+    result = graph.chromatic_index()
+    return [__chromaticIndexParamater, result], graph
+
+
+def _get_Edge_Connectivity(graph):
+    result = graph.edge_connectivity()
+    return [__edgeConnectivityParamater, result], graph
+
 
 def _save_graph(newGraph, oldGraph):
     response = ["save", "Graph saved"]
@@ -210,14 +240,15 @@ def _save_graph(newGraph, oldGraph):
     update_graph(oldGraph, newGraph)
     return response
 
+
 def _switch_lock(client):
     response = [__switchLockParameter]
     client['lock'] = not client['lock']
     s = "Save auto "
 
-    if client['lock'] :
+    if client['lock']:
         s += "enabled"
-    else :
+    else:
         s += "disabled"
 
     print(s)
@@ -225,8 +256,10 @@ def _switch_lock(client):
 
     return response
 
+
 def _freezePositions(graph):
     return [__freezeGraphParameter, "Nodes' positions set"], graph
+
 
 def _mergeVertices(graph, verticesToMerge) :
     verticesToMerge2=casteTypeVertex(graph, verticesToMerge)
@@ -247,6 +280,7 @@ def casteTypeVertex(graph, verticesToMerge) :
     return verteciesToReturn
     
 
+
 JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __strongOrientationParameter: _strong_orientation_for_JS,
                      __randomOrientationParameter: _random_orientation_for_JS,
@@ -254,18 +288,16 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __edgeColoringParameter: _generate_edge_coloring_for_JS,
                      __convertGraphParameter: _convert_graph_digraph_bidirectionnal_for_JS,
                      __renewGraphParameter: _get_new_graph_in_JSON_for_JS,
-                     __graph6Parameter: _generate_graph6_formula,
                      __showSpanTreeParameter: _span_tree_as_string_array,
                      __girthParameter: _get_girth,
+                     __vertexConnectivityParameter: _get_Vertex_Connectivity,
+                     __chromaticNumberParameter: _get_Chromatic_Number,
+                     __chromaticIndexParamater: _get_Chromatic_Index,
+                     __edgeConnectivityParamater: _get_Edge_Connectivity,
                      __saveGraphParameter: _save_graph,
                      __switchLockParameter: _switch_lock,
                      __freezeGraphParameter: _freezePositions,
                      __mergeVerticesParameter: _mergeVertices}
-
-
-
-
-
 
 # def create_show_global_tmp_graph(graph):
 # 	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'
