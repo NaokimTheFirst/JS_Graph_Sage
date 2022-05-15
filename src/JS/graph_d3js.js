@@ -97,7 +97,7 @@ function PageOpenOrReload() {
 window.onresize = function() {
     if (typeof graphJSON != "undefined") {
         OptimizeVertexSize();
-        recenter_and_rescale();
+        center_and_scale();
         UpdateLayout();
     }
 }
@@ -225,10 +225,11 @@ function InitGraph() {
     force.nodes(graphJSON.nodes);
     force.force("link").links(graphJSON.links);
 
+    force.nodes().forEach((d, i) => { d.fx = graphJSON.pos[i][0]; d.fy = graphJSON.pos[i][1]; });
+
     // Adapts the graph layout to the javascript window's dimensions
-    if (graphJSON.pos.length != 0) {
-        center_and_scale();
-    }
+
+    center_and_scale();
 
     // The function 'line' takes as input a sequence of tuples, and returns a
     // curve interpolating these points.
@@ -284,58 +285,28 @@ function third_point_of_curved_edge(pa, pb, d) {
     return [cx + d * nx / nn, cy + d * ny / nn]
 }
 
-function recenter_and_rescale() {
-
-    if (force.nodes().length != 0) {
-        var minx = force.nodes()[0].x;
-        var maxx = force.nodes()[0].x;
-        var miny = force.nodes()[0].y;
-        var maxy = force.nodes()[0].y;
-    }
-
-    force.nodes().forEach(function (d, i) {
-        maxx = Math.max(maxx, d.x);
-        minx = Math.min(minx, d.x);
-        maxy = Math.max(maxy, d.y);
-        miny = Math.min(miny, d.y);
-    });
-
-    var border = 60;
-    var xspan = maxx - minx;
-    var yspan = maxy - miny;
-
-    var w = width();
-    var h = height();
-    var scale = Math.min((h - border) / yspan, (w - border) / xspan);
-    var xshift = (w - scale * xspan) / 2;
-    var yshift = (h - scale * yspan) / 2;
-
-    force.nodes().forEach(function (d, i) {
-        d.fx = scale * (d.x - minx) + xshift;
-        d.fy = scale * (d.y - miny) + yshift;
-    });
-}
-
 // Applies an homothety to the points of the graph respecting the
 // aspect ratio, so that the graph takes the whole javascript
 // window and is centered
 function center_and_scale() {
-    var minx = graphJSON.pos[0][0];
-    var maxx = graphJSON.pos[0][0];
-    var miny = graphJSON.pos[0][1];
-    var maxy = graphJSON.pos[0][1];
 
-    // Determine Min/Max
-    graphJSON.nodes.forEach(function (d, i) {
-        maxx = Math.max(maxx, graphJSON.pos[i][0]);
-        minx = Math.min(minx, graphJSON.pos[i][0]);
-        maxy = Math.max(maxy, graphJSON.pos[i][1]);
-        miny = Math.min(miny, graphJSON.pos[i][1]);
+    if (force.nodes().length != 0) {
+        var minx = force.nodes()[0].fx;
+        var maxx = force.nodes()[0].fx;
+        var miny = force.nodes()[0].fy;
+        var maxy = force.nodes()[0].fy;
+    }
+
+    force.nodes().forEach(function (d, i) {
+        maxx = Math.max(maxx, d.fx);
+        minx = Math.min(minx, d.fx);
+        maxy = Math.max(maxy, d.fy);
+        miny = Math.min(miny, d.fy);
     });
 
     var border = 60;
-    var xspan = maxx - minx;
-    var yspan = maxy - miny;
+    var xspan = maxx - minx == 0 ? 1 : maxx - minx;
+    var yspan = maxy - miny == 0 ? 1 : maxy - miny;
 
     var w = width();
     var h = height();
@@ -344,8 +315,8 @@ function center_and_scale() {
     var yshift = (h - scale * yspan) / 2;
 
     force.nodes().forEach(function (d, i) {
-        d.fx = scale * (graphJSON.pos[i][0] - minx) + xshift;
-        d.fy = scale * (graphJSON.pos[i][1] - miny) + yshift;
+        d.fx = scale * (d.fx - minx) + xshift;
+        d.fy = scale * (d.fy - miny) + yshift;
     });
 }
 
@@ -354,32 +325,32 @@ function InitForce() {
     force.on("tick", function () {
         // Position of vertices
         nodes.attr("cx", function (d) {
-            return d.x;
+            return d.fx;
         })
             .attr("cy", function (d) {
-                return d.y;
+                return d.fy;
             })
         // Position of edges
         links.attr("d", function (d) {
 
             // Straight edges
             if (d.curve == 0) {
-                return "M" + d.source.x + "," + d.source.y + " L" + d.target.x + "," + d.target.y;
+                return "M" + d.source.fx + "," + d.source.fy + " L" + d.target.fx + "," + d.target.fy;
             }
             // Curved edges
             else {
                 var p = third_point_of_curved_edge(d.source, d.target, d.curve)
                 return line([{
-                    'x': d.source.x,
-                    'y': d.source.y
+                    'x': d.source.fx,
+                    'y': d.source.fy
                 },
                     {
                         'x': p[0],
                         'y': p[1]
                     },
                     {
-                        'x': d.target.x,
-                        'y': d.target.y
+                        'x': d.target.fx,
+                        'y': d.target.fy
                     }
                 ])
             }
@@ -389,20 +360,20 @@ function InitForce() {
         if (graphJSON.loops.length != 0) {
             loops
                 .attr("cx", function (d) {
-                    return d.source.x;
+                    return d.source.fx;
                 })
                 .attr("cy", function (d) {
-                    return d.source.y - d.curve;
+                    return d.source.fy - d.curve;
                 })
         }
 
         // Position of vertex labels
         v_labels
             .attr("x", function (d) {
-                return d.x + graphJSON.vertex_size;
+                return d.fx + graphJSON.vertex_size;
             })
             .attr("y", function (d) {
-                return d.y;
+                return d.fy;
             })
         // Position of the edge labels
         e_labels
@@ -414,10 +385,10 @@ function InitForce() {
             })
         l_labels
             .attr("x", function (d) {
-                return d.source.x;
+                return d.source.fx;
             })
             .attr("y", function (d) {
-                return d.source.y - 2 * d.curve - 1;
+                return d.source.fy - 2 * d.curve - 1;
             })
     });
 }
