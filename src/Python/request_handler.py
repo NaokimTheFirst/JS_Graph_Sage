@@ -263,11 +263,7 @@ def _freezePositions(graph):
 
 def _mergeVertices(graph, verticesToMerge) :
     verticesToMerge2=casteTypeVertex(graph, verticesToMerge)
-
-
-    
     graph.merge_vertices(verticesToMerge2)  
-
     return [__mergeVerticesParameter, graph_to_JSON(graph, layout=None)]
 
 def casteTypeVertex(graph, verticesToMerge) :

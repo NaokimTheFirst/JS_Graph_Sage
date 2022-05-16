@@ -153,56 +153,13 @@ var overlayElements = {
         }
         return this._iseulerian;
     },
-    _g6:null,
-    get g6() {
-        if (!this._g6){
-            this._g6 = document.getElementById("g6");
-        }
-        return this._g6;
-    },
     _girth: null,
     get girth() {
         if (!this._girth) {
             this._girth = document.getElementById("Girth");
         }
         return this._girth;
-    },
-    _vertexConnectivity:null,
-    get vertexConnectivity(){
-        if(!this._vertexConnectivity){
-            this._vertexConnectivity=document.getElementById("vertexConnectivity");
-        }
-        return this._vertexConnectivity
-    },
-    _chromaticNumber:null,
-    get chromaticNumber(){
-        if (!this._chromaticNumber){
-            this._chromaticNumber=document.getElementById("chromaticNumber")
-        }
-        return this._chromaticNumber
-    },
-    _chromaticIndex:null,
-    get chromaticIndex(){
-        if (!this._chromaticIndex){
-            this._chromaticIndex=document.getElementById("chromaticIndex")
-        }
-        return this._chromaticIndex
-    },
-    _edgeConnectivity:null,
-    get edgeConnectivity(){
-        if (!this._edgeConnectivity){
-            this._edgeConnectivity=document.getElementById("edgeConnectivity")
-        }
-        return this._edgeConnectivity
-    },
-    _g6:null,
-    get g6(){
-        if(!this._g6){
-            this._g6=document.getElementById("g6");
-        }
-        return this._g6;
     }
-
 }
 
 //Return string with time on format "HH:MM""
@@ -239,7 +196,6 @@ function SetProperties(radius,
                        edges,
                        halmitonian,
                        eulerian,
-                       g6Value
 
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
@@ -253,7 +209,6 @@ function SetProperties(radius,
     overlayElements.edgesNumber.innerHTML = edges;
     overlayElements.isHamiltonian.innerHTML = halmitonian;
     overlayElements.isEulerian.innerHTML = eulerian;
-    overlayElements.g6.textContent = g6Value;
 }
 
 function InitInterface() {
@@ -367,33 +322,23 @@ function KeyboardEventInit() {
                 result = [AddLoopOnSelection(), "Add loop on selected nodes"];
                 break;
             case 77 :
-                //M for Merge Vertices
-      
-                let selectedVertices = [];
-                if (countKey[0] == 0 || countKey[1] != 'M'){ 
-                    if(GetCurrentSelection()['nodes'].length != 1 ){
-                        CustomWarn('Select only one Vertex');
-                    }
-                    else {
-                        countKey[0] ++;
-                        countKey[1] = 'M';
-                        originVertex = GetCurrentSelection()['nodes'][0]['data']['name'];
-                        CustomWarn('Origin Vertex ' + originVertex + ' selected')
-                    }
+                ///M for Merge Vertices
+               let selectedVertices = [];
+               
+               
+
+                for (let vertex of GetCurrentSelection()['nodes']){
+                     let vertexname = vertex['data']['name'];
+                     selectedVertices.push(vertexname);
                 }
-                else { //peut etre un if à rajouter pour que ça ne suprime pas un sommet
-                    selectedVertices.push(originVertex);
-                
 
-                    for (let vertex of GetCurrentSelection()['nodes']){
-                        let vertexname = vertex['data']['name'];
-                        selectedVertices.push(vertexname);
-                    }
+                countKey[0] = 0;
+                countKey[1] = '';
+                mergeVertices(selectedVertices);
 
-                    countKey[0] = 0;
-                    countKey[1] = '';
-                    mergeVertices(selectedVertices);
-                } 
+                CustomWarn('Vertices merged');
+               
+             
                 break;
             case 78 :
                 //N for Rename
@@ -541,22 +486,3 @@ function develop(button){
 function afficherResultGirth(parameter){
        overlayElements.girth.innerHTML=parameter;
 }
-
-function afficherVertexConnectivity(paramater){
-    overlayElements.vertexConnectivity.innerHTML=paramater;
-}
-
-function afficherChromaticNumber(paramater){
-    overlayElements.chromaticNumber.innerHTML=paramater
-}
-
-function afficherChromaticIndex(parameter){
-    overlayElements.chromaticIndex.innerHTML=parameter
-}
-function afficherEdgeConnectivity(parameter){
-    overlayElements.edgeConnectivity.innerHTML=parameter
-}
-
-
-
-
