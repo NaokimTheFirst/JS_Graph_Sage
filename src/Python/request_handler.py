@@ -44,7 +44,7 @@ def _get_graph_properties(graph):
     response[1].append(ds[0])  # get max degree of the graph
     response[1].append(ds[len(ds) - 1])  # get minimum degree of the graph
     response[1].append(graph.size())
-    response[1].append(graph.is_hamiltonian())
+    response[1].append(False)
     response[1].append(graph.is_eulerian())
     response[1].append(_generate_graph6_formula(graph))
     return response, graph
@@ -134,7 +134,11 @@ def _generate_vertex_coloring_for_JS(graph):
         newGraph = Graph()
         update_graph(newGraph, graph)
         color = graph_coloring.vertex_coloring(newGraph)
-    return [__vertexColoringParameter, color], graph
+    coloration = []
+    for col in color:
+        coloration.append(list(col))
+
+    return [__vertexColoringParameter, coloration], graph
 
 
 def _generate_edge_coloring_for_JS(graph):

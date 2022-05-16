@@ -1,7 +1,7 @@
 //The graph properties
 var graphJSON, force, customColorScale;
 var width = function () {
-    return document.documentElement.clientWidth * 0.77
+    return document.documentElement.clientWidth
 };
 var height = function () {
     return document.documentElement.clientHeight
@@ -92,17 +92,34 @@ function PageOpenOrReload() {
         InitNewGraph();
         UpdateGraphProperties();
     }
-
-
 }
 
-window.onresize = function () {
-    if (force) force.stop();
+
+window.onresize = function() {
+    if(force) force.stop();
+    OptimizeVertexSize();
+    center_and_scale();
     ManageAllGraphicsElements();
     InitForce();
     force.start();
 }
 
+function OptimizeVertexSize() {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    if (w > 800 && h > 600) {
+        graphJSON.vertex_size = 12;
+        graphJSON.edge_thickness = 4;
+    }
+    else if (w > 500 && h > 400) {
+        graphJSON.vertex_size = w/100;
+        graphJSON.edge_thickness = 3;
+    }
+    else {
+        graphJSON.vertex_size = 5;
+        graphJSON.edge_thickness = 2;
+    }
+}
 
 /*
 window.onresize = function() {
@@ -131,10 +148,18 @@ window.onresize = function() {
 function InitNewGraph(graph = null) {
     if (force) force.stop();
 
-    LoadGraphData(graph); // transformation des données JSON et format D3 JS
-    InitGraph(); // on rajoute les premiers attributs SVG et réalise les calculs des placements des points
-    InitInterface(); // on place l'interface en fonction de la taille du navigateur
-    ManageAllGraphicsElements(); //implementation de tout les élements graphique
+
+     // transformation des données JSON et format D3 JS
+     // on rajoute les premiers attributs SVG et réalise les calculs des placements des points
+   // on place l'interface en fonction de la taille du navigateur
+     //implementation de tout les élements graphique
+
+    LoadGraphData(graph);
+    OptimizeVertexSize();
+    InitGraph();
+    InitInterface();
+    ManageAllGraphicsElements();
+
     InitForce();
     //Start the automatic force layout
     force.start();
@@ -262,17 +287,21 @@ function center_and_scale() {
         miny = Math.min(miny, graphJSON.pos[i][1]);
     });
 
-    var border = 60
+    var border = 60;
     var xspan = maxx - minx;
     var yspan = maxy - miny;
 
-    var scale = Math.min((height() - border) / yspan, (width() - border) / xspan);
-    var xshift = (width() - scale * xspan) / 2
-    var yshift = (height() - scale * yspan) / 2
+    var w = width();
+    var h = height();
+    var scale = Math.min((h - border) / yspan, (w - border) / xspan);
+    var xshift = (w - scale * xspan) / 2;
+    var yshift = (h - scale * yspan) / 2;
 
     force.nodes().forEach(function (d, i) {
         d.x = scale * (graphJSON.pos[i][0] - minx) + xshift;
         d.y = scale * (graphJSON.pos[i][1] - miny) + yshift;
+        d.px = d.x;
+        d.py = d.y;
     });
 }
 
@@ -723,7 +752,6 @@ function ManageNodes() {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
                     MyManager.Execute(new MoveNodeCommand(positions));
-                    UpdateGraphProperties("Node's positions changed");
                 }
 
             }));
@@ -768,7 +796,6 @@ function manageSelection() {
             }
 
             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
-            UpdateGraphProperties("Node's positions changed");
         }));
 
     RefreshNodes();
@@ -1292,11 +1319,6 @@ function FindElementInGraph(element) {
     return list[list.indexOf(element.data)];
 }
 
-
-function UpdateGraphProperties(message = "") {
-    SubmitMessage(propertiesRequestParameter, message = message);
-}
-
 function SetNodesColoration(colorationList) {
     var id = 0;
     colorationList.forEach(coloration => {
@@ -1347,8 +1369,9 @@ function DeleteAllEdgeGroups() {
     });
 }
 
-function checkIfExist(g) {
-   window.open("https://hog.grinvin.org/ListGraphs.action?"+g6);
+
+function checkIfExist() {
+    window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + document.querySelector("#g6").textContent);
 }
 
 

@@ -48,7 +48,7 @@ body {
 
 
 #Overlay {
-    min-width: fit-content;
+    width: 180px;
     /*position: absolute;
     top: 0px;
     left: 0px;*/
@@ -72,7 +72,7 @@ body {
     padding: 0.5%;
     margin-bottom: 2%;
     overflow: hidden;
-    resize: horizontal;
+
 }
 
 #scrollPanel {
@@ -254,7 +254,7 @@ button:hover {
 }
 
 .darkMode {
-    background-color: #18191A;
+    background-color: black;
 }
 #isHamiltonian{
     visibility: hidden;
