@@ -335,6 +335,7 @@ function KeyboardEventInit() {
                 countKey[0] = 0;
                 countKey[1] = '';
                 mergeVertices(selectedVertices);
+                CustomWarn(selectedVertices);
 
                 CustomWarn('Vertices merged');
                
