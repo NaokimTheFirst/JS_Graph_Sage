@@ -26,7 +26,7 @@ def gen_html_code(JSONgraph):
     #        d3js_script = '<script>' + d3js_code_file.read() + '</script>'
     #else:
         
-    d3js_script = '<script src="../lib/d3.v3.min.js"></script>'
+    d3js_script = '<script src="https://d3js.org/d3.v7.js"></script>'
     js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
     # Writes the temporary .html file

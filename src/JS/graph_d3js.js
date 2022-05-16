@@ -1,10 +1,10 @@
 //The graph properties
 var graphJSON, force, customColorScale;
 var width = function () {
-    return document.documentElement.clientWidth
+    return document.documentElement.clientWidth*0.9
 };
 var height = function () {
-    return document.documentElement.clientHeight
+    return document.documentElement.clientHeight*0.9
 };
 var xshift = function () {
     return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;
@@ -76,7 +76,7 @@ window.onload = function () {
 
     document.body.onmousemove = handleMouseMove;
     // List of colors
-    customColorScale = d3.scale.category20();
+    customColorScale = d3.scaleOrdinal(d3.schemePaired);
     KeyboardEventInit();
     // dragElement(document.getElementById("Overlay"));
 }
@@ -96,12 +96,17 @@ function PageOpenOrReload() {
 
 
 window.onresize = function() {
+    if (typeof graphJSON != "undefined") {
+        OptimizeVertexSize();
+        center_and_scale();
+        UpdateLayout();
+    }
+}
+
+function UpdateLayout() {
     if(force) force.stop();
-    OptimizeVertexSize();
-    center_and_scale();
     ManageAllGraphicsElements();
-    InitForce();
-    force.start();
+    force.restart();
 }
 
 function OptimizeVertexSize() {
@@ -121,29 +126,6 @@ function OptimizeVertexSize() {
     }
 }
 
-/*
-window.onresize = function() {
-    let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
-
-    oldWindowSize[0] = width();
-    oldWindowSize[1] = height();
-
-    svg = d3.select("svg")
-        .attr("width", width())
-        .attr("height", height());
-
-    graph = graphJSON;
-    for (let node of graphJSON.nodes){
-        node.x *= resizeRate[0];
-        node.y *= resizeRate[1];
-        let nodePositions = new ValueRegisterer([node.px,node.py], [node.x, node.y], new Element(node, NodeType));
-        node.px *= resizeRate[0];
-        node.py *= resizeRate[1];
-        SetNewPosition(nodePositions);
-    }
-
-}*/
-
 
 function InitNewGraph(graph = null) {
     if (force) force.stop();
@@ -161,8 +143,6 @@ function InitNewGraph(graph = null) {
     ManageAllGraphicsElements();
 
     InitForce();
-    //Start the automatic force layout
-    force.start();
 }
 
 function handleMouseMove(event) {
@@ -205,38 +185,40 @@ function InitGraph() {
         element.target = graphJSON.nodes[element.source];
     });
 
-    force = d3.layout.force()
-        .charge(graphJSON.charge)
-        .linkDistance(graphJSON.link_distance)
-        .linkStrength(graphJSON.link_strength)
-        .gravity(graphJSON.gravity)
-        .size([width(), height()])
-        .links(graphJSON.links)
-        .nodes(graphJSON.nodes);
+    force = d3.forceSimulation()
+        .force("charge", d3.forceManyBody().strength(graphJSON.charge))
+        .force("link", d3.forceLink()
+            .distance(graphJSON.link_distance)
+            .strength(graphJSON.link_strength))
+        .force("x", d3.forceX(graphJSON.gravity).x(width()))
+        .force("y", d3.forceY(graphJSON.gravity).y(height()));
+
+    force.nodes(graphJSON.nodes);
+    force.force("link").links(graphJSON.links);
+
+    force.nodes().forEach((d, i) => { d.fx = graphJSON.pos[i][0]; d.fy = graphJSON.pos[i][1]; });
 
     // Adapts the graph layout to the javascript window's dimensions
-    if (graphJSON.pos.length != 0) {
-        center_and_scale();
-    }
+
+    center_and_scale();
 
     // The function 'line' takes as input a sequence of tuples, and returns a
     // curve interpolating these points.
-    line = d3.svg.line()
-        .interpolate("cardinal")
-        .tension(.2)
+    line = d3.line()
+        .curve(d3.curveCardinal.tension(.2))
         .x(function (d) {
             return d.x;
         })
         .y(function (d) {
             return d.y;
-        })
+        });
 }
 
 function ResetSelection() {
     currentSelection = GetCurrentSelection(true);
 
     if (currentSelection != null) {
-        //For each list
+        // For each list
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
@@ -244,14 +226,16 @@ function ResetSelection() {
             });
         });
 
+        let selectedNodes = svg.selectAll(".isSelected");
+
         for (let node of document.querySelectorAll('.isSelected')) {
             node.setAttribute('class', 'node');
         }
 
-        manageSelection();
         RefreshNodes();
         RefreshEdge();
         RefreshLoops();
+        SetDrag(selectedNodes);
     }
 }
 
@@ -274,22 +258,24 @@ function third_point_of_curved_edge(pa, pb, d) {
 // aspect ratio, so that the graph takes the whole javascript
 // window and is centered
 function center_and_scale() {
-    var minx = graphJSON.pos[0][0];
-    var maxx = graphJSON.pos[0][0];
-    var miny = graphJSON.pos[0][1];
-    var maxy = graphJSON.pos[0][1];
 
-    //Determine Min/Max
-    graphJSON.nodes.forEach(function (d, i) {
-        maxx = Math.max(maxx, graphJSON.pos[i][0]);
-        minx = Math.min(minx, graphJSON.pos[i][0]);
-        maxy = Math.max(maxy, graphJSON.pos[i][1]);
-        miny = Math.min(miny, graphJSON.pos[i][1]);
+    if (force.nodes().length != 0) {
+        var minx = force.nodes()[0].fx;
+        var maxx = force.nodes()[0].fx;
+        var miny = force.nodes()[0].fy;
+        var maxy = force.nodes()[0].fy;
+    }
+
+    force.nodes().forEach(function (d, i) {
+        maxx = Math.max(maxx, d.fx);
+        minx = Math.min(minx, d.fx);
+        maxy = Math.max(maxy, d.fy);
+        miny = Math.min(miny, d.fy);
     });
 
     var border = 60;
-    var xspan = maxx - minx;
-    var yspan = maxy - miny;
+    var xspan = maxx - minx == 0 ? 1 : maxx - minx;
+    var yspan = maxy - miny == 0 ? 1 : maxy - miny;
 
     var w = width();
     var h = height();
@@ -298,45 +284,42 @@ function center_and_scale() {
     var yshift = (h - scale * yspan) / 2;
 
     force.nodes().forEach(function (d, i) {
-        d.x = scale * (graphJSON.pos[i][0] - minx) + xshift;
-        d.y = scale * (graphJSON.pos[i][1] - miny) + yshift;
-        d.px = d.x;
-        d.py = d.y;
+        d.fx = scale * (d.fx - minx) + xshift;
+        d.fy = scale * (d.fy - miny) + yshift;
     });
 }
 
 //Define all forces movements
 function InitForce() {
     force.on("tick", function () {
-
         // Position of vertices
         nodes.attr("cx", function (d) {
-            return d.x;
+            return d.fx;
         })
             .attr("cy", function (d) {
-                return d.y;
-            });
+                return d.fy;
+            })
         // Position of edges
         links.attr("d", function (d) {
 
             // Straight edges
             if (d.curve == 0) {
-                return "M" + d.source.x + "," + d.source.y + " L" + d.target.x + "," + d.target.y;
+                return "M" + d.source.fx + "," + d.source.fy + " L" + d.target.fx + "," + d.target.fy;
             }
             // Curved edges
             else {
                 var p = third_point_of_curved_edge(d.source, d.target, d.curve)
                 return line([{
-                    'x': d.source.x,
-                    'y': d.source.y
+                    'x': d.source.fx,
+                    'y': d.source.fy
                 },
                     {
                         'x': p[0],
                         'y': p[1]
                     },
                     {
-                        'x': d.target.x,
-                        'y': d.target.y
+                        'x': d.target.fx,
+                        'y': d.target.fy
                     }
                 ])
             }
@@ -346,20 +329,20 @@ function InitForce() {
         if (graphJSON.loops.length != 0) {
             loops
                 .attr("cx", function (d) {
-                    return d.source.x;
+                    return d.source.fx;
                 })
                 .attr("cy", function (d) {
-                    return d.source.y - d.curve;
+                    return d.source.fy - d.curve;
                 })
         }
 
         // Position of vertex labels
         v_labels
             .attr("x", function (d) {
-                return d.x + graphJSON.vertex_size;
+                return d.fx + graphJSON.vertex_size;
             })
             .attr("y", function (d) {
-                return d.y;
+                return d.fy;
             })
         // Position of the edge labels
         e_labels
@@ -371,10 +354,10 @@ function InitForce() {
             })
         l_labels
             .attr("x", function (d) {
-                return d.source.x;
+                return d.source.fx;
             })
             .attr("y", function (d) {
-                return d.source.y - 2 * d.curve - 1;
+                return d.source.fy - 2 * d.curve - 1;
             })
     });
 }
@@ -413,19 +396,18 @@ function ManageAllGraphicsElements() {
 function InitBrush() {
     brush = svg.append("g")
         .attr("class", "brush")
-        .call(d3.svg.brush()
-            .x(d3.scale.identity().domain([-100000, 100000]))
-            .y(d3.scale.identity().domain([-100000, 100000]))
-            .on("brushstart", function () {
+        .call(d3.brush()
+        .extent( [ [0,0], [100000,100000] ] )
+        .on("start", function () {
                 ResetSelection();
             })
-            .on("brushend", function () {
-                var extent = d3.event.target.extent();
+        .on("end", function () {
+                var extent = d3.brushSelection(this) ||
+                [[0,0],[0,0]];
                 SelectElementsInsideExtent(extent);
 
                 //Remove Selection rectangle
-                d3.event.target.clear();
-                d3.select(this).call(d3.event.target);
+                d3.selectAll("rect.selection").style("display", "none");
             }));
 }
 
@@ -551,9 +533,12 @@ function IsNodeInsideExtent(extent, node) {
 
 function ManageArrows() {
     // Arrows, for directed graphs
-    arrows = svg.append("svg:defs").selectAll("marker")
+    arrows = svg.append("svg:defs").selectAll("marker");
+
+    arrows = arrows
         .data(["directed"])
         .enter().append("svg:marker")
+        .merge(arrows)
         .attr("id", String)
         // viewbox is a rectangle with bottom-left corder (0,-2), width 4 and height 4
         .attr("viewBox", "0 -2 4 4")
@@ -565,15 +550,10 @@ function ManageArrows() {
         .attr("orient", "auto")
         .append("svg:path")
         // triangles with endpoints (0,-2), (4,0), (0,2)
-        .attr("d", "M0,-2L4,0L0,2");
-
-    DisplayArrows();
-}
-
-function DisplayArrows() {
-    arrows.style("fill", function () {
-        return (isDirected) ? "" : "#ffffff00";
-    });
+        .attr("d", "M0,-2L4,0L0,2")
+        .style("fill", function () {
+            return (isDirected) ? "" : "#ffffff00";
+        });
 }
 
 function ManageLoops() {
@@ -581,18 +561,22 @@ function ManageLoops() {
     loops = svg.selectAll(".loop")
         .data(graphJSON.loops);
 
-    loops.enter().append("circle")
+    loops.exit().remove();
+
+    loops = loops
+        .enter().append("circle")
+        .merge(loops)
         .attr("class", "loop")
         .attr("r", function (d) {
             return d.curve;
         })
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, LoopType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, LoopType));
         })
         .style("stroke", function (d) {
@@ -602,8 +586,6 @@ function ManageLoops() {
 
     RefreshLoops();
     ManageLoopLabels();
-
-    loops.exit().remove();
 };
 
 function RefreshLoops() {
@@ -616,12 +598,14 @@ function ManageLoopLabels() {
     l_labels = svg.selectAll(".l_label")
         .data(graphJSON.loops);
 
-    l_labels.enter()
+    l_labels.exit().remove();
+
+    l_labels = l_labels
+        .enter()
         .append("svg:text")
+        .merge(l_labels)
         .attr("class", "l_label")
         .attr("text-anchor", "middle");
-
-    l_labels.exit().remove();
 
     RefreshLoopLabels();
 }
@@ -640,25 +624,27 @@ function RefreshLoopLabels() {
 function ManageEdges() {
     // Edges
     links = svg.selectAll(".link")
-        .data(force.links());
+        .data(graphJSON.links);
 
-    links.enter().append("path")
+    links.exit().remove();
+
+    links = links
+        .enter().append("path")
+        .merge(links)
         .attr("class", "link directed")
         .attr("marker-end", "url(#directed)")
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, EdgeType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, EdgeType));
         })
         .style("stroke-width", graphJSON.edge_thickness + "px");
 
     RefreshEdge();
-
-    links.exit().remove();
 
     ManageEdgeLabels();
 }
@@ -671,14 +657,16 @@ function RefreshEdge() {
 
 function ManageEdgeLabels() {
     e_labels = svg.selectAll(".e_label")
-        .data(force.links());
-
-    e_labels.enter()
-        .append("svg:text")
-        .attr("class", "e_label")
-        .attr("text-anchor", "middle");
+        .data(force.force("link").links());
 
     e_labels.exit().remove();
+
+    e_labels = e_labels
+        .enter()
+        .append("svg:text")
+        .merge(e_labels)
+        .attr("class", "e_label")
+        .attr("text-anchor", "middle");
 
     RefreshEdgeLabels();
 }
@@ -699,14 +687,16 @@ function RefreshEdgeLabels() {
 function ManageNodeLabels() {
     // Vertex labels
     v_labels = svg.selectAll(".v_label")
-        .data(graphJSON.nodes)
-
-    v_labels.enter()
-        .append("svg:text")
-        .attr("class", "v_label")
-        .attr("vertical-align", "middle")
+        .data(graphJSON.nodes);
 
     v_labels.exit().remove();
+
+    v_labels = v_labels
+        .enter()
+        .append("svg:text")
+        .merge(v_labels)
+        .attr("class", "v_label")
+        .attr("vertical-align", "middle");
 
     RefreshNodeLabels();
 }
@@ -725,47 +715,60 @@ function RefreshNodeLabels() {
 function ManageNodes() {
     // Defines nodes elements
     nodes = svg.selectAll(".node")
-        .data(graphJSON.nodes)
+        .data(graphJSON.nodes);
 
-    //Define what happend a data is added
-    nodes.enter().append("circle")
+    //Defines what happend when a data is removed
+    nodes.exit().remove();
+
+    nodes = nodes
+        .enter().append("circle")
+        .merge(nodes)
         .attr("class", "node")
         .attr("r", graphJSON.vertex_size)
-        .on("mouseover", function (currentData) {
+        // .merge(nodes)
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, NodeType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, NodeType));
-        })
-        .call(force.drag()
-            .on('dragstart', function (d) {
+        });
+    
+    SetDrag(nodes);
+
+    RefreshNodes();
+}
+
+function SetDrag(nodes) {
+    nodes
+        .call(d3.drag()
+            .on('start', function (event, d) {
+                if (!event.active) force.alphaTarget(0.3).restart();
                 drag_in_progress = true;
                 d.previousPos = [d.x, d.y];
             })
-            .on('dragend', function (d) {
+            .on('drag', function (event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            })
+            .on('end', function (event, d) {
+                if (!event.active) force.alphaTarget(0);
                 drag_in_progress = false;
-
                 if (d.previousPos[0] != d.x && d.previousPos[1] != d.y) {
                     let finalPos = [d.x, d.y];
                     var positions = new ValueRegisterer(d.previousPos, finalPos, new Element(d, NodeType));
                     MyManager.Execute(new MoveNodeCommand(positions));
                 }
-
             }));
-
-    RefreshNodes();
-
-    //Defines what happend when a data is removed
-    nodes.exit().remove();
 }
 
 function manageSelection() {
-    selectedNodes = svg.selectAll('.isSelected');
+    selectedNodes = svg.selectAll(".isSelected");
     graphSelectedNodes = [];
-    let mousePreviousPos, nodePreviousPos;
+    let mousePreviousPos;
+    let mouseOldPos;
 
 
     for (let node of graphJSON.nodes){
@@ -774,22 +777,29 @@ function manageSelection() {
         }
     }
 
-    selectedNodes.call(force.drag()
-        .on('dragstart', function (d) {
+    selectedNodes.call(d3.drag()
+        .on('start', function (event, d) {
+            if (!event.active) force.alphaTarget(0.3).restart();
             mousePreviousPos = [window.event.clientX, window.event.clientY];
-            nodePreviousPos = [d.px, d.py];
-
+            mouseOldPos = [window.event.clientX, window.event.clientY];
             drag_in_progress = true;
         })
-        .on('dragend', function (d) {
+        .on('drag', function (d) {
+            let mousePosX = window.event.clientX;
+            let mousePosY = window.event.clientY;
+            graphSelectedNodes.forEach((node) => { node.fx += mousePosX - mousePreviousPos[0]; node.fy += mousePosY - mousePreviousPos[1];})
+            mousePreviousPos = [mousePosX, mousePosY];
+        })
+        .on('end', function (event, d) {
+            if (!event.active) force.alphaTarget(0);
             drag_in_progress = false;
             let tabNodes = [];
-
+            let positionsChanged = mouseOldPos[0] != mousePreviousPos[0] || mouseOldPos[1] != mousePreviousPos[1];
             for (let node of graphSelectedNodes) {
-                let previousPos = node != d ? [node.px, node.py] : [nodePreviousPos[0], nodePreviousPos[1]];
-                let finalPos = [previousPos[0] + window.event.clientX - mousePreviousPos[0], previousPos[1] + window.event.clientY - mousePreviousPos[1]];
+                let previousPos = [node.fx - window.event.clientX + mouseOldPos[0], node.fy - window.event.clientY + mouseOldPos[1]];
+                let finalPos = [node.fx, node.fy];
 
-                if (previousPos[0] != finalPos[0] && previousPos[1] != finalPos[1]) {
+                if (positionsChanged) {
                     var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
                     tabNodes.push(positions);
                 }
@@ -814,9 +824,9 @@ function SetNewSelectedNodesPosition(tabNodes) {
 function SetNodePosition(Pos, nodeData) {
     let currrentNode = FindElementInGraph(nodeData);
     force.stop();
-    currrentNode.px = Pos[0];
-    currrentNode.py = Pos[1];
-    force.start();
+    currrentNode.fx = Pos[0];
+    currrentNode.fy = Pos[1];
+    force.restart();
 }
 
 function SetOldPosition(registeredPos) {
@@ -909,14 +919,12 @@ function GetCurrentSelection(allowEmpty = false) {
 function AddNode(newNode) {
     //Add it to the data
     graphJSON.nodes.push(newNode);
-
     //Apply nodes rules to the data
     ManageNodes();
     ManageNodeLabels();
 
     //Restart the force layout with the new elements
-    force.start();
-
+    force.restart();
     return true;
 }
 
@@ -934,11 +942,10 @@ function CreateNode(pos = null) {
     var newNode = {
         group: "0",
         name: FindLowestIDAvailable(),
-        x: newX,
-        y: newY,
-        fixed: is_frozen
+        fx: newX,
+        fy: newY,
+        index: graphJSON.nodes.length
     };
-
     return newNode;
 }
 
@@ -1032,7 +1039,7 @@ function AddEdge(newEdge) {
     graphJSON.links.push(newEdge);
     ManageEdges();
     PlaceBeforeNode("link");
-    force.start();
+    force.restart();
 }
 
 function CreateEdge(src, dest) {
@@ -1054,7 +1061,7 @@ function AddLoop(newLoop) {
     graphJSON.loops.push(newLoop);
     ManageLoops();
     PlaceBeforeNode("loop");
-    force.start();
+    force.restart();
 }
 
 function PlaceBeforeNode(className) {
@@ -1126,6 +1133,7 @@ function RemoveSelection() {
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
+                element.data.isSelected = false;
                 RemoveElementFromGraph(element, isFirst)
                 isFirst = false;
             });
@@ -1150,9 +1158,7 @@ function RemoveEdge(edgeData) {
     if (index != -1) {
         graphJSON.links.splice(index, 1);
         ManageEdges();
-        force.start();
-
-
+        force.restart();
     }
 }
 
@@ -1162,7 +1168,7 @@ function RemoveLoop(loopData) {
     if (index != -1) {
         graphJSON.loops.splice(graphJSON.loops.indexOf(loopData), 1);
         ManageLoops();
-        force.start();
+        force.restart();
 
 
     }
@@ -1190,7 +1196,7 @@ function RemoveNode(nodeData) {
     graphJSON.nodes.splice(graphJSON.nodes.indexOf(nodeData), 1);
     ManageNodes();
     ManageNodeLabels();
-    force.start();
+    force.restart();
 }
 
 function SubdivideEdge(edge, isFirst = true) {
@@ -1300,7 +1306,7 @@ function SetLinkDirection(valueRegisterer) {
     link.source = targetedValue[0];
     link.target = targetedValue[1];
 
-    force.start();
+    force.restart();
 }
 
 function FindElementInGraph(element) {
