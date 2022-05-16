@@ -105,11 +105,13 @@
                             <label for="span_tree">Show spanning tree</label>
                         </tr>
                         <tr>
-                            <td>G6</td>
-                            <td>
-                                <textarea id="g6" rows="1" cols="7"></textarea>
-                                <button onclick="checkIfExist();">Exist</button>
-                            </td>
+                            <div class="horizontal">
+                                <td>G6</td>
+                                <td><textarea id="g6" rows="1" cols="7"></textarea></td>
+                            </div>
+                            <tr>
+                               <td> <button onclick="checkIfExist();">Exists on House of Graphs ?</button></td>
+                            </tr>
                         </tr>
                     </table>
                 </div>
@@ -184,7 +186,9 @@
                             <td id="chromaticIndex"></td>
                         </tr>
                         <tr>
-                            <td><button onclick="montrerHamiltonian()"> Hamiltonian</button></td>
+                            <td>
+                                <button onclick="montrerHamiltonian()"> Hamiltonian</button>
+                            </td>
                             <td id="isHamiltonian"></td>
                         </tr>
                     </table>

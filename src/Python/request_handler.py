@@ -203,16 +203,12 @@ def _get_girth(graph):
     isTree = _the_graph_is_a_tree(graph)
     empty=_the_graph_is_a_forest(graph)
 
-    if (isTree or empty):
-        result="Infinite"
+    if isTree or empty:
+        result="+Infinite"
     else:
         result=graph.girth()
 
 
-    if (isTree):
-        result = "Infinite"
-    else:
-        result = graph.girth()
 
     return [__girthParameter, result], graph
 

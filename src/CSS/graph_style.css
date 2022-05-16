@@ -263,3 +263,7 @@ button:hover {
 #PropertyPanelContent{
     display: block;
 }
+.horizontal{
+    display: flex;
+    flex-direction: row;
+}
