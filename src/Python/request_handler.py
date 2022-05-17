@@ -52,13 +52,16 @@ def _get_graph_properties(graph):
 
 def _span_tree_as_string_array(graph):
     spanTree = graph.min_spanning_tree()
-    stringSpanTree = []
-    for tuple in spanTree:
+    return [__showSpanTreeParameter, coloration_as_string_array(spanTree)], graph
+
+def coloration_as_string_array(coloration):
+    stringColoration = []
+    for tuple in coloration:
         tupleOfStrings = ()
         for v in tuple:
             tupleOfStrings += (str(v),)
-        stringSpanTree.append(tupleOfStrings)
-    return [__showSpanTreeParameter, stringSpanTree], graph
+        stringColoration.append(tupleOfStrings)
+    return stringColoration
 
 
 def convert_sage_types(target):
@@ -136,14 +139,21 @@ def _generate_vertex_coloring_for_JS(graph):
         color = graph_coloring.vertex_coloring(newGraph)
     coloration = []
     for col in color:
-        coloration.append(list(col))
+        colorationClass = []
+        for c in col:
+            colorationClass.append(str(c))
+        coloration.append(colorationClass)
 
     return [__vertexColoringParameter, coloration], graph
 
 
 def _generate_edge_coloring_for_JS(graph):
     print("Generated edge coloration")
-    return [__edgeColoringParameter, graph_coloring.edge_coloring(graph)], graph
+    edgeColoring = graph_coloring.edge_coloring(graph)
+    coloration = []
+    for colorationClass in edgeColoring:
+        coloration.append(coloration_as_string_array(colorationClass))
+    return [__edgeColoringParameter, coloration], graph
 
 
 def _convert_graph_digraph_bidirectionnal_for_JS(graph):
