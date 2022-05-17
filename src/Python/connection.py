@@ -111,6 +111,7 @@ def message_received(client, server, message):
 			response, newGraph = handle_message(JSONmessage.parameter,targetGraph)
 		else:
 			newGraph = ConstructGraphFromJSONObject(JSONmessage)
+			CheckForUnsetPositions(targetGraph, newGraph, JSONmessage)
 			if JSONmessage.parameter == "switchLock":
 				response = handle_message(JSONmessage.parameter, None, None, client)
 			elif JSONmessage.parameter == "save":

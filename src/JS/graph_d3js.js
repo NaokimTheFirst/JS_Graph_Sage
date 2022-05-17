@@ -935,6 +935,8 @@ function CreateNode(pos = null) {
         name: FindLowestIDAvailable(),
         fx: newX,
         fy: newY,
+        x: newX,
+        y: newY,
         index: graphJSON.nodes.length
     };
     return newNode;
