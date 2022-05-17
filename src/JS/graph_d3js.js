@@ -1,10 +1,10 @@
 //The graph properties
 var graphJSON, force, customColorScale;
 var width = function () {
-    return document.documentElement.clientWidth * 0.7
+    return document.documentElement.clientWidth*0.9
 };
 var height = function () {
-    return document.documentElement.clientHeight
+    return document.documentElement.clientHeight*0.9
 };
 var xshift = function () {
     return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;
@@ -94,6 +94,7 @@ function PageOpenOrReload() {
     }
 }
 
+
 window.onresize = function() {
     if (typeof graphJSON != "undefined") {
         OptimizeVertexSize();
@@ -128,11 +129,19 @@ function OptimizeVertexSize() {
 
 function InitNewGraph(graph = null) {
     if (force) force.stop();
+
+
+     // transformation des données JSON et format D3 JS
+     // on rajoute les premiers attributs SVG et réalise les calculs des placements des points
+   // on place l'interface en fonction de la taille du navigateur
+     //implementation de tout les élements graphique
+
     LoadGraphData(graph);
     OptimizeVertexSize();
     InitGraph();
     InitInterface();
     ManageAllGraphicsElements();
+
     InitForce();
 }
 
@@ -1368,59 +1377,104 @@ function DeleteAllEdgeGroups() {
     });
 }
 
+
 function checkIfExist() {
     window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + document.querySelector("#g6").textContent);
 }
 
-function lightMode() {
-    document.querySelector("body").classList.remove("darkMode");
-    document.querySelector("body").classList.add("lightMode");
-    var all = document.getElementsByTagName("*");
-    for (var i = 0, max = all.length; i < max; i++) {
-        all[i].style.color = "black";
+
+// function dragElement(elmnt) {
+//     let mouseX = 0, mouseY = 0, offsetX, offsetY;
+//     if (document.getElementById(elmnt.id + "header")) {
+//         /* if present, the header is where you move the DIV from:*/
+//         document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+//     } else {
+//         /* otherwise, move the DIV from anywhere inside the DIV:*/
+//         elmnt.onmousedown = dragMouseDown;
+//     }
+
+//     function dragMouseDown(e) {
+//         e = e || window.event;
+//         e.preventDefault();
+
+//         offsetX = e.clientX - elmnt.style.left;
+//         offsetY = e.clientY - elmnt.style.top;
+
+//         mouseX = e.clientX;
+//         mouseY = e.clientY;
+//         document.onmouseup = closeDragElement;
+
+//         document.onmousemove = elementDrag;
+//     }
+
+//     function elementDrag(e) {
+//         e = e || window.event;
+//         e.preventDefault();
+
+//         mouseX = e.clientX;
+//         mouseY = e.clientY;
+
+//         elmnt.style.top = -offsetY + mouseY + "px";
+//         elmnt.style.left = -offsetX + mouseX + "px";
+//     }
+
+//     function closeDragElement() {
+
+//         document.onmouseup = null;
+//         document.onmousemove = null;
+//     }
+// }
+
+    function lightMode() {
+        document.querySelector("body").classList.remove("darkMode");
+        document.querySelector("body").classList.add("lightMode");
+        var all = document.getElementsByTagName("*");
+        for (var i = 0, max = all.length; i < max; i++) {
+            all[i].style.color = "black";
+        }
+        var allButton = document.getElementsByTagName("button");
+        for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+            allButton[j].style.color = "white";
+            allButton[j].style.backgroundColor = "lightblue";
+        }
+        window.localStorage.setItem('themeSelect', 'lightMode');
+        getCookieTheme();
     }
-    var allButton = document.getElementsByTagName("button");
-    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
-        allButton[j].style.color = "white";
-        allButton[j].style.backgroundColor = "lightblue";
+
+    function darkMode() {
+        document.querySelector("body").classList.remove("lightMode");
+        document.querySelector("body").classList.add("darkMode");
+        var all = document.getElementsByTagName("*");
+        for (var i = 0, max = all.length; i < max; i++) {
+            all[i].style.color = "white";
+        }
+        var allButton = document.getElementsByTagName("button");
+        for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+            allButton[j].style.color = "grey";
+            allButton[j].style.backgroundColor = "black";
+        }
+        window.localStorage.setItem('themeSelect', 'darkMode');
+        document.querySelector('#g6').style.color = "black";
+        getCookieTheme();
     }
-    window.localStorage.setItem('themeSelect', 'lightMode');
-    getCookieTheme();
-}
 
-function darkMode() {
-    document.querySelector("body").classList.remove("lightMode");
-    document.querySelector("body").classList.add("darkMode");
-    var all = document.getElementsByTagName("*");
-    for (var i = 0, max = all.length; i < max; i++) {
-        all[i].style.color = "white";
+    function getCookieTheme() {
+        return window.localStorage.getItem('themeSelect')
     }
-    var allButton = document.getElementsByTagName("button");
-    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
-        allButton[j].style.color = "grey";
-        allButton[j].style.backgroundColor = "black";
+
+    function selectModeDependOfCookie() {
+
+        if (getCookieTheme() === 'darkMode') {
+            darkMode();
+
+        } else if (getCookieTheme() === 'lightMode') {
+            lightMode();
+        } else {
+        }
     }
-    window.localStorage.setItem('themeSelect', 'darkMode');
-    document.querySelector('#g6').style.color = "black";
-    getCookieTheme();
-}
 
-function getCookieTheme() {
-    return window.localStorage.getItem('themeSelect')
-}
-
-function selectModeDependOfCookie() {
-
-    if (getCookieTheme() === 'darkMode') {
-        darkMode();
-
-    } else if (getCookieTheme() === 'lightMode') {
-        lightMode();
-    } else {
+    function montrerHamiltonian() {
+        var element = document.getElementById("isHamiltonian");
+        element.style.visibility = "visible";
     }
-}
 
-function montrerHamiltonian() {
-    var element = document.getElementById("isHamiltonian");
-    element.style.visibility = "visible";
-}

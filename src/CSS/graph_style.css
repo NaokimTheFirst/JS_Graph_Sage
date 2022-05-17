@@ -72,7 +72,7 @@ body {
     padding: 0.5%;
     margin-bottom: 2%;
     overflow: hidden;
-    resize: horizontal;
+
 }
 
 #scrollPanel {
@@ -84,6 +84,7 @@ body {
     font-size: large;
     font-weight: bold;
     text-align: center;
+
 }
 
 .PanelContent th {
@@ -254,11 +255,15 @@ button:hover {
 }
 
 .darkMode {
-    background-color: #18191A;
+    background-color: black;
 }
 #isHamiltonian{
     visibility: hidden;
 }
 #PropertyPanelContent{
     display: block;
+}
+.horizontal{
+    display: flex;
+    flex-direction: row;
 }
