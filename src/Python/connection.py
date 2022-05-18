@@ -118,7 +118,7 @@ def message_received(client, server, message):
 				response = handle_message(JSONmessage.parameter, newGraph, targetGraph)
 			
 			elif JSONmessage.parameter == "mergeVertices" : 
-				response, newGraph = handle_message(JSONmessage.parameter, newGraph, None, None, JSONmessage.message)
+				response, newGraph = handle_message(JSONmessage.parameter, newGraph, targetGraph, None, JSONmessage.message)
 			else:
 				response, newGraph = handle_message(JSONmessage.parameter,newGraph)
 
@@ -138,12 +138,12 @@ def message_received(client, server, message):
 def handle_message(parameter, graph, oldGraph = None, client=None, message=None):
 	response = None
 	if parameter is not None:
-		if oldGraph is not None :
+		if message is not None :
+			response, graph = JS_functions_dict[parameter](graph, message, oldGraph)
+		elif oldGraph is not None :
 			response, graph = JS_functions_dict[parameter](graph, oldGraph)
 		elif client is not None :
 			response, graph = JS_functions_dict[parameter](client)
-		elif message is not None :
-			response, graph = JS_functions_dict[parameter](graph, message)
 		else :
 			response, graph = JS_functions_dict[parameter](graph)
 	return response, graph
