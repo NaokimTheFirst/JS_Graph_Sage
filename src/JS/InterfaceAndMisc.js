@@ -235,7 +235,9 @@ function SetProperties(radius,
                        eulerian,
                        g6Value,
                        girth,
-                       hamiltonian
+                       hamiltonian,
+                       edgeConnectivity,
+                       vertexConnectivity
 
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
@@ -251,6 +253,8 @@ function SetProperties(radius,
     overlayElements.g6.textContent = g6Value;
     overlayElements.girth.textContent=girth;
     overlayElements.isHamiltonian.innerHTML=hamiltonian;
+    overlayElements.vertexConnectivity.innerHTML=edgeConnectivity;
+    overlayElements.edgeConnectivity.innerHTML=vertexConnectivity;
 }
 
 function InitInterface() {
