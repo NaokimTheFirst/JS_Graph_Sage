@@ -118,7 +118,7 @@ def message_received(client, server, message):
 				response = handle_message(JSONmessage.parameter, newGraph, targetGraph)
 			
 			elif JSONmessage.parameter == "mergeVertices" : 
-				response = handle_message(JSONmessage.parameter, newGraph, None, None, JSONmessage.message)
+				response, newGraph = handle_message(JSONmessage.parameter, newGraph, None, None, JSONmessage.message)
 			else:
 				response, newGraph = handle_message(JSONmessage.parameter,newGraph)
 
