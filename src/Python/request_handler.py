@@ -54,7 +54,6 @@ def _get_graph_properties(graph):
     response[1].append(ds[0])  # get max degree of the graph
     response[1].append(ds[len(ds) - 1])  # get minimum degree of the graph
     response[1].append(graph.size())
-    response[1].append(False)
     response[1].append(graph.is_eulerian())
     response[1].append(_generate_graph6_formula(graph))
     response[1].append(result)
@@ -294,8 +293,7 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __edgeConnectivityParamater: _get_Edge_Connectivity,
                      __saveGraphParameter: _save_graph,
                      __switchLockParameter: _switch_lock,
-                     __freezeGraphParameter: _freezePositions,
-                     __hamiltonianParameter : _get_IsHamiltonian}
+                     __freezeGraphParameter: _freezePositions}
 
 # def create_show_global_tmp_graph(graph):
 # 	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'

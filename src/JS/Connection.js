@@ -66,8 +66,8 @@ function TreatResponse(response) {
                 response.result[11],
                 response.result[12],
                 response.result[13],
-                  response.result[14],
-                  response.result[15],
+                 response.result[14],
+                response.result[15],
                 response.result[16],
             );
             break;
@@ -125,8 +125,7 @@ function TreatResponse(response) {
             CustomWarn(response.result);
             break;
         case hamiltonianParameter:
-            afficherIsHamiltonian(response.result)
-            alert(response.result())
+            afficherIsHamiltonian(response.result);
             break;
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);

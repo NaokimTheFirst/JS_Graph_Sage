@@ -232,10 +232,10 @@ function SetProperties(radius,
                        maximalDegree,
                        minimalDegree,
                        edges,
-                       halmitonian,
                        eulerian,
                        g6Value,
-                       girth
+                       girth,
+                       hamiltonian
 
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
@@ -247,10 +247,10 @@ function SetProperties(radius,
     overlayElements.maxDegree.innerHTML = maximalDegree;
     overlayElements.minDegree.innerHTML = minimalDegree;
     overlayElements.edgesNumber.innerHTML = edges;
-    overlayElements.isHamiltonian.innerHTML = halmitonian;
     overlayElements.isEulerian.innerHTML = eulerian;
     overlayElements.g6.textContent = g6Value;
     overlayElements.girth.textContent=girth;
+    overlayElements.isHamiltonian.innerHTML=hamiltonian;
 }
 
 function InitInterface() {
