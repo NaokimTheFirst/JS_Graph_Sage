@@ -15,6 +15,7 @@ __edgeConnectivityParamater = "edgeConnectivity"
 __saveGraphParameter = 'save'
 __switchLockParameter = "switchLock"
 __freezeGraphParameter = "freezePositions"
+__hamiltonianParameter = "hamiltonian"
 
 from json import JSONEncoder
 
@@ -32,6 +33,15 @@ def _get_graph_properties(graph):
     else:
         diameter = convert_sage_types(graph.diameter())
 
+    isTree = _the_graph_is_a_tree(graph)
+    empty = _the_graph_is_a_forest(graph)
+
+    if isTree or empty:
+        result = "+Infinite"
+    else:
+        result = graph.girth()
+
+
     response[1].append(radius)
     response[1].append(diameter)
     response[1].append(graph.is_regular())
@@ -47,6 +57,8 @@ def _get_graph_properties(graph):
     response[1].append(False)
     response[1].append(graph.is_eulerian())
     response[1].append(_generate_graph6_formula(graph))
+    response[1].append(result)
+    response[1].append(graph.is_hamiltonian())
     return response, graph
 
 
@@ -221,7 +233,7 @@ def _the_graph_is_a_forest(graph):
 
 def _get_Vertex_Connectivity(graph):
     result = graph.vertex_connectivity()
-    return [__vertexConnectivityParameter, result], graph
+    return [__vertexConnectivityParameter, int(result)], graph
 
 
 def _get_Chromatic_Number(graph):
@@ -233,7 +245,9 @@ def _get_Chromatic_Index(graph):
     result = graph.chromatic_index()
     return [__chromaticIndexParamater, result], graph
 
-
+def _get_IsHamiltonian(graph):
+    result = graph.is_hamiltonian()
+    return [__hamiltonianParameter, result], graph
 def _get_Edge_Connectivity(graph):
     result = graph.edge_connectivity()
     return [__edgeConnectivityParamater, result], graph
@@ -274,14 +288,14 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __convertGraphParameter: _convert_graph_digraph_bidirectionnal_for_JS,
                      __renewGraphParameter: _get_new_graph_in_JSON_for_JS,
                      __showSpanTreeParameter: _span_tree_as_string_array,
-                     __girthParameter: _get_girth,
                      __vertexConnectivityParameter: _get_Vertex_Connectivity,
                      __chromaticNumberParameter: _get_Chromatic_Number,
                      __chromaticIndexParamater: _get_Chromatic_Index,
                      __edgeConnectivityParamater: _get_Edge_Connectivity,
                      __saveGraphParameter: _save_graph,
                      __switchLockParameter: _switch_lock,
-                     __freezeGraphParameter: _freezePositions}
+                     __freezeGraphParameter: _freezePositions,
+                     __hamiltonianParameter : _get_IsHamiltonian}
 
 # def create_show_global_tmp_graph(graph):
 # 	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'

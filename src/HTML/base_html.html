@@ -60,7 +60,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <button onclick="montrerGirth()">Girth</button>
+                                Girth
                             </td>
                             <td id="Girth"></td>
                         </tr>
@@ -100,6 +100,10 @@
                             <td>Is eulerian</td>
                             <td id="isEulerian"></td>
                         </tr>
+                         <tr>
+                            <td>Is Hamiltonian</td>
+                            <td id="isHamiltonian"></td>
+                        </tr>
                         <tr>
                             <input type="checkbox" id="span_tree"/>
                             <label for="span_tree">Show spanning tree</label>
@@ -109,9 +113,15 @@
                                 <td>G6</td>
                                 <td><textarea id="g6" rows="1" cols="7"></textarea></td>
                             </div>
-                            <tr>
-                               <td> <button onclick="checkIfExist();">Exists on House of Graphs ?</button></td>
-                            </tr>
+
+                        <tr>
+                            <div class="horizontal">
+                                <td>
+                                    <button id="HouseButton" onclick="checkIfExist();">Exists on House of Graphs ?
+                                    </button>
+                                </td>
+                            </div>
+
                         </tr>
                     </table>
                 </div>
@@ -184,12 +194,6 @@
                                 <button onclick="montrerChromaticIndex()">chromatic Index</button>
                             </td>
                             <td id="chromaticIndex"></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <button onclick="montrerHamiltonian()"> Hamiltonian</button>
-                            </td>
-                            <td id="isHamiltonian"></td>
                         </tr>
                     </table>
                 </div>

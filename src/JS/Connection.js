@@ -17,6 +17,7 @@ const edgeConnectivityParamater="edgeConnectivity"
 const saveGraphParamter = "save";
 const switchLockParameter = "switchLock"
 const freezeGraphCoordinates = "freezePositions";
+const hamiltonianParameter="hamiltonian";
 
 
 function InitWebSocketConnection() {
@@ -63,7 +64,11 @@ function TreatResponse(response) {
                 response.result[9],
                 response.result[10],
                 response.result[11],
-                response.result[12]
+                response.result[12],
+                response.result[13],
+                  response.result[14],
+                  response.result[15],
+                response.result[16],
             );
             break;
         case showSpanTreeParameter :
@@ -119,6 +124,10 @@ function TreatResponse(response) {
         case freezeGraphCoordinates:
             CustomWarn(response.result);
             break;
+        case hamiltonianParameter:
+            afficherIsHamiltonian(response.result)
+            alert(response.result())
+            break;
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
             break;
@@ -133,6 +142,9 @@ function UpdateGraphProperties(message = ""){
 
 function montrerGirth(){
     SubmitMessage(girthParameter);
+}
+function montrerHamiltonian(){
+    SubmitMessage(hamiltonianParameter);
 }
 
 function montrerVertexConnectivity() {
@@ -201,7 +213,6 @@ function switchLock(){
 function onCloseClick() {
     webSocket.close();
 }
-
 
 
 

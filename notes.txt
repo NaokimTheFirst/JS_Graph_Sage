@@ -28,5 +28,5 @@ Note: both JavaScript and Python use the same 9001 port to create linked WebSock
 
 Si le Sage affiche une erreur OSError: [Errno 112] Address already in use:
       netstat -ano | findstr :9001 - affiche a la fin le PID du processus
-    taskkill (/F) /PID numeroDePIDTrouve - pour kill le processus sur Windows
+    taskkill /F /PID numeroDePIDTrouve - pour kill le processus sur Windows
 Parfois ce probleme peut etre regle par une simple fermeture du terminal Sage et tous les tabs result.html.

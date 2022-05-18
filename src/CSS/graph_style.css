@@ -5,13 +5,16 @@ body {
     font-family: Arial, serif;
     margin: 0;
 }
-.darkMode body{
+
+.darkMode body {
     background-color: #18191A;
 }
-.lightMode body{
+
+.lightMode body {
     background-color: white;
 }
-.lightMode text{
+
+.lightMode text {
     fill: black;
 }
 
@@ -242,7 +245,8 @@ button:hover {
     fill: white;
 
 }
-#g6{
+
+#g6 {
     color: black;
 }
 
@@ -257,13 +261,18 @@ button:hover {
 .darkMode {
     background-color: black;
 }
-#isHamiltonian{
-    visibility: hidden;
+
+#isHamiltonian {
 }
-#PropertyPanelContent{
+
+#PropertyPanelContent {
     display: block;
+    width: 20%;
 }
-.horizontal{
-    display: flex;
-    flex-direction: row;
+
+
+
+textarea {
+    resize: none;
+
 }

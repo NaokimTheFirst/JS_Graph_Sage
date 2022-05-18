@@ -234,7 +234,8 @@ function SetProperties(radius,
                        edges,
                        halmitonian,
                        eulerian,
-                       g6Value
+                       g6Value,
+                       girth
 
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
@@ -249,6 +250,7 @@ function SetProperties(radius,
     overlayElements.isHamiltonian.innerHTML = halmitonian;
     overlayElements.isEulerian.innerHTML = eulerian;
     overlayElements.g6.textContent = g6Value;
+    overlayElements.girth.textContent=girth;
 }
 
 function InitInterface() {
@@ -506,6 +508,10 @@ function develop(button){
 
 function afficherResultGirth(parameter){
        overlayElements.girth.innerHTML=parameter;
+}
+
+function afficherIsHamiltonian(parameter){
+    overlayElements.isHamiltonian.innerHTML=parameter;
 }
 
 function afficherVertexConnectivity(paramater){
