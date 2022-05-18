@@ -1348,7 +1348,7 @@ function SetLinksColoration(colorationList, id = 0) {
     colorationList.forEach(coloration => {
         coloration.forEach(tuple => {
             link = graphJSON.links.find(function (link) {
-                return link.source.name == tuple[0] && link.target.name == tuple[1];
+                return (link.source.name == tuple[0] && link.target.name == tuple[1]) || (link.source.name == tuple[1] && link.target.name == tuple[0]);
             });
             SetGroupElement(new ValueRegisterer(id, id, new Element(link, EdgeType)));
         });

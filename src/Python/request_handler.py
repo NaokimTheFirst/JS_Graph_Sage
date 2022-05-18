@@ -154,6 +154,7 @@ def _generate_edge_coloring_for_JS(graph):
     coloration = []
     for colorationClass in edgeColoring:
         coloration.append(coloration_as_string_array(colorationClass))
+    print(coloration)
     return [__edgeColoringParameter, coloration], graph
 
 
