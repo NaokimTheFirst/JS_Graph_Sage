@@ -26,7 +26,7 @@ def gen_html_code(JSONgraph):
     #        d3js_script = '<script>' + d3js_code_file.read() + '</script>'
     #else:
         
-    d3js_script = '<script src="https://d3js.org/d3.v4.js"></script>'
+    d3js_script = '<script src="https://d3js.org/d3.v7.js"></script>'
     js_code = js_code.replace('// D3JS_SCRIPT_HEREEEEEEEEEEE', d3js_script)
 
     # Writes the temporary .html file
@@ -150,10 +150,6 @@ def graph_to_JSON(G,
         link_strength = 0
         gravity = 0
         
-        nodesNumber = len(G.get_vertices())
-        if nodesNumber > len(Gpos):
-          Gpos[G.vertices()[nodesNumber-1]] = (0, 0)
-          
         for v in G:
             x, y = Gpos[v]
             pos.append([float(x), float(-y)])
@@ -174,6 +170,14 @@ def graph_to_JSON(G,
     return string
 
 
+def CheckForUnsetPositions(targetGraph, newGraph, newGraphJSON):
+  Gpos = targetGraph.get_pos()
+  if Gpos and len(Gpos) < len(newGraphJSON.nodes):
+    posdict = {}
+    for n in newGraphJSON.nodes:
+        posdict[original_nodes[n.get("name")]] = (n.get("x"),n.get("y"))
+
+    newGraph.set_pos(posdict)
 
 import re, webbrowser, time
 def show_CustomJS(G, layout=None):

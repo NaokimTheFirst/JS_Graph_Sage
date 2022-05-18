@@ -1,10 +1,10 @@
 //The graph properties
 var graphJSON, force, customColorScale;
 var width = function () {
-    return document.documentElement.clientWidth * 0.7
+    return document.documentElement.clientWidth*0.7;
 };
 var height = function () {
-    return document.documentElement.clientHeight
+    return document.documentElement.clientHeight;
 };
 var xshift = function () {
     return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;
@@ -76,7 +76,7 @@ window.onload = function () {
 
     document.body.onmousemove = handleMouseMove;
     // List of colors
-    customColorScale = d3.scaleOrdinal(d3.schemeCategory20);
+    customColorScale = d3.scaleOrdinal(d3.schemePaired);
     KeyboardEventInit();
     // dragElement(document.getElementById("Overlay"));
 }
@@ -94,10 +94,11 @@ function PageOpenOrReload() {
     }
 }
 
+
 window.onresize = function() {
     if (typeof graphJSON != "undefined") {
         OptimizeVertexSize();
-        recenter_and_rescale();
+        center_and_scale();
         UpdateLayout();
     }
 }
@@ -125,45 +126,23 @@ function OptimizeVertexSize() {
     }
 }
 
-/*
-window.onresize = function() {
-    let resizeRate = [width()/oldWindowSize[0], height()/oldWindowSize[1]];
-
-    oldWindowSize[0] = width();
-    oldWindowSize[1] = height();
-
-    svg = d3.select("svg")
-        .attr("width", width())
-        .attr("height", height());
-
-    graph = graphJSON;
-    for (let node of graphJSON.nodes){
-        node.x *= resizeRate[0];
-        node.y *= resizeRate[1];
-        let nodePositions = new ValueRegisterer([node.px,node.py], [node.x, node.y], new Element(node, NodeType));
-        node.px *= resizeRate[0];
-        node.py *= resizeRate[1];
-        SetNewPosition(nodePositions);
-    }
-
-}*/
-
 
 function InitNewGraph(graph = null) {
     if (force) force.stop();
+
+
+     // transformation des données JSON et format D3 JS
+     // on rajoute les premiers attributs SVG et réalise les calculs des placements des points
+   // on place l'interface en fonction de la taille du navigateur
+     //implementation de tout les élements graphique
+
     LoadGraphData(graph);
     OptimizeVertexSize();
     InitGraph();
     InitInterface();
     ManageAllGraphicsElements();
+
     InitForce();
-    // ManageNodeLabels();
-    // ManageEdges();
-    // ManageLoops();
-    // ManageNodes();
-    // ManageArrows();
-    //Start the automatic force layout
-    // force.restart();
 }
 
 function handleMouseMove(event) {
@@ -213,29 +192,20 @@ function InitGraph() {
             .strength(graphJSON.link_strength))
         .force("x", d3.forceX(graphJSON.gravity).x(width()))
         .force("y", d3.forceY(graphJSON.gravity).y(height()));
-        
-        // .charge(graphJSON.charge)
-        // .linkDistance(graphJSON.link_distance)
-        // .linkStrength(graphJSON.link_strength)
-        // .gravity(graphJSON.gravity)
-        // .size([width(), height()])
-        // .links(graphJSON.links)
-        // .nodes(graphJSON.nodes);
 
     force.nodes(graphJSON.nodes);
     force.force("link").links(graphJSON.links);
 
+    force.nodes().forEach((d, i) => { d.fx = graphJSON.pos[i][0]; d.fy = graphJSON.pos[i][1]; });
+
     // Adapts the graph layout to the javascript window's dimensions
-    if (graphJSON.pos.length != 0) {
-        center_and_scale();
-    }
+
+    center_and_scale();
 
     // The function 'line' takes as input a sequence of tuples, and returns a
     // curve interpolating these points.
     line = d3.line()
         .curve(d3.curveCardinal.tension(.2))
-        // .interpolate("cardinal")
-        // .tension(.2)
         .x(function (d) {
             return d.x;
         })
@@ -284,58 +254,28 @@ function third_point_of_curved_edge(pa, pb, d) {
     return [cx + d * nx / nn, cy + d * ny / nn]
 }
 
-function recenter_and_rescale() {
-
-    if (force.nodes().length != 0) {
-        var minx = force.nodes()[0].x;
-        var maxx = force.nodes()[0].x;
-        var miny = force.nodes()[0].y;
-        var maxy = force.nodes()[0].y;
-    }
-
-    force.nodes().forEach(function (d, i) {
-        maxx = Math.max(maxx, d.x);
-        minx = Math.min(minx, d.x);
-        maxy = Math.max(maxy, d.y);
-        miny = Math.min(miny, d.y);
-    });
-
-    var border = 60;
-    var xspan = maxx - minx;
-    var yspan = maxy - miny;
-
-    var w = width();
-    var h = height();
-    var scale = Math.min((h - border) / yspan, (w - border) / xspan);
-    var xshift = (w - scale * xspan) / 2;
-    var yshift = (h - scale * yspan) / 2;
-
-    force.nodes().forEach(function (d, i) {
-        d.fx = scale * (d.x - minx) + xshift;
-        d.fy = scale * (d.y - miny) + yshift;
-    });
-}
-
 // Applies an homothety to the points of the graph respecting the
 // aspect ratio, so that the graph takes the whole javascript
 // window and is centered
 function center_and_scale() {
-    var minx = graphJSON.pos[0][0];
-    var maxx = graphJSON.pos[0][0];
-    var miny = graphJSON.pos[0][1];
-    var maxy = graphJSON.pos[0][1];
 
-    // Determine Min/Max
-    graphJSON.nodes.forEach(function (d, i) {
-        maxx = Math.max(maxx, graphJSON.pos[i][0]);
-        minx = Math.min(minx, graphJSON.pos[i][0]);
-        maxy = Math.max(maxy, graphJSON.pos[i][1]);
-        miny = Math.min(miny, graphJSON.pos[i][1]);
+    if (force.nodes().length != 0) {
+        var minx = force.nodes()[0].fx;
+        var maxx = force.nodes()[0].fx;
+        var miny = force.nodes()[0].fy;
+        var maxy = force.nodes()[0].fy;
+    }
+
+    force.nodes().forEach(function (d, i) {
+        maxx = Math.max(maxx, d.fx);
+        minx = Math.min(minx, d.fx);
+        maxy = Math.max(maxy, d.fy);
+        miny = Math.min(miny, d.fy);
     });
 
     var border = 60;
-    var xspan = maxx - minx;
-    var yspan = maxy - miny;
+    var xspan = maxx - minx == 0 ? 1 : maxx - minx;
+    var yspan = maxy - miny == 0 ? 1 : maxy - miny;
 
     var w = width();
     var h = height();
@@ -344,8 +284,8 @@ function center_and_scale() {
     var yshift = (h - scale * yspan) / 2;
 
     force.nodes().forEach(function (d, i) {
-        d.fx = scale * (graphJSON.pos[i][0] - minx) + xshift;
-        d.fy = scale * (graphJSON.pos[i][1] - miny) + yshift;
+        d.fx = scale * (d.fx - minx) + xshift;
+        d.fy = scale * (d.fy - miny) + yshift;
     });
 }
 
@@ -354,32 +294,32 @@ function InitForce() {
     force.on("tick", function () {
         // Position of vertices
         nodes.attr("cx", function (d) {
-            return d.x;
+            return d.fx;
         })
             .attr("cy", function (d) {
-                return d.y;
+                return d.fy;
             })
         // Position of edges
         links.attr("d", function (d) {
 
             // Straight edges
             if (d.curve == 0) {
-                return "M" + d.source.x + "," + d.source.y + " L" + d.target.x + "," + d.target.y;
+                return "M" + d.source.fx + "," + d.source.fy + " L" + d.target.fx + "," + d.target.fy;
             }
             // Curved edges
             else {
                 var p = third_point_of_curved_edge(d.source, d.target, d.curve)
                 return line([{
-                    'x': d.source.x,
-                    'y': d.source.y
+                    'x': d.source.fx,
+                    'y': d.source.fy
                 },
                     {
                         'x': p[0],
                         'y': p[1]
                     },
                     {
-                        'x': d.target.x,
-                        'y': d.target.y
+                        'x': d.target.fx,
+                        'y': d.target.fy
                     }
                 ])
             }
@@ -389,20 +329,20 @@ function InitForce() {
         if (graphJSON.loops.length != 0) {
             loops
                 .attr("cx", function (d) {
-                    return d.source.x;
+                    return d.source.fx;
                 })
                 .attr("cy", function (d) {
-                    return d.source.y - d.curve;
+                    return d.source.fy - d.curve;
                 })
         }
 
         // Position of vertex labels
         v_labels
             .attr("x", function (d) {
-                return d.x + graphJSON.vertex_size;
+                return d.fx + graphJSON.vertex_size;
             })
             .attr("y", function (d) {
-                return d.y;
+                return d.fy;
             })
         // Position of the edge labels
         e_labels
@@ -414,10 +354,10 @@ function InitForce() {
             })
         l_labels
             .attr("x", function (d) {
-                return d.source.x;
+                return d.source.fx;
             })
             .attr("y", function (d) {
-                return d.source.y - 2 * d.curve - 1;
+                return d.source.fy - 2 * d.curve - 1;
             })
     });
 }
@@ -630,13 +570,13 @@ function ManageLoops() {
         .attr("r", function (d) {
             return d.curve;
         })
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, LoopType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, LoopType));
         })
         .style("stroke", function (d) {
@@ -693,13 +633,13 @@ function ManageEdges() {
         .merge(links)
         .attr("class", "link directed")
         .attr("marker-end", "url(#directed)")
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, EdgeType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, EdgeType));
         })
         .style("stroke-width", graphJSON.edge_thickness + "px");
@@ -786,13 +726,13 @@ function ManageNodes() {
         .attr("class", "node")
         .attr("r", graphJSON.vertex_size)
         // .merge(nodes)
-        .on("mouseover", function (currentData) {
+        .on("mouseover", function (e, currentData) {
             currentObject = new Element(currentData, NodeType)
         })
         .on("mouseout", function () {
             currentObject = null;
         })
-        .on("dblclick", function (currentData) {
+        .on("dblclick", function (e, currentData) {
             SelectElement(new Element(currentData, NodeType));
         });
     
@@ -804,17 +744,17 @@ function ManageNodes() {
 function SetDrag(nodes) {
     nodes
         .call(d3.drag()
-            .on('start', function (d) {
-                if (!d3.event.active) force.alphaTarget(0.3).restart();
+            .on('start', function (event, d) {
+                if (!event.active) force.alphaTarget(0.3).restart();
                 drag_in_progress = true;
                 d.previousPos = [d.x, d.y];
             })
-            .on('drag', function (d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
+            .on('drag', function (event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
             })
-            .on('end', function (d) {
-                if (!d3.event.active) force.alphaTarget(0);
+            .on('end', function (event, d) {
+                if (!event.active) force.alphaTarget(0);
                 drag_in_progress = false;
                 if (d.previousPos[0] != d.x && d.previousPos[1] != d.y) {
                     let finalPos = [d.x, d.y];
@@ -823,45 +763,6 @@ function SetDrag(nodes) {
                 }
             }));
 }
-
-// var mousePreviousPos;
-// var mouseOldPos;
-// var graphSelectedNodes = [];
-
-// function MultiDrag(call) {
-//     for (let node of graphJSON.nodes){
-//         if (node.isSelected){
-//             graphSelectedNodes.push(node);
-//         }
-//     }
-
-//     switch(call) {
-//         case 'start':
-//             mousePreviousPos = [window.event.clientX, window.event.clientY];
-//             mouseOldPos = [window.event.clientX, window.event.clientY];
-//             break;
-//         case 'drag':
-//             let mousePosX = window.event.clientX;
-//             let mousePosY = window.event.clientY;
-//             graphSelectedNodes.forEach((node) => { node.fx += mousePosX - mousePreviousPos[0]; node.fy += mousePosY - mousePreviousPos[1];})
-//             mousePreviousPos = [mousePosX, mousePosY];
-//             break;
-//         case 'end':
-//             let tabNodes = [];
-//             let positionsChanged = mouseOldPos[0] != mousePreviousPos[0] || mouseOldPos[1] != mousePreviousPos[1];
-//             for (let node of graphSelectedNodes) {
-//                 let previousPos = [node.fx - window.event.clientX + mouseOldPos[0], node.fy - window.event.clientY + mouseOldPos[1]];
-//                 let finalPos = [node.fx, node.fy];
-        
-//                 if (positionsChanged) {
-//                     var positions = new ValueRegisterer(previousPos, finalPos, new Element(node, NodeType));
-//                     tabNodes.push(positions);
-//                 }
-//             }
-//             MyManager.Execute(new MoveSelectedNodesCommand(tabNodes));
-//             break;
-//     }
-// }
 
 function manageSelection() {
     selectedNodes = svg.selectAll(".isSelected");
@@ -877,8 +778,8 @@ function manageSelection() {
     }
 
     selectedNodes.call(d3.drag()
-        .on('start', function (d) {
-            if (!d3.event.active) force.alphaTarget(0.3).restart();
+        .on('start', function (event, d) {
+            if (!event.active) force.alphaTarget(0.3).restart();
             mousePreviousPos = [window.event.clientX, window.event.clientY];
             mouseOldPos = [window.event.clientX, window.event.clientY];
             drag_in_progress = true;
@@ -889,8 +790,8 @@ function manageSelection() {
             graphSelectedNodes.forEach((node) => { node.fx += mousePosX - mousePreviousPos[0]; node.fy += mousePosY - mousePreviousPos[1];})
             mousePreviousPos = [mousePosX, mousePosY];
         })
-        .on('end', function (d) {
-            if (!d3.event.active) force.alphaTarget(0);
+        .on('end', function (event, d) {
+            if (!event.active) force.alphaTarget(0);
             drag_in_progress = false;
             let tabNodes = [];
             let positionsChanged = mouseOldPos[0] != mousePreviousPos[0] || mouseOldPos[1] != mousePreviousPos[1];
@@ -1043,6 +944,8 @@ function CreateNode(pos = null) {
         name: FindLowestIDAvailable(),
         fx: newX,
         fy: newY,
+        x: newX,
+        y: newY,
         index: graphJSON.nodes.length
     };
     return newNode;
@@ -1232,6 +1135,7 @@ function RemoveSelection() {
         Object.keys(currentSelection).forEach(objectAttribute => {
             //For each element
             currentSelection[objectAttribute].forEach(element => {
+                element.data.isSelected = false;
                 RemoveElementFromGraph(element, isFirst)
                 isFirst = false;
             });
@@ -1473,9 +1377,11 @@ function DeleteAllEdgeGroups() {
     });
 }
 
+
 function checkIfExist() {
     window.open("https://hog.grinvin.org/DoSearchGraphFromGraph6String.action?graph6String=" + document.querySelector("#g6").textContent);
 }
+
 
 // function dragElement(elmnt) {
 //     let mouseX = 0, mouseY = 0, offsetX, offsetY;
@@ -1519,55 +1425,56 @@ function checkIfExist() {
 //     }
 // }
 
-function lightMode() {
-    document.querySelector("body").classList.remove("darkMode");
-    document.querySelector("body").classList.add("lightMode");
-    var all = document.getElementsByTagName("*");
-    for (var i = 0, max = all.length; i < max; i++) {
-        all[i].style.color = "black";
+    function lightMode() {
+        document.querySelector("body").classList.remove("darkMode");
+        document.querySelector("body").classList.add("lightMode");
+        var all = document.getElementsByTagName("*");
+        for (var i = 0, max = all.length; i < max; i++) {
+            all[i].style.color = "black";
+        }
+        var allButton = document.getElementsByTagName("button");
+        for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+            allButton[j].style.color = "white";
+            allButton[j].style.backgroundColor = "lightblue";
+        }
+        window.localStorage.setItem('themeSelect', 'lightMode');
+        getCookieTheme();
     }
-    var allButton = document.getElementsByTagName("button");
-    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
-        allButton[j].style.color = "white";
-        allButton[j].style.backgroundColor = "lightblue";
+
+    function darkMode() {
+        document.querySelector("body").classList.remove("lightMode");
+        document.querySelector("body").classList.add("darkMode");
+        var all = document.getElementsByTagName("*");
+        for (var i = 0, max = all.length; i < max; i++) {
+            all[i].style.color = "white";
+        }
+        var allButton = document.getElementsByTagName("button");
+        for (var j = 0, jmax = allButton.length; j < jmax; j++) {
+            allButton[j].style.color = "grey";
+            allButton[j].style.backgroundColor = "black";
+        }
+        window.localStorage.setItem('themeSelect', 'darkMode');
+        document.querySelector('#g6').style.color = "black";
+        getCookieTheme();
     }
-    window.localStorage.setItem('themeSelect', 'lightMode');
-    getCookieTheme();
-}
 
-function darkMode() {
-    document.querySelector("body").classList.remove("lightMode");
-    document.querySelector("body").classList.add("darkMode");
-    var all = document.getElementsByTagName("*");
-    for (var i = 0, max = all.length; i < max; i++) {
-        all[i].style.color = "white";
+    function getCookieTheme() {
+        return window.localStorage.getItem('themeSelect')
     }
-    var allButton = document.getElementsByTagName("button");
-    for (var j = 0, jmax = allButton.length; j < jmax; j++) {
-        allButton[j].style.color = "grey";
-        allButton[j].style.backgroundColor = "black";
+
+    function selectModeDependOfCookie() {
+
+        if (getCookieTheme() === 'darkMode') {
+            darkMode();
+
+        } else if (getCookieTheme() === 'lightMode') {
+            lightMode();
+        } else {
+        }
     }
-    window.localStorage.setItem('themeSelect', 'darkMode');
-    document.querySelector('#g6').style.color = "black";
-    getCookieTheme();
-}
 
-function getCookieTheme() {
-    return window.localStorage.getItem('themeSelect')
-}
-
-function selectModeDependOfCookie() {
-
-    if (getCookieTheme() === 'darkMode') {
-        darkMode();
-
-    } else if (getCookieTheme() === 'lightMode') {
-        lightMode();
-    } else {
+    function montrerHamiltonian() {
+        var element = document.getElementById("isHamiltonian");
+        element.style.visibility = "visible";
     }
-}
 
-function montrerHamiltonian() {
-    var element = document.getElementById("isHamiltonian");
-    element.style.visibility = "visible";
-}
