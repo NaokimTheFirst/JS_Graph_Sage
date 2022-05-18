@@ -18,6 +18,7 @@ const saveGraphParamter = "save";
 const switchLockParameter = "switchLock"
 const freezeGraphCoordinates = "freezePositions";
 const hamiltonianParameter="hamiltonian";
+const mergeVerticesParameter = "mergeVertices";
 
 
 function InitWebSocketConnection() {
@@ -127,6 +128,12 @@ function TreatResponse(response) {
         case hamiltonianParameter:
             afficherIsHamiltonian(response.result);
             break;
+        case mergeVerticesParameter:
+          InitNewGraph(StringToObject(response.result));
+          UpdateGraphProperties();
+          CustomWarn("Nodes merged");
+
+              break; 
         default:
             CustomWarn("Undefined response behavior for parameter :" + response.request);
             break;
@@ -211,6 +218,10 @@ function switchLock(){
 
 function onCloseClick() {
     webSocket.close();
+}
+
+function mergeVertices(verticesToMerge){
+  SubmitMessage(mergeVerticesParameter, verticesToMerge);
 }
 
 

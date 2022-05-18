@@ -1,10 +1,10 @@
 //The graph properties
 var graphJSON, force, customColorScale;
 var width = function () {
-    return document.documentElement.clientWidth*0.9
+    return document.documentElement.clientWidth*0.7;
 };
 var height = function () {
-    return document.documentElement.clientHeight*0.9
+    return document.documentElement.clientHeight;
 };
 var xshift = function () {
     return document.getElementById("graphFrame").childNodes[3].getBoundingClientRect().left;
@@ -944,6 +944,8 @@ function CreateNode(pos = null) {
         name: FindLowestIDAvailable(),
         fx: newX,
         fy: newY,
+        x: newX,
+        y: newY,
         index: graphJSON.nodes.length
     };
     return newNode;

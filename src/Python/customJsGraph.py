@@ -150,10 +150,6 @@ def graph_to_JSON(G,
         link_strength = 0
         gravity = 0
         
-        nodesNumber = len(G.get_vertices())
-        if nodesNumber > len(Gpos):
-          Gpos[G.vertices()[nodesNumber-1]] = (0, 0)
-          
         for v in G:
             x, y = Gpos[v]
             pos.append([float(x), float(-y)])
@@ -174,6 +170,14 @@ def graph_to_JSON(G,
     return string
 
 
+def CheckForUnsetPositions(targetGraph, newGraph, newGraphJSON):
+  Gpos = targetGraph.get_pos()
+  if Gpos and len(Gpos) < len(newGraphJSON.nodes):
+    posdict = {}
+    for n in newGraphJSON.nodes:
+        posdict[original_nodes[n.get("name")]] = (n.get("x"),n.get("y"))
+
+    newGraph.set_pos(posdict)
 
 import re, webbrowser, time
 def show_CustomJS(G, layout=None):
