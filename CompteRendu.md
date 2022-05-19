@@ -173,7 +173,7 @@ Faire un bouton("save") qui permet de fixer l'embedding (la possibilité de free
 - Reécrire les positions des sommets dans command stack (utilisés pour Ctrl+Z) chaque fois qu'on appele la fonction `center_and_scale`.
 - Augmenter la taille de menu.
 - Rendre la taille l'interface grapique égale à celle de la fênetre. Ne pas avoir de l'interface derrière le menu (actuellement on peut créer un sommet derrière le menu et c'est un bug.
-- Ajouter une propriète 'Allows Multiple Edges' dans le menu.
+- Ajouter un checkbox 'Allow Multiple Edges' dans le menu.
 - Renommer Key Helper en Key Commands.
 - Rendre Ctrl+Z possible après le merge des sommets.
 - Limiter le nombre de chagements sauvegardé dans le command stack.
