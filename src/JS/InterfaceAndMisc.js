@@ -187,7 +187,13 @@ var overlayElements = {
             this._g6=document.getElementById("g6");
         }
         return this._g6;
-    }
+    },_chromaticIndex:null,
+    get chromaticIndex(){
+        if (!this._chromaticIndex){
+            this._chromaticIndex=document.getElementById("chromaticIndex")
+        }
+        return this._chromaticIndex
+    },
 }
 
 //Return string with time on format "HH:MM""
