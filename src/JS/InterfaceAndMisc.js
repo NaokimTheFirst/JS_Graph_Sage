@@ -159,6 +159,34 @@ var overlayElements = {
             this._girth = document.getElementById("Girth");
         }
         return this._girth;
+    },
+    _vertexConnectivity:null,
+    get vertexConnectivity(){
+        if(!this._vertexConnectivity){
+            this._vertexConnectivity=document.getElementById("vertexConnectivity");
+        }
+        return this._vertexConnectivity
+    },
+    _chromaticNumber:null,
+    get chromaticNumber(){
+        if (!this._chromaticNumber){
+            this._chromaticNumber=document.getElementById("chromaticNumber")
+        }
+        return this._chromaticNumber
+    },
+    _edgeConnectivity:null,
+    get edgeConnectivity(){
+        if (!this._edgeConnectivity){
+            this._edgeConnectivity=document.getElementById("edgeConnectivity")
+        }
+        return this._edgeConnectivity
+    },
+     _g6:null,
+    get g6(){
+        if(!this._g6){
+            this._g6=document.getElementById("g6");
+        }
+        return this._g6;
     }
 }
 

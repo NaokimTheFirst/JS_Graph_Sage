@@ -16,7 +16,6 @@ __saveGraphParameter = 'save'
 __switchLockParameter = "switchLock"
 __freezeGraphParameter = "freezePositions"
 __hamiltonianParameter = "hamiltonian"
-
 __mergeVerticesParameter = "mergeVertices"
 
 from json import JSONEncoder
@@ -263,7 +262,7 @@ def _get_IsHamiltonian(graph):
     return [__hamiltonianParameter, result], graph
 def _get_Edge_Connectivity(graph):
     result = graph.edge_connectivity()
-    return [__edgeConnectivityParamater, result], graph
+    return [__edgeConnectivityParamater, int(result)], graph
 
 
 def _save_graph(newGraph, oldGraph):
