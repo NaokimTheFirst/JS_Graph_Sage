@@ -168,4 +168,26 @@ Faire un bouton("save") qui permet de fixer l'embedding (la possibilité de free
 - Taille du menu fixé.
 - Améliorer le positionnement du graphe dans le centre (problème du décalage vers le droit fixé).
     
-**Prochaine reunion :** lundi 16/05 a 16h20 ? 8h30 ? (envoyer un mail au prof)
+#### 19/05/2022 - 12e rdv
+*Nouvelles choses à faire :*
+- Reécrire les positions des sommets dans command stack (utilisés pour Ctrl+Z) chaque fois qu'on appele la fonction `center_and_scale`.
+- Augmenter la taille de menu.
+- Rendre la taille l'interface grapique égale à celle de la fênetre. Ne pas avoir de l'interface derrière le menu (actuellement on peut créer un sommet derrière le menu et c'est un bug.
+- Ajouter une propriète 'Allows Multiple Edges' dans le menu.
+- Renommer Key Helper en Key Commands.
+- Rendre Ctrl+Z possible après le merge des sommets.
+- Limiter le nombre de chagements sauvegardé dans le command stack.
+- Fixer les bugs de G6 window style.
+- Ne pas permettre d'ajouter les changements sur interface avant RedrawGraph si on a fait des changements dans le terminal sage.
+- Bug avec les sommets qui portent le même nom.
+    
+*Travail fait :*
+- Migration d3js de v3 à v7.
+- Drag de la selection (bug fixé).
+- Resize du graph lors du resize de la fenêtre.
+- Problème avec l'ajout des sommets dans un graph avec des sommets positionnés réglé.
+- Coloration des arêtes après edge subdivide.
+- Renommage des boutons.
+- Merge des sommets.
+    
+**Prochaine reunion :** ???
