@@ -167,6 +167,7 @@ def _generate_edge_coloring_for_JS(graph):
     coloration = []
     for colorationClass in edgeColoring:
         coloration.append(coloration_as_string_array(colorationClass))
+    print(coloration)
     return [__edgeColoringParameter, coloration], graph
 
 
@@ -292,7 +293,8 @@ def _freezePositions(graph):
     return [__freezeGraphParameter, "Nodes' positions set"], graph
 
 
-def _mergeVertices(graph, verticesToMerge) :
+def _mergeVertices(graph, verticesToMerge, oldGraph) :
+    graph.set_pos(oldGraph.get_pos())
     verticesToMerge2=casteTypeVertex(graph, verticesToMerge)
     graph.merge_vertices(verticesToMerge2)  
     return [__mergeVerticesParameter, graph_to_JSON(graph, layout=None)], graph
