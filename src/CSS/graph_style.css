@@ -51,7 +51,7 @@ body {
 
 
 #Overlay {
-    width: 180px;
+    width: 20%;
     /*position: absolute;
     top: 0px;
     left: 0px;*/
@@ -67,7 +67,6 @@ body {
 .Panel {
     position: relative;
     z-index: 1;
-    width: 100%;
     height: fit-content;
     pointer-events: auto;
     color: white;
@@ -267,7 +266,11 @@ button:hover {
 
 #PropertyPanelContent {
     display: block;
-    width: 50%;
+
+}
+#PropertyPanelContent button{
+    width: 100%;
+
 }
 
 
@@ -275,4 +278,11 @@ button:hover {
 textarea {
     resize: none;
 
+}
+
+#HouseButton{
+    width: 100%;
+}
+table{
+    width: 100%;
 }

@@ -17,7 +17,7 @@ const edgeConnectivityParamater="edgeConnectivity"
 const saveGraphParamter = "save";
 const switchLockParameter = "switchLock"
 const freezeGraphCoordinates = "freezePositions";
-const hamiltonianParameter="hamiltonian";
+const hamiltonianParameter= "hamiltonian";
 const mergeVerticesParameter = "mergeVertices";
 
 
@@ -69,7 +69,7 @@ function TreatResponse(response) {
                 response.result[13],
                  response.result[14],
                 response.result[15],
-                response.result[16],
+                response.result[16]
             );
             break;
         case showSpanTreeParameter :

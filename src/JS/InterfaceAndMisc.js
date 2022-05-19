@@ -139,12 +139,12 @@ var overlayElements = {
         }
         return this._edgesNumber;
     },
-    _isHamiltonian: null,
-    get isHamiltonian() {
-        if (!this._isHamiltonian) {
-            this._isHamiltonian = document.getElementById("isHamiltonian");
+    _hamiltonian: null,
+    get hamiltonian() {
+        if (!this._hamiltonian) {
+            this._hamiltonian = document.getElementById("isHamiltonian");
         }
-        return this._isHamiltonian;
+        return this._hamiltonian;
     },
     _iseulerian: null,
     get isEulerian() {
@@ -231,7 +231,6 @@ function SetProperties(radius,
                        eulerian,
                        g6Value,
                        girth,
-                       hamiltonian,
                        edgeConnectivity,
                        vertexConnectivity
 
@@ -249,7 +248,6 @@ function SetProperties(radius,
     overlayElements.isEulerian.innerHTML = eulerian;
     overlayElements.g6.textContent = g6Value;
     overlayElements.girth.textContent=girth;
-    overlayElements.isHamiltonian.innerHTML=hamiltonian;
     overlayElements.vertexConnectivity.innerHTML=edgeConnectivity;
     overlayElements.edgeConnectivity.innerHTML=vertexConnectivity;
 
@@ -534,7 +532,7 @@ function afficherResultGirth(parameter){
 
 
 function afficherIsHamiltonian(parameter){
-    overlayElements.isHamiltonian.innerHTML=parameter;
+    overlayElements.hamiltonian.innerHTML=parameter;
 }
 
 function afficherVertexConnectivity(paramater){
@@ -542,14 +540,14 @@ function afficherVertexConnectivity(paramater){
 }
 
 function afficherChromaticNumber(paramater){
-    overlayElements.chromaticNumber.innerHTML=paramater
+    overlayElements.chromaticNumber.innerHTML=paramater;
 }
 
 function afficherChromaticIndex(parameter){
-    overlayElements.chromaticIndex.innerHTML=parameter
+    overlayElements.chromaticIndex.innerHTML=parameter;
 }
 function afficherEdgeConnectivity(parameter){
-    overlayElements.edgeConnectivity.innerHTML=parameter
+    overlayElements.edgeConnectivity.innerHTML=parameter;
 }
 
 

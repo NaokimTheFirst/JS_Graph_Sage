@@ -58,7 +58,6 @@ def _get_graph_properties(graph):
     response[1].append(graph.is_eulerian())
     response[1].append(_generate_graph6_formula(graph))
     response[1].append(result)
-    response[1].append(graph.is_hamiltonian())
     response[1].append(graph.edge_connectivity())
     response[1].append(graph.vertex_connectivity())
     return response, graph
@@ -325,7 +324,8 @@ JS_functions_dict = {__propertiesParameter: _get_graph_properties,
                      __saveGraphParameter: _save_graph,
                      __switchLockParameter: _switch_lock,
                      __freezeGraphParameter: _freezePositions,
-                     __mergeVerticesParameter: _mergeVertices}
+                     __mergeVerticesParameter: _mergeVertices,
+                     __hamiltonianParameter:_get_IsHamiltonian}
 
 # def create_show_global_tmp_graph(graph):
 # 	path_to_tmp_graph = SAGE_TMP+'/tmpJSgraph'
