@@ -339,8 +339,8 @@ function KeyboardEventInit() {
                 break;
             case 65:
                 //A for Add
-                alert(y);
-                if (x >= 256 && y>0 && y>=568 ) result = [AddNewNode(), "Add new node"];
+                //alert("y="+y+ "\nx="+x);
+                if (x >= 256 && y>30 && y<550  ) result = [AddNewNode(), "Add new node"];
                 break;
             case 67 :
                 //C for color
