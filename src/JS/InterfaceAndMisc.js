@@ -1,5 +1,5 @@
 //Counter that will count how many times we press a key
-var countKey = [0,''];
+var countKey = [0, ''];
 
 var originVertex;
 
@@ -160,37 +160,37 @@ var overlayElements = {
         }
         return this._girth;
     },
-    _vertexConnectivity:null,
-    get vertexConnectivity(){
-        if(!this._vertexConnectivity){
-            this._vertexConnectivity=document.getElementById("vertexConnectivity");
+    _vertexConnectivity: null,
+    get vertexConnectivity() {
+        if (!this._vertexConnectivity) {
+            this._vertexConnectivity = document.getElementById("vertexConnectivity");
         }
         return this._vertexConnectivity
     },
-    _chromaticNumber:null,
-    get chromaticNumber(){
-        if (!this._chromaticNumber){
-            this._chromaticNumber=document.getElementById("chromaticNumber")
+    _chromaticNumber: null,
+    get chromaticNumber() {
+        if (!this._chromaticNumber) {
+            this._chromaticNumber = document.getElementById("chromaticNumber")
         }
         return this._chromaticNumber
     },
-    _edgeConnectivity:null,
-    get edgeConnectivity(){
-        if (!this._edgeConnectivity){
-            this._edgeConnectivity=document.getElementById("edgeConnectivity")
+    _edgeConnectivity: null,
+    get edgeConnectivity() {
+        if (!this._edgeConnectivity) {
+            this._edgeConnectivity = document.getElementById("edgeConnectivity")
         }
         return this._edgeConnectivity
     },
-     _g6:null,
-    get g6(){
-        if(!this._g6){
-            this._g6=document.getElementById("g6");
+    _g6: null,
+    get g6() {
+        if (!this._g6) {
+            this._g6 = document.getElementById("g6");
         }
         return this._g6;
-    },_chromaticIndex:null,
-    get chromaticIndex(){
-        if (!this._chromaticIndex){
-            this._chromaticIndex=document.getElementById("chromaticIndex")
+    }, _chromaticIndex: null,
+    get chromaticIndex() {
+        if (!this._chromaticIndex) {
+            this._chromaticIndex = document.getElementById("chromaticIndex")
         }
         return this._chromaticIndex
     },
@@ -233,8 +233,6 @@ function SetProperties(radius,
                        girth,
                        edgeConnectivity,
                        vertexConnectivity
-
-
 ) {
     overlayElements.radiusLabel.innerHTML = radius;
     overlayElements.diameterLabel.innerHTML = diameter;
@@ -247,9 +245,9 @@ function SetProperties(radius,
     overlayElements.edgesNumber.innerHTML = edges;
     overlayElements.isEulerian.innerHTML = eulerian;
     overlayElements.g6.textContent = g6Value;
-    overlayElements.girth.textContent=girth;
-    overlayElements.vertexConnectivity.innerHTML=edgeConnectivity;
-    overlayElements.edgeConnectivity.innerHTML=vertexConnectivity;
+    overlayElements.girth.textContent = girth;
+    overlayElements.vertexConnectivity.innerHTML = edgeConnectivity;
+    overlayElements.edgeConnectivity.innerHTML = vertexConnectivity;
 
 }
 
@@ -328,8 +326,12 @@ function TryAddNewGroup() {
 }
 
 function KeyboardEventInit() {
+
+
     //Keyboard Event
     document.onkeyup = function (key) {
+        var isOnDiv = false;
+
         var result = null;
         switch (key.keyCode) {
             case 46:
@@ -337,7 +339,8 @@ function KeyboardEventInit() {
                 break;
             case 65:
                 //A for Add
-                result = [AddNewNode(), "Add new node"];
+                alert(y);
+                if (x >= 256 && y>0 && y>=568 ) result = [AddNewNode(), "Add new node"];
                 break;
             case 67 :
                 //C for color
@@ -365,23 +368,22 @@ function KeyboardEventInit() {
                 break;
             case 77 :
                 ///M for Merge Vertices
-               let selectedVertices = [];
-               
-               
+                let selectedVertices = [];
 
-                for (let vertex of GetCurrentSelection()['nodes']){
-                     let vertexname = vertex['data']['name'];
-                     selectedVertices.push(vertexname);
+
+                for (let vertex of GetCurrentSelection()['nodes']) {
+                    let vertexname = vertex['data']['name'];
+                    selectedVertices.push(vertexname);
                 }
 
                 countKey[0] = 0;
                 countKey[1] = '';
                 mergeVertices(selectedVertices);
-            
+
 
                 CustomWarn('Vertices merged');
-               
-             
+
+
                 break;
             case 78 :
                 //N for Rename
@@ -501,21 +503,21 @@ function StringToObject(string) {
 function DisplayColoringInText(idHtml, coloring) {
     coloringString = '';
     for (var i = 0; i < coloring.length; i++) {
-      coloringString += "<div><strong>" + (i+1) + ":</strong> ";
-      for (var j = 0; j < coloring[i].length; j++) {
-        coloringString += " (" + coloring[i][j] + ") ";
-      }
-      coloringString += "</div>";
+        coloringString += "<div><strong>" + (i + 1) + ":</strong> ";
+        for (var j = 0; j < coloring[i].length; j++) {
+            coloringString += " (" + coloring[i][j] + ") ";
+        }
+        coloringString += "</div>";
     }
     document.getElementById(idHtml).innerHTML = `
           <button class="x" onclick="this.parentElement.innerHTML = '';"></button> 
           <span id="classes">Classes:</span>` + coloringString;
-  }
+}
 
-function develop(button){
+function develop(button) {
     let content = button.parentNode.nextElementSibling;
     let style = window.getComputedStyle(content).display;
-    if (style == "block"){
+    if (style == "block") {
         content.style.display = "none";
         button.innerHTML = ">";
     } else {
@@ -526,28 +528,29 @@ function develop(button){
     return true;
 }
 
-function afficherResultGirth(parameter){
-       overlayElements.girth.innerHTML=parameter;
+function afficherResultGirth(parameter) {
+    overlayElements.girth.innerHTML = parameter;
 }
 
 
-function afficherIsHamiltonian(parameter){
-    overlayElements.hamiltonian.innerHTML=parameter;
+function afficherIsHamiltonian(parameter) {
+    overlayElements.hamiltonian.innerHTML = parameter;
 }
 
-function afficherVertexConnectivity(paramater){
-    overlayElements.vertexConnectivity.innerHTML=paramater;
+function afficherVertexConnectivity(paramater) {
+    overlayElements.vertexConnectivity.innerHTML = paramater;
 }
 
-function afficherChromaticNumber(paramater){
-    overlayElements.chromaticNumber.innerHTML=paramater;
+function afficherChromaticNumber(paramater) {
+    overlayElements.chromaticNumber.innerHTML = paramater;
 }
 
-function afficherChromaticIndex(parameter){
-    overlayElements.chromaticIndex.innerHTML=parameter;
+function afficherChromaticIndex(parameter) {
+    overlayElements.chromaticIndex.innerHTML = parameter;
 }
-function afficherEdgeConnectivity(parameter){
-    overlayElements.edgeConnectivity.innerHTML=parameter;
+
+function afficherEdgeConnectivity(parameter) {
+    overlayElements.edgeConnectivity.innerHTML = parameter;
 }
 
 
